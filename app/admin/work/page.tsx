@@ -299,7 +299,7 @@ export default function AdminWorkPage() {
   async function uploadFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
     if (!activeFolder) return;
-  
+
     setStatus("");
     try {
       for (const file of Array.from(files)) {
@@ -311,30 +311,19 @@ export default function AdminWorkPage() {
           method: "POST",
           body: form,
         });
-  
+
         const json = await res.json();
         if (!res.ok) throw new Error(json?.error || "Upload failed");
-  
-        // ✅ IMPORTANT: add the uploaded video to the active category using Supabase URL
-        if (json?.src) {
-          updateActive((c) => {
-            const already = (c.videos || []).some((v) => v.src === json.src);
-            if (already) return c;
-            return { ...c, videos: [...(c.videos || []), { src: json.src }] };
-          });
-        }
       }
-  
-      // Keep this (we'll improve it in Step 2)
+
       await loadAvailableFiles(activeFolder);
-      setStatus("Upload complete. Click Save changes to persist.");
+      setStatus("Upload complete.");
     } catch (e: any) {
       setStatus(e?.message || "Upload failed.");
     } finally {
       if (uploadInputRef.current) uploadInputRef.current.value = "";
     }
   }
-  
 
   async function save() {
     setSaving(true);
