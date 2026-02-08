@@ -1,8 +1,7 @@
-import rawWork from "@/content/work.json";
 import { notFound } from "next/navigation";
 import { VideoTripleView } from "@/components/video-triple-view";
 
-const work = rawWork as any;
+export const dynamic = "force-dynamic";
 
 type WorkVideo = { src: string; title?: string };
 type WorkCollection = {
@@ -13,6 +12,20 @@ type WorkCollection = {
   description?: string;
   videos: WorkVideo[];
 };
+type WorkData = { collections: WorkCollection[] };
+
+async function getWork(): Promise<WorkData> {
+  const base =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "");
+
+  const url = `${base}/api/work`;
+
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) return { collections: [] };
+  return res.json();
+}
+
 
 export default async function Page({
   params,
@@ -21,7 +34,8 @@ export default async function Page({
 }) {
   const { slug } = await params;
 
-  const collections = (work.collections ?? []) as WorkCollection[];
+  const work = await getWork();
+  const collections = work.collections ?? [];
   const collection = collections.find((c) => c.slug === slug);
 
   if (!collection) notFound();
