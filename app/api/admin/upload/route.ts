@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
+import { supabaseAdmin } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
 const ALLOWED_EXACT = [
-    "production-house/hero/videos",
-    "production-house/hero/photos",
-    "clients/logos",
-  ] as const;
-  
+  "production-house/hero/videos",
+  "production-house/hero/photos",
+  "clients/logos",
+] as const;
 
 function isAllowedFolder(folder: string) {
   // exact allowed folders
@@ -37,13 +37,6 @@ function safeName(name: string) {
 
 export async function POST(req: Request) {
   try {
-    if (process.env.NODE_ENV !== "development") {
-      return NextResponse.json(
-        { error: "Disabled in production" },
-        { status: 403 }
-      );
-    }
-
     const form = await req.formData();
     const folder = String(form.get("folder") || "");
     const file = form.get("file");
@@ -57,8 +50,6 @@ export async function POST(req: Request) {
     }
 
     const filename = safeName(file.name);
-    const bytes = Buffer.from(await file.arrayBuffer());
-
     const lower = filename.toLowerCase();
 
     const isVideoFolder = folder.endsWith("/videos");
@@ -82,13 +73,52 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid file type" }, { status: 400 });
     }
 
+    // ✅ If it's work/<slug>/videos -> upload to Supabase Storage
+    if (folder.startsWith("work/") && folder.endsWith("/videos")) {
+      const supabase = supabaseAdmin();
+
+      // folder is like: work/<slug>/videos
+      // we want Storage path like: <slug>/videos/<filename>
+      const parts = folder.split("/"); // ["work", "<slug>", "videos"]
+      const slug = parts[1];
+      const objectPath = `${slug}/videos/${Date.now()}-${filename}`.replace(/\s+/g, "-");
+
+      const arrayBuffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+
+      const { error: uploadError } = await supabase.storage
+        .from("work")
+        .upload(objectPath, bytes, {
+          contentType: file.type || "video/mp4",
+          upsert: false,
+        });
+
+      if (uploadError) {
+        return NextResponse.json({ error: uploadError.message }, { status: 500 });
+      }
+
+      const { data: pub } = supabase.storage.from("work").getPublicUrl(objectPath);
+
+      // IMPORTANT: return a src that your front-end can play
+      // We'll use the public URL as src going forward.
+      return NextResponse.json({
+        ok: true,
+        filename: objectPath.split("/").pop(),
+        path: objectPath,
+        url: pub.publicUrl,
+        src: pub.publicUrl,
+      });
+    }
+
+    // ✅ Otherwise, keep old local filesystem behavior (dev/local only)
+    const bytes = Buffer.from(await file.arrayBuffer());
     const absDir = path.join(process.cwd(), "public", folder);
     await fs.mkdir(absDir, { recursive: true });
 
     const absFile = path.join(absDir, filename);
     await fs.writeFile(absFile, bytes);
 
-    return NextResponse.json({ ok: true, filename });
+    return NextResponse.json({ ok: true, filename, src: `/${folder}/${filename}` });
   } catch (e) {
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
