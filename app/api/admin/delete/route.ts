@@ -1,33 +1,41 @@
 import { NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
+import { supabaseAdmin } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
-const ALLOWED_PREFIXES = ["work/", "production-house/hero/"];
-
-function allowed(folder: string) {
-  return ALLOWED_PREFIXES.some((p) => folder.startsWith(p));
-}
-
+// We will support deleting from:
+// - work bucket paths like: "<slug>/videos/<file>.mp4"
 export async function POST(req: Request) {
   try {
-    if (process.env.NODE_ENV !== "development") {
-      return NextResponse.json({ error: "Disabled in production" }, { status: 403 });
+    const body = await req.json();
+
+    // Support either:
+    // { path: "slug/videos/file.mp4" }
+    // or { paths: ["slug/videos/a.mp4", "slug/videos/b.mp4"] }
+    const paths: string[] = Array.isArray(body?.paths)
+      ? body.paths
+      : body?.path
+      ? [body.path]
+      : [];
+
+    if (!paths.length) {
+      return NextResponse.json({ error: "Missing path(s)" }, { status: 400 });
     }
 
-    const { folder, filename } = await req.json();
-
-    if (!folder || !filename) {
-      return NextResponse.json({ error: "Missing folder/filename" }, { status: 400 });
+    // Basic safety: only allow deletes inside "<slug>/videos/"
+    for (const p of paths) {
+      if (!/^[a-z0-9-]+\/videos\/.+$/i.test(p)) {
+        return NextResponse.json({ error: "Path not allowed" }, { status: 400 });
+      }
     }
 
-    if (!allowed(folder)) {
-      return NextResponse.json({ error: "Folder not allowed" }, { status: 400 });
-    }
+    const supabase = supabaseAdmin();
 
-    const abs = path.join(process.cwd(), "public", folder, filename);
-    await fs.unlink(abs);
+    const { error } = await supabase.storage.from("work").remove(paths);
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
     return NextResponse.json({ ok: true });
   } catch (e) {
