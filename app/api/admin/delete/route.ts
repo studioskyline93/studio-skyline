@@ -3,15 +3,13 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
-// We will support deleting from:
-// - work bucket paths like: "<slug>/videos/<file>.mp4"
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    // Support either:
+    // Accept:
     // { path: "slug/videos/file.mp4" }
-    // or { paths: ["slug/videos/a.mp4", "slug/videos/b.mp4"] }
+    // or { paths: ["slug/videos/a.mp4", ...] }
     const paths: string[] = Array.isArray(body?.paths)
       ? body.paths
       : body?.path
@@ -22,7 +20,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing path(s)" }, { status: 400 });
     }
 
-    // Basic safety: only allow deletes inside "<slug>/videos/"
+    // Safety: only allow deletes inside "<slug>/videos/"
     for (const p of paths) {
       if (!/^[a-z0-9-]+\/videos\/.+$/i.test(p)) {
         return NextResponse.json({ error: "Path not allowed" }, { status: 400 });
