@@ -25,33 +25,12 @@ export async function GET() {
       return NextResponse.json({ collections: [] });
     }
 
-    return NextResponse.json(payload);
-  } catch {
-    return NextResponse.json({ collections: [] });
-  }
-}
-
-export async function POST(req: Request) {
-  try {
-    const body = await req.json();
-
-    if (!body || typeof body !== "object" || !Array.isArray(body.collections)) {
-      return NextResponse.json(
-        { error: "Invalid work format: expected { collections: [] }" },
-        { status: 400 }
-      );
-    }
-
-    const supabase = supabaseAdmin();
-
-    const { error } = await supabase
-      .from("content")
-      .upsert({ key: "work", data: body, updated_at: new Date().toISOString() });
-
-    if (error) throw error;
-
-    return NextResponse.json({ ok: true });
-  } catch {
-    return NextResponse.json({ error: "Failed to save work content" }, { status: 500 });
+    return NextResponse.json(payload, { status: 200 });
+  } catch (e: any) {
+    // helpful for debugging (won’t break your UI)
+    return NextResponse.json(
+      { collections: [], error: e?.message || "Failed to load work" },
+      { status: 200 }
+    );
   }
 }
