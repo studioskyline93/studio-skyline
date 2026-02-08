@@ -1,61 +1,125 @@
 import { NextResponse } from "next/server";
+import fs from "fs/promises";
+import path from "path";
 import { supabaseAdmin } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
-export async function GET() {
-  try {
-    const supabase = supabaseAdmin();
+const ALLOWED_EXACT = [
+  "production-house/hero/videos",
+  "production-house/hero/photos",
+  "clients/logos",
+] as const;
 
-    const { data, error } = await supabase
-      .from("content")
-      .select("data")
-      .eq("key", "work")
-      .single();
+function isAllowedFolder(folder: string) {
+  // exact allowed folders
+  if ((ALLOWED_EXACT as readonly string[]).includes(folder)) return true;
 
-    if (error) throw error;
+  // allow work/<slug>/videos
+  // example: "work/stationery/videos"
+  if (!folder.startsWith("work/")) return false;
+  if (!folder.endsWith("/videos")) return false;
 
-    const payload = data?.data;
+  const parts = folder.split("/");
+  // ["work", "<slug>", "videos"]
+  if (parts.length !== 3) return false;
 
-    // If empty or wrong shape, return the expected shape
-    if (!payload || typeof payload !== "object" || !Array.isArray((payload as any).collections)) {
-      return NextResponse.json({ collections: [] });
-    }
+  const slug = parts[1];
+  // only allow safe slugs
+  if (!/^[a-z0-9-]+$/.test(slug)) return false;
 
-    return NextResponse.json(payload);
-  } catch (err) {
-    return NextResponse.json(
-      { error: "Failed to read work content" },
-      { status: 500 }
-    );
-  }
+  return true;
+}
+
+function safeName(name: string) {
+  return name.replace(/[^a-zA-Z0-9._-]/g, "-");
 }
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const form = await req.formData();
+    const folder = String(form.get("folder") || "");
+    const file = form.get("file");
 
-    // keep your sanity check
-    if (!body || typeof body !== "object" || !Array.isArray(body.collections)) {
-      return NextResponse.json(
-        { error: "Invalid work format: expected { collections: [] }" },
-        { status: 400 }
-      );
+    if (!isAllowedFolder(folder)) {
+      return NextResponse.json({ error: "Folder not allowed" }, { status: 400 });
     }
 
-    const supabase = supabaseAdmin();
+    if (!(file instanceof File)) {
+      return NextResponse.json({ error: "Missing file" }, { status: 400 });
+    }
 
-    const { error } = await supabase
-      .from("content")
-      .upsert({ key: "work", data: body, updated_at: new Date().toISOString() });
+    const filename = safeName(file.name);
+    const lower = filename.toLowerCase();
 
-    if (error) throw error;
+    const isVideoFolder = folder.endsWith("/videos");
+    const isPhotoFolder = folder.includes("/photos");
 
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    return NextResponse.json(
-      { error: "Failed to save work content" },
-      { status: 500 }
-    );
+    const isVideo = isVideoFolder && lower.endsWith(".mp4");
+    const isPhoto =
+      isPhotoFolder &&
+      (lower.endsWith(".jpg") ||
+        lower.endsWith(".jpeg") ||
+        lower.endsWith(".png") ||
+        lower.endsWith(".webp"));
+
+    // work uploads are videos only
+    if (folder.startsWith("work/") && !isVideo) {
+      return NextResponse.json({ error: "Only .mp4 allowed" }, { status: 400 });
+    }
+
+    // production-house can be video or photo
+    if (!folder.startsWith("work/") && !isVideo && !isPhoto) {
+      return NextResponse.json({ error: "Invalid file type" }, { status: 400 });
+    }
+
+    // ✅ If it's work/<slug>/videos -> upload to Supabase Storage
+    if (folder.startsWith("work/") && folder.endsWith("/videos")) {
+      const supabase = supabaseAdmin();
+
+      // folder is like: work/<slug>/videos
+      // we want Storage path like: <slug>/videos/<filename>
+      const parts = folder.split("/"); // ["work", "<slug>", "videos"]
+      const slug = parts[1];
+      const objectPath = `${slug}/videos/${Date.now()}-${filename}`.replace(/\s+/g, "-");
+
+      const arrayBuffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+
+      const { error: uploadError } = await supabase.storage
+        .from("work")
+        .upload(objectPath, bytes, {
+          contentType: file.type || "video/mp4",
+          upsert: false,
+        });
+
+      if (uploadError) {
+        return NextResponse.json({ error: uploadError.message }, { status: 500 });
+      }
+
+      const { data: pub } = supabase.storage.from("work").getPublicUrl(objectPath);
+
+      // IMPORTANT: return a src that your front-end can play
+      // We'll use the public URL as src going forward.
+      return NextResponse.json({
+        ok: true,
+        filename: objectPath.split("/").pop(),
+        path: objectPath,
+        url: pub.publicUrl,
+        src: pub.publicUrl,
+      });
+    }
+
+    // ✅ Otherwise, keep old local filesystem behavior (dev/local only)
+    const bytes = Buffer.from(await file.arrayBuffer());
+    const absDir = path.join(process.cwd(), "public", folder);
+    await fs.mkdir(absDir, { recursive: true });
+
+    const absFile = path.join(absDir, filename);
+    await fs.writeFile(absFile, bytes);
+
+    return NextResponse.json({ ok: true, filename, src: `/${folder}/${filename}` });
+  } catch (e) {
+    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }
