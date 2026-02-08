@@ -1,8 +1,6 @@
 import { notFound } from "next/navigation";
 import { VideoTripleView } from "@/components/video-triple-view";
 
-export const dynamic = "force-dynamic";
-
 type WorkVideo = { src: string; title?: string };
 type WorkCollection = {
   slug: string;
@@ -19,24 +17,20 @@ async function getWork(): Promise<WorkData> {
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "");
 
-  const url = `${base}/api/work`;
-
-  const res = await fetch(url, { cache: "no-store" });
+  const res = await fetch(`${base}/api/work`, { cache: "no-store" });
   if (!res.ok) return { collections: [] };
   return res.json();
 }
 
-
 export default async function Page({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }) {
-  const { slug } = await params;
+  const { slug } = params;
 
   const work = await getWork();
-  const collections = work.collections ?? [];
-  const collection = collections.find((c) => c.slug === slug);
+  const collection = (work.collections || []).find((c) => c.slug === slug);
 
   if (!collection) notFound();
 
@@ -59,7 +53,7 @@ export default async function Page({
           ) : null}
         </header>
 
-        <VideoTripleView videos={collection.videos} />
+        <VideoTripleView videos={collection.videos || []} />
 
         {collection.description ? (
           <p className="mt-10 max-w-2xl text-sm leading-relaxed text-zinc-600">
