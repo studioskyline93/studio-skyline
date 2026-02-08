@@ -1,47 +1,39 @@
 import { NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
+import { supabaseAdmin } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
-const ALLOWED = [
-  "production-house/hero/videos",
-  "production-house/hero/photos",
-] as const;
-
-function isAllowedFolder(folder: string) {
-  return (ALLOWED as readonly string[]).includes(folder);
-}
-
-function safeName(name: string) {
-  return name.replace(/[^a-zA-Z0-9._-]/g, "");
-}
-
 export async function POST(req: Request) {
   try {
-    // Safety: dev only
-    if (process.env.NODE_ENV !== "development") {
-      return NextResponse.json(
-        { error: "Delete disabled in production" },
-        { status: 403 }
-      );
-    }
-
     const body = await req.json();
-    const folder = String(body.folder || "");
-    const filename = safeName(String(body.filename || ""));
 
-    if (!isAllowedFolder(folder)) {
-      return NextResponse.json({ error: "Folder not allowed" }, { status: 400 });
+    // Accept:
+    // { path: "slug/videos/file.mp4" }
+    // or { paths: ["slug/videos/a.mp4", ...] }
+    const paths: string[] = Array.isArray(body?.paths)
+      ? body.paths
+      : body?.path
+      ? [body.path]
+      : [];
+
+    if (!paths.length) {
+      return NextResponse.json({ error: "Missing path(s)" }, { status: 400 });
     }
 
-    if (!filename) {
-      return NextResponse.json({ error: "Missing filename" }, { status: 400 });
+    // Safety: only allow deletes inside "<slug>/videos/"
+    for (const p of paths) {
+      if (!/^[a-z0-9-]+\/videos\/.+$/i.test(p)) {
+        return NextResponse.json({ error: "Path not allowed" }, { status: 400 });
+      }
     }
 
-    const absPath = path.join(process.cwd(), "public", folder, filename);
+    const supabase = supabaseAdmin();
 
-    await fs.unlink(absPath);
+    const { error } = await supabase.storage.from("work").remove(paths);
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
     return NextResponse.json({ ok: true });
   } catch (e) {
