@@ -23,9 +23,6 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    if (process.env.NODE_ENV !== "development") {
-      return NextResponse.json({ error: "Disabled in production" }, { status: 403 });
-    }
 
     if (!body || typeof body !== "object") {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
