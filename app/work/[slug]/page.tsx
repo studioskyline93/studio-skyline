@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { VideoTripleView } from "@/components/video-triple-view";
 
 type WorkVideo = { src: string; title?: string };
@@ -13,20 +14,19 @@ type WorkCollection = {
 type WorkData = { collections: WorkCollection[] };
 
 async function getWork(): Promise<WorkData> {
-  const base =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "");
+  const h = await headers();
+  const host = h.get("x-forwarded-host") || h.get("host");
+  const proto = h.get("x-forwarded-proto") || "https";
 
-  const res = await fetch(`${base}/api/work`, { cache: "no-store" });
+  if (!host) return { collections: [] };
+
+  const res = await fetch(`${proto}://${host}/api/work`, { cache: "no-store" });
   if (!res.ok) return { collections: [] };
+
   return res.json();
 }
 
-export default async function Page({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function Page({ params }: { params: { slug: string } }) {
   const { slug } = params;
 
   const work = await getWork();
