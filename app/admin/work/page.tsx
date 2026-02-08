@@ -13,6 +13,12 @@ type WorkCollection = {
 };
 type WorkData = { collections: WorkCollection[] };
 
+function supabasePublicSrcFor(slug: string, filename: string) {
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!base) return "";
+  return `${base}/storage/v1/object/public/work/${slug}/videos/${filename}`;
+}
+
 function isSafeSlug(slug: string) {
   return /^[a-z0-9-]+$/.test(slug);
 }
@@ -263,17 +269,22 @@ export default function AdminWorkPage() {
   // ---------- Videos (existing features) ----------
 
   function addVideoFromFilename(filename: string) {
-    if (!activeSlug || !activeFolder) return;
-
-    const src = `/${activeFolder}/${filename}`;
-
+    if (!active) return;
+  
+    const src = supabasePublicSrcFor(active.slug, filename);
+    if (!src) {
+      setStatus("Missing NEXT_PUBLIC_SUPABASE_URL env var.");
+      return;
+    }
+  
     updateActive((c) => {
       const already = (c.videos || []).some((v) => v.src === src);
       if (already) return c;
-
+  
       return { ...c, videos: [...(c.videos || []), { src }] };
     });
   }
+  
 
   function removeVideo(src: string) {
     updateActive((c) => ({
@@ -298,33 +309,52 @@ export default function AdminWorkPage() {
 
   async function uploadFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
-    if (!activeFolder) return;
-
+    if (!active) return;
+  
     setStatus("");
+  
     try {
       for (const file of Array.from(files)) {
-        const form = new FormData();
-        form.append("folder", activeFolder);
-        form.append("file", file);
-
-        const res = await fetch("/api/admin/upload", {
+        // 1) ask server for a signed upload URL (small request)
+        const metaRes = await fetch("/api/admin/upload-url", {
           method: "POST",
-          body: form,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            slug: active.slug,
+            filename: file.name,
+          }),
         });
-
-        const json = await res.json();
-        if (!res.ok) throw new Error(json?.error || "Upload failed");
+  
+        const meta = await metaRes.json().catch(() => ({}));
+        if (!metaRes.ok) throw new Error(meta?.error || "Failed to start upload");
+  
+        // 2) upload the file directly to Supabase (big file goes here)
+        const putRes = await fetch(meta.signedUrl, {
+          method: "PUT",
+          headers: { "Content-Type": file.type || "video/mp4" },
+          body: file,
+        });
+  
+        if (!putRes.ok) throw new Error("Upload failed");
+  
+        // 3) add the new video to the CURRENT category immediately (so it shows)
+        updateActive((c) => {
+          const already = (c.videos || []).some((v) => v.src === meta.src);
+          if (already) return c;
+          return { ...c, videos: [...(c.videos || []), { src: meta.src }] };
+        });
       }
-
+  
+      // refresh the “Uploaded videos” list
       await loadAvailableFiles(activeFolder);
-      setStatus("Upload complete.");
+      setStatus("Upload complete. Click Save changes to persist.");
     } catch (e: any) {
       setStatus(e?.message || "Upload failed.");
     } finally {
       if (uploadInputRef.current) uploadInputRef.current.value = "";
     }
   }
-
+  
   async function save() {
     setSaving(true);
     setStatus("");
@@ -403,9 +433,10 @@ export default function AdminWorkPage() {
   const activeVideoSrcs = new Set((active?.videos || []).map((v) => v.src));
   const addableFiles = availableFiles.filter((f) => {
     if (!active) return true;
-    const src = `/${activeFolder}/${f}`;
-    return !activeVideoSrcs.has(src);
+    const src = supabasePublicSrcFor(active.slug, f);
+    return src ? !activeVideoSrcs.has(src) : true;
   });
+  
 
   return (
     <main className="px-6 pt-24 pb-16">
