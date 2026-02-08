@@ -233,15 +233,22 @@ export default function AdminWorkPage() {
         // If slug changed, rewrite video src paths to match new slug folder
         const slugChanged = newSlug !== active.slug;
         const nextVideos = slugChanged
-          ? (c.videos || []).map((v) => ({
-              ...v,
-              src: v.src.replace(
-                `/work/${active.slug}/videos/`,
-                `/work/${newSlug}/videos/`
-              ),
-            }))
-          : c.videos || [];
-
+        ? (c.videos || []).map((v) => {
+            // only rewrite LOCAL /work/... paths
+            if (v.src.startsWith(`/work/${active.slug}/videos/`)) {
+              return {
+                ...v,
+                src: v.src.replace(
+                  `/work/${active.slug}/videos/`,
+                  `/work/${newSlug}/videos/`
+                ),
+              };
+            }
+            // keep Supabase URLs untouched
+            return v;
+          })
+        : c.videos || [];
+      
         return {
           ...c,
           slug: newSlug,
@@ -384,17 +391,6 @@ export default function AdminWorkPage() {
 
   async function deleteForever(src: string) {
     if (!src) return;
-    const { folder, filename } = parseSrcToFolderAndFilename(src);
-
-    if (!folder || !filename) {
-      setStatus("Could not determine file path for deletion.");
-      return;
-    }
-
-    const ok1 = window.confirm(
-      `Delete forever?\n\n${filename}\n\nThis will remove the file from /public and cannot be undone.`
-    );
-    if (!ok1) return;
 
     const ok2 = window.confirm(
       "Final confirmation: This is permanent. Delete now?"
@@ -405,23 +401,36 @@ export default function AdminWorkPage() {
     setStatus("");
 
     try {
-      let res = await fetch("/api/admin/delete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ folder, filename }),
-      });
-
-      if (res.status === 405 || res.status === 404) {
-        const qs = new URLSearchParams({ folder, filename }).toString();
-        res = await fetch(`/api/admin/delete?${qs}`, { method: "DELETE" });
+      const base = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+    
+      let res: Response;
+    
+      // If it's a Supabase public URL, delete by storage path
+      if (base && src.startsWith(`${base}/storage/v1/object/public/work/`)) {
+        const path = src.replace(`${base}/storage/v1/object/public/work/`, "");
+    
+        res = await fetch("/api/admin/delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ path }),
+        });
+      } else {
+        // fallback: local /public delete (dev only)
+        const { folder, filename } = parseSrcToFolderAndFilename(src);
+    
+        res = await fetch("/api/admin/delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ folder, filename }),
+        });
       }
-
+    
       const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(json?.error || "Delete failed");
-
+    
       removeVideo(src);
       if (activeFolder) await loadAvailableFiles(activeFolder);
-
+    
       setStatus("Deleted forever. Click Save changes to persist JSON update.");
     } catch (e: any) {
       setStatus(e?.message || "Delete failed.");
