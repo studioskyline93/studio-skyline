@@ -1,17 +1,31 @@
 import { NextResponse } from "next/server";
-import path from "path";
-import fs from "fs/promises";
+import { supabaseAdmin } from "@/lib/supabase/server";
 
-const WORK_PATH = path.join(process.cwd(), "content", "work.json");
+export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    const raw = await fs.readFile(WORK_PATH, "utf-8");
-    const data = JSON.parse(raw);
-    return NextResponse.json(data);
+    const supabase = supabaseAdmin();
+
+    const { data, error } = await supabase
+      .from("content")
+      .select("data")
+      .eq("key", "work")
+      .single();
+
+    if (error) throw error;
+
+    const payload = data?.data;
+
+    // If empty or wrong shape, return the expected shape
+    if (!payload || typeof payload !== "object" || !Array.isArray((payload as any).collections)) {
+      return NextResponse.json({ collections: [] });
+    }
+
+    return NextResponse.json(payload);
   } catch (err) {
     return NextResponse.json(
-      { error: "Failed to read content/work.json" },
+      { error: "Failed to read work content" },
       { status: 500 }
     );
   }
@@ -19,21 +33,28 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const data = await req.json();
+    const body = await req.json();
 
-    // Basic sanity check (keep lightweight)
-    if (!data || typeof data !== "object" || !Array.isArray(data.collections)) {
+    // keep your sanity check
+    if (!body || typeof body !== "object" || !Array.isArray(body.collections)) {
       return NextResponse.json(
-        { error: "Invalid work.json format: expected { collections: [] }" },
+        { error: "Invalid work format: expected { collections: [] }" },
         { status: 400 }
       );
     }
 
-    await fs.writeFile(WORK_PATH, JSON.stringify(data, null, 2) + "\n", "utf-8");
+    const supabase = supabaseAdmin();
+
+    const { error } = await supabase
+      .from("content")
+      .upsert({ key: "work", data: body, updated_at: new Date().toISOString() });
+
+    if (error) throw error;
+
     return NextResponse.json({ ok: true });
   } catch (err) {
     return NextResponse.json(
-      { error: "Failed to write content/work.json" },
+      { error: "Failed to save work content" },
       { status: 500 }
     );
   }

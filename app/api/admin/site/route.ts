@@ -1,21 +1,23 @@
 import { NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
+import { supabaseAdmin } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
-const SITE_PATH = path.join(process.cwd(), "content", "site.json");
-
 export async function GET() {
   try {
-    const raw = await fs.readFile(SITE_PATH, "utf8");
-    const json = JSON.parse(raw);
-    return NextResponse.json(json);
+    const supabase = supabaseAdmin();
+
+    const { data, error } = await supabase
+      .from("content")
+      .select("data")
+      .eq("key", "site")
+      .single();
+
+    if (error) throw error;
+
+    return NextResponse.json(data?.data ?? {});
   } catch (e) {
-    return NextResponse.json(
-      { error: "Failed to read content/site.json" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to read site content" }, { status: 500 });
   }
 }
 
@@ -23,17 +25,20 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-
     if (!body || typeof body !== "object") {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
 
-    await fs.writeFile(SITE_PATH, JSON.stringify(body, null, 2) + "\n", "utf8");
+    const supabase = supabaseAdmin();
+
+    const { error } = await supabase
+      .from("content")
+      .upsert({ key: "site", data: body, updated_at: new Date().toISOString() });
+
+    if (error) throw error;
+
     return NextResponse.json({ ok: true });
   } catch (e) {
-    return NextResponse.json(
-      { error: "Failed to save content/site.json" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to save site content" }, { status: 500 });
   }
 }
