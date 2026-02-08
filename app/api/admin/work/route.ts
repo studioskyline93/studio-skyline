@@ -25,9 +25,8 @@ export async function GET() {
       return NextResponse.json({ collections: [] });
     }
 
-    return NextResponse.json(payload, { status: 200 });
+    return NextResponse.json(payload);
   } catch (e: any) {
-    // helpful for debugging (won’t break your UI)
     return NextResponse.json(
       { collections: [], error: e?.message || "Failed to load work" },
       { status: 200 }
