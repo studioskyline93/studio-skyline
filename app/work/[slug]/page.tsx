@@ -20,7 +20,7 @@ async function getWork(): Promise<WorkData> {
 
   if (!host) return { collections: [] };
 
-  const res = await fetch(`${proto}://${host}/api/work`, { cache: "no-store" });
+  const res = await fetch(`${proto}://${host}/api/admin/work`, { cache: "no-store" });
   if (!res.ok) return { collections: [] };
 
   return res.json();
