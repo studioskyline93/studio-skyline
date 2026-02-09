@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { VideoTripleView } from "@/components/video-triple-view";
@@ -45,13 +44,36 @@ async function getWork(): Promise<WorkData> {
   return res.json();
 }
 
-// FIXED: params is now awaited
+// Tell Next.js which slugs to pre-render
+export async function generateStaticParams() {
+  try {
+    // Use production URL for build time
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || "https://studio-skyline-a2rklciiu-studioskylines-projects.vercel.app";
+    const url = baseUrl.startsWith("http") ? baseUrl : `https://${baseUrl}`;
+    
+    const res = await fetch(`${url}/api/work`, { 
+      cache: "no-store" 
+    });
+    
+    if (!res.ok) return [];
+    
+    const data: WorkData = await res.json();
+    
+    return data.collections.map((c) => ({
+      slug: c.slug,
+    }));
+  } catch (error) {
+    console.error("Failed to generate static params:", error);
+    return [];
+  }
+}
+
 export default async function Page({ 
   params 
 }: { 
   params: Promise<{ slug: string }> 
 }) {
-  const { slug } = await params;  // ← ADD AWAIT HERE
+  const { slug } = await params;
 
   const work = await getWork();
   const collection = (work.collections || []).find((c) => c.slug === slug);
