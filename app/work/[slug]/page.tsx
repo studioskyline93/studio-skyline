@@ -1,11 +1,5 @@
 import { notFound } from "next/navigation";
-import dynamic from "next/dynamic";
-
-// Lazy load the client component (won't run during SSG)
-const VideoTripleView = dynamic(
-  () => import("@/components/video-triple-view").then(mod => ({ default: mod.VideoTripleView })),
-  { ssr: false }
-);
+import { WorkDetailClient } from "@/components/work-detail-client";
 
 type WorkVideo = { src: string; title?: string };
 type WorkCollection = {
@@ -62,7 +56,7 @@ export default async function Page({
           )}
         </header>
 
-        <VideoTripleView 
+        <WorkDetailClient 
           videos={collection.videos || []} 
           collectionIndex={collection.index}
         />
