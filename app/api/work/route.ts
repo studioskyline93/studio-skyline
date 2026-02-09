@@ -26,7 +26,7 @@ export async function GET() {
     }
 
     return NextResponse.json(payload);
-  } catch {
-    return NextResponse.json({ collections: [] });
+  } catch (e) {
+    return NextResponse.json({ collections: [] }, { status: 200 });
   }
 }
