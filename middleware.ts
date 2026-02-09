@@ -4,16 +4,21 @@ import type { NextRequest } from "next/server";
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  const isAdmin =
+  // Only protect admin routes
+  const isAdminRoute =
     pathname.startsWith("/admin") || pathname.startsWith("/api/admin");
 
-  if (!isAdmin) return NextResponse.next();
+  // Let non-admin routes through immediately
+  if (!isAdminRoute) {
+    return NextResponse.next();
+  }
 
-  // Only protect in production
+  // Skip auth in development
   if (process.env.NODE_ENV !== "production") {
     return NextResponse.next();
   }
 
+  // Admin protection logic (only runs for admin routes in production)
   const user = process.env.ADMIN_USER;
   const pass = process.env.ADMIN_PASS;
 
