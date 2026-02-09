@@ -1,4 +1,11 @@
 import { notFound } from "next/navigation";
+import dynamic from "next/dynamic";
+
+// Lazy load the client component (won't run during SSG)
+const VideoTripleView = dynamic(
+  () => import("@/components/video-triple-view").then(mod => ({ default: mod.VideoTripleView })),
+  { ssr: false }
+);
 
 type WorkVideo = { src: string; title?: string };
 type WorkCollection = {
@@ -39,11 +46,33 @@ export default async function Page({
   if (!collection) notFound();
 
   return (
-    <div className="p-8">
-      <h1 className="text-4xl">{collection.title}</h1>
-      <p>{collection.subtitle}</p>
-      <p>Videos: {collection.videos?.length || 0}</p>
-      <pre>{JSON.stringify(collection.videos, null, 2)}</pre>
-    </div>
+    <main className="px-6 pt-24 pb-16">
+      <div className="mx-auto max-w-6xl">
+        <header className="mb-10">
+          {collection.index && (
+            <div className="text-xs tracking-[0.25em] text-zinc-500">
+              {collection.index}
+            </div>
+          )}
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight">
+            {collection.title}
+          </h1>
+          {collection.subtitle && (
+            <p className="mt-2 text-sm text-zinc-600">{collection.subtitle}</p>
+          )}
+        </header>
+
+        <VideoTripleView 
+          videos={collection.videos || []} 
+          collectionIndex={collection.index}
+        />
+
+        {collection.description && (
+          <p className="mt-10 max-w-2xl text-sm leading-relaxed text-zinc-600">
+            {collection.description}
+          </p>
+        )}
+      </div>
+    </main>
   );
 }
