@@ -24,14 +24,19 @@ async function getWork(): Promise<WorkData> {
     "";
 
   const proto = h.get("x-forwarded-proto") || "https";
-
   if (!host) return { collections: [] };
 
   const base = host.startsWith("http") ? host : `${proto}://${host}`;
 
-  const res = await fetch(`${base}/api/work`, { cache: "no-store" });
-  if (!res.ok) return { collections: [] };
+  // ✅ IMPORTANT: forward basic-auth header to internal API
+  const auth = h.get("authorization") || "";
 
+  const res = await fetch(`${base}/api/work`, {
+    cache: "no-store",
+    headers: auth ? { authorization: auth } : undefined,
+  });
+
+  if (!res.ok) return { collections: [] };
   return res.json();
 }
 
