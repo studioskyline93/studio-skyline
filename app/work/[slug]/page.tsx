@@ -28,8 +28,13 @@ async function getWork(): Promise<WorkData> {
 
   const base = host.startsWith("http") ? host : `${proto}://${host}`;
 
-  // ✅ IMPORTANT: forward basic-auth header to internal API
-  const auth = h.get("authorization") || "";
+  const user = process.env.BASIC_AUTH_USER || "";
+  const pass = process.env.BASIC_AUTH_PASS || "";
+
+  const auth =
+    user && pass
+      ? "Basic " + Buffer.from(`${user}:${pass}`).toString("base64")
+      : "";
 
   const res = await fetch(`${base}/api/work`, {
     cache: "no-store",
@@ -39,6 +44,7 @@ async function getWork(): Promise<WorkData> {
   if (!res.ok) return { collections: [] };
   return res.json();
 }
+
 
 
 export default async function Page({ params }: { params: { slug: string } }) {
