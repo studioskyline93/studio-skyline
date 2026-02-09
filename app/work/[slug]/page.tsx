@@ -45,10 +45,13 @@ async function getWork(): Promise<WorkData> {
   return res.json();
 }
 
-
-
-export default async function Page({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+// FIXED: params is now awaited
+export default async function Page({ 
+  params 
+}: { 
+  params: Promise<{ slug: string }> 
+}) {
+  const { slug } = await params;  // ← ADD AWAIT HERE
 
   const work = await getWork();
   const collection = (work.collections || []).find((c) => c.slug === slug);
