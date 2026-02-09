@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { headers } from "next/headers";
 import { VideoTripleView } from "@/components/video-triple-view";
 
 type WorkVideo = { src: string; title?: string };
@@ -14,58 +13,34 @@ type WorkCollection = {
 type WorkData = { collections: WorkCollection[] };
 
 async function getWork(): Promise<WorkData> {
-  const h = await headers();
+  try {
+    // Use the deployed URL directly
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 
+                    process.env.VERCEL_URL || 
+                    "https://studio-skyline.vercel.app";
+    
+    const url = baseUrl.startsWith("http") ? baseUrl : `https://${baseUrl}`;
+    
+    const res = await fetch(`${url}/api/work`, {
+      cache: "no-store",
+    });
 
-  const host =
-    h.get("x-forwarded-host") ||
-    h.get("host") ||
-    process.env.VERCEL_URL ||
-    "";
-
-  const proto = h.get("x-forwarded-proto") || "https";
-  if (!host) return { collections: [] };
-
-  const base = host.startsWith("http") ? host : `${proto}://${host}`;
-
-  const user = process.env.BASIC_AUTH_USER || "";
-  const pass = process.env.BASIC_AUTH_PASS || "";
-
-  const auth =
-    user && pass
-      ? "Basic " + Buffer.from(`${user}:${pass}`).toString("base64")
-      : "";
-
-  const res = await fetch(`${base}/api/work`, {
-    cache: "no-store",
-    headers: auth ? { authorization: auth } : undefined,
-  });
-
-  if (!res.ok) return { collections: [] };
-  return res.json();
+    if (!res.ok) {
+      console.error("Failed to fetch work:", res.status);
+      return { collections: [] };
+    }
+    
+    return res.json();
+  } catch (error) {
+    console.error("Error fetching work:", error);
+    return { collections: [] };
+  }
 }
 
 // Tell Next.js which slugs to pre-render
 export async function generateStaticParams() {
-  try {
-    // Use production URL for build time
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || "https://studio-skyline-a2rklciiu-studioskylines-projects.vercel.app";
-    const url = baseUrl.startsWith("http") ? baseUrl : `https://${baseUrl}`;
-    
-    const res = await fetch(`${url}/api/work`, { 
-      cache: "no-store" 
-    });
-    
-    if (!res.ok) return [];
-    
-    const data: WorkData = await res.json();
-    
-    return data.collections.map((c) => ({
-      slug: c.slug,
-    }));
-  } catch (error) {
-    console.error("Failed to generate static params:", error);
-    return [];
-  }
+  const data = await getWork();
+  return data.collections.map((c) => ({ slug: c.slug }));
 }
 
 export default async function Page({ 
@@ -74,9 +49,8 @@ export default async function Page({
   params: Promise<{ slug: string }> 
 }) {
   const { slug } = await params;
-
   const work = await getWork();
-  const collection = (work.collections || []).find((c) => c.slug === slug);
+  const collection = work.collections.find((c) => c.slug === slug);
 
   if (!collection) notFound();
 
