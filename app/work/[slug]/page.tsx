@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { VideoTripleView } from "@/components/video-triple-view";
@@ -15,16 +16,25 @@ type WorkData = { collections: WorkCollection[] };
 
 async function getWork(): Promise<WorkData> {
   const h = await headers();
-  const host = h.get("x-forwarded-host") || h.get("host");
+
+  const host =
+    h.get("x-forwarded-host") ||
+    h.get("host") ||
+    process.env.VERCEL_URL ||
+    "";
+
   const proto = h.get("x-forwarded-proto") || "https";
 
   if (!host) return { collections: [] };
 
-  const res = await fetch(`${proto}://${host}/api/admin/work`, { cache: "no-store" });
+  const base = host.startsWith("http") ? host : `${proto}://${host}`;
+
+  const res = await fetch(`${base}/api/work`, { cache: "no-store" });
   if (!res.ok) return { collections: [] };
 
   return res.json();
 }
+
 
 export default async function Page({ params }: { params: { slug: string } }) {
   const { slug } = params;
