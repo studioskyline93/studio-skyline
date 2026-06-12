@@ -4,14 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Studio Skyline — Premium Packaging &amp; Print Production</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    /* Force body dark — comes after Tailwind so it wins */
+    html, body {
+      background: #0f0f0f !important;
+      color: #ffffff;
+      margin: 0;
+      overflow-x: hidden;
+    }
 
     /* ══════════════════════════════════════
-       HERO SCROLL ZONE — scoped, no leaks
+       HERO SCROLL ZONE
     ══════════════════════════════════════ */
-
     #hero-scroll-zone {
       position: relative;
       height: 500vh;
@@ -31,7 +37,7 @@
       object-fit: cover;
     }
 
-    /* Fixed scene overlays — only visible during hero scroll */
+    /* Fixed scene overlays */
     .hero-scene {
       position: fixed;
       inset: 0;
@@ -45,11 +51,9 @@
       transition: opacity 0.5s ease;
     }
     .hero-scene .inner { pointer-events: auto; }
-
-    /* Scene 1: right-aligned */
     #scene-1 { align-items: flex-end; padding-right: 4%; }
 
-    /* Glass overlay card */
+    /* Glass card */
     .hero-glass-card {
       background: rgba(0,0,0,0.60);
       backdrop-filter: blur(10px);
@@ -60,17 +64,15 @@
       box-sizing: border-box;
     }
     #scene-1 .hero-glass-card { text-align: right; }
-    #scene-2 .hero-glass-card,
-    #scene-3 .hero-glass-card { text-align: center; }
+    #scene-2 .hero-glass-card { text-align: center; }
 
-    /* Scene headings — scoped, won't touch site content */
+    /* Scene text — fully scoped */
     .hero-scene h1 {
       font-size: clamp(28px, 4vw, 52px);
       font-weight: 900;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       line-height: 1.1;
-      word-break: break-word;
       color: #ffffff;
       text-shadow: 0 2px 20px rgba(0,0,0,0.8);
       margin: 0;
@@ -85,13 +87,6 @@
       margin: 0 0 14px;
       line-height: 1.2;
     }
-    .hero-scene h2.lg {
-      font-size: clamp(26px, 4vw, 52px);
-      font-weight: 900;
-      color: #ffffff;
-      margin-bottom: 28px;
-    }
-    .hero-scene h2.lg .red { color: #cc0000; }
     .hero-scene p.sub {
       font-size: clamp(10px, 1.2vw, 13px);
       font-weight: 300;
@@ -153,26 +148,10 @@
       100% { transform: translateY(0);    opacity: 0; }
     }
 
-    /* Scene 3 CTA button */
-    .btn-hero-cta {
-      background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
-      color: #fff; border: none; cursor: pointer;
-      padding: 14px 36px; border-radius: 999px;
-      font-size: 15px; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      box-shadow: 0 4px 15px rgba(204,0,0,0.35);
-      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
-    }
-    .btn-hero-cta:hover {
-      background: linear-gradient(135deg, #e60000 0%, #b30000 100%);
-      box-shadow: 0 6px 20px rgba(204,0,0,0.55);
-      transform: translateY(-2px) scale(1.04);
-    }
-
     /* Hide scenes once hero is scrolled past */
     body.hero-done .hero-scene { display: none !important; }
 
-    /* Navigation override (glass + fixed, sits above everything) */
+    /* Navigation */
     nav.skyline-nav {
       position: fixed !important;
       top: 0; left: 0; right: 0; z-index: 100;
@@ -213,7 +192,7 @@
     }
   </style>
 </head>
-<body class="text-white font-sans antialiased overflow-x-hidden">
+<body>
 
   <!-- Navigation -->
   <nav class="skyline-nav pointer-events-auto">
@@ -238,7 +217,7 @@
   <!-- Scene 1: Studio Skyline intro -->
   <div id="scene-1" class="hero-scene" style="opacity:1;">
     <div class="inner ss-floating">
-      <div class="hero-glass-card shadow-2xl" style="margin-top:52px;">
+      <div class="hero-glass-card" style="margin-top:52px;">
         <div class="kicker-pill">
           <span class="kicker-dot"></span>
           Graphics &nbsp;✦&nbsp; Design &nbsp;✦&nbsp; Fabrication
@@ -258,7 +237,7 @@
   <!-- Scene 2: Engineering Vision -->
   <div id="scene-2" class="hero-scene">
     <div class="inner ss-floating-delayed">
-      <div class="hero-glass-card shadow-2xl">
+      <div class="hero-glass-card">
         <h2>Engineering Vision</h2>
         <p class="body-text">
           Bridging the gap between raw mechanics and refined aesthetic beauty.
@@ -268,18 +247,8 @@
     </div>
   </div>
 
-  <!-- Scene 3: Start Your Project -->
-  <div id="scene-3" class="hero-scene">
-    <div class="inner ss-floating">
-      <div class="hero-glass-card shadow-2xl">
-        <h2 class="lg">Start Your<br><span class="red">Project</span></h2>
-        <button class="btn-hero-cta">GET A QUOTE</button>
-      </div>
-    </div>
-  </div>
-
   <!-- ══════════════════════════════
-       SITE CONTENT (original index)
+       SITE CONTENT
   ══════════════════════════════ -->
   <div id="site-header"></div>
 
@@ -351,11 +320,10 @@
       <div class="testimonials-track" id="testimonials"></div>
     </div>
 
-  </div><!-- /.site-main -->
+  </div>
 
   <div id="site-footer"></div>
 
-  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="supabase-client.js"></script>
@@ -370,7 +338,6 @@
       const heroZone = document.getElementById('hero-scroll-zone');
       const s1 = document.getElementById('scene-1');
       const s2 = document.getElementById('scene-2');
-      const s3 = document.getElementById('scene-3');
 
       const frameCount = 200;
       canvas.width = 1920; canvas.height = 1080;
@@ -406,13 +373,15 @@
 
         requestAnimationFrame(() => draw(Math.min(frameCount, Math.max(1, Math.ceil(sf * frameCount)))));
 
+        // Scene 1: fades out in first 25%
         s1.style.opacity = sf < 0.25 ? 1 - (sf / 0.25) : 0;
 
-        if (sf >= 0.25 && sf <= 0.65) {
-          s2.style.opacity = sf < 0.35 ? (sf-0.25)/0.1 : sf > 0.55 ? 1-((sf-0.55)/0.1) : 1;
-        } else { s2.style.opacity = 0; }
-
-        s3.style.opacity = sf >= 0.65 ? Math.min(1,(sf-0.65)/0.15) : 0;
+        // Scene 2: fades in at 25%, holds, fades out at 55%
+        if (sf >= 0.25 && sf <= 0.75) {
+          s2.style.opacity = sf < 0.35 ? (sf-0.25)/0.1 : sf > 0.65 ? 1-((sf-0.65)/0.1) : 1;
+        } else {
+          s2.style.opacity = 0;
+        }
 
         if (bottom <= 0 && !heroDone) { heroDone = true;  document.body.classList.add('hero-done'); }
         if (bottom >  0 &&  heroDone) { heroDone = false; document.body.classList.remove('hero-done'); s1.style.opacity = 0; }
