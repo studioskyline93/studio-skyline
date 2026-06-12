@@ -5,11 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Studio Skyline — Premium Packaging &amp; Print Production</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Force body dark — comes after Tailwind so it wins */
     html, body {
-      background: #0f0f0f !important;
+      background: #0f0f0f;
       color: #ffffff;
       margin: 0;
       overflow-x: hidden;
@@ -151,41 +149,10 @@
     /* Hide scenes once hero is scrolled past */
     body.hero-done .hero-scene { display: none !important; }
 
-    /* Navigation */
-    nav.skyline-nav {
-      position: fixed !important;
-      top: 0; left: 0; right: 0; z-index: 100;
-      padding: 20px 44px;
-      display: flex; justify-content: space-between; align-items: center;
-      background: rgba(0,0,0,0.55);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(204,0,0,0.25);
-      text-transform: uppercase; letter-spacing: 0.2em;
-      font-size: 11px; font-weight: 700;
-    }
-    .brand-name {
-      font-weight: 900; font-size: clamp(15px, 2vw, 22px);
-      letter-spacing: 0.25em; color: white; text-decoration: none;
-    }
-    .brand-name .skyline-red { color: #cc0000; font-weight: 300; }
-    .nav-links a {
-      color: rgba(255,255,255,0.80); text-decoration: none; transition: color 0.2s;
-    }
-    .nav-links a:hover { color: #cc0000; }
-    .nav-links .cta {
-      background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
-      color: #fff !important; padding: 10px 24px; border-radius: 999px;
-      font-weight: 700; box-shadow: 0 4px 15px rgba(204,0,0,0.35);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .nav-links .cta:hover {
-      background: linear-gradient(135deg, #e60000 0%, #b30000 100%);
-      box-shadow: 0 6px 20px rgba(204,0,0,0.55);
-      transform: translateY(-2px);
-    }
+    /* Keep shared.js nav on top during hero scroll */
+    #site-header { position: relative; z-index: 100; }
 
     @media (max-width: 720px) {
-      nav.skyline-nav { padding: 16px 20px; }
       .hero-glass-card { padding: 28px 24px; }
       #scene-1 { align-items: center; padding-right: 0; }
       #scene-1 .hero-glass-card { text-align: center; }
@@ -194,16 +161,8 @@
 </head>
 <body>
 
-  <!-- Navigation -->
-  <nav class="skyline-nav pointer-events-auto">
-    <div class="brand-name">STUDIO <span class="skyline-red">SKYLINE</span></div>
-    <div class="nav-links hidden md:flex space-x-10 items-center">
-      <a href="#">Services</a>
-      <a href="work.html">Portfolio</a>
-      <a href="#">About</a>
-      <a href="contact.html" class="cta">Contact Now</a>
-    </div>
-  </nav>
+  <!-- Shared nav injected by shared.js -->
+  <div id="site-header"></div>
 
   <!-- ══════════════════════════════
        PHOTO SCROLL HERO
@@ -250,8 +209,6 @@
   <!-- ══════════════════════════════
        SITE CONTENT
   ══════════════════════════════ -->
-  <div id="site-header"></div>
-
   <div class="site-main">
 
     <div class="hero-card">
