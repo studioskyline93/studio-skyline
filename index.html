@@ -10,7 +10,7 @@
       overflow-x: hidden;
     }
 
-    /* ═════════════════════════════════════
+    /* ══════════════════════════════════════
        HERO SCROLL ZONE
     ══════════════════════════════════════ */
     #hero-scroll-zone {
@@ -146,8 +146,41 @@
     /* Hide scenes once hero is scrolled past */
     body.hero-done .hero-scene { display: none !important; }
 
-    /* Keep shared.js nav on top during hero scroll */
+    /* Skip button — fixed bottom-centre during hero scroll */
+    #hero-skip {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 999px;
+      padding: 10px 24px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: background 0.2s, border-color 0.2s;
+      pointer-events: auto;
+    }
+    #hero-skip:hover {
+      background: rgba(255,255,255,0.22);
+      border-color: rgba(255,255,255,0.6);
+    }
+    body.hero-done #hero-skip { display: none; }
+
+    /* site-header: normal flow during hero, fixed once past it */
     #site-header { position: relative; z-index: 100; }
+    body.hero-done #site-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+    }
+    body.hero-done .site-main { padding-top: 80px; }
 
     @media (max-width: 720px) {
       .hero-glass-card { padding: 28px 24px; }
@@ -160,6 +193,9 @@
 
   <!-- Shared nav injected by shared.js -->
   <div id="site-header"></div>
+
+  <!-- Skip button (visible during hero scroll) -->
+  <button id="hero-skip" onclick="skipHero()">Skip intro ↓</button>
 
   <!-- ══════════════════════════════
        PHOTO SCROLL HERO
@@ -285,6 +321,13 @@
   <script src="data.js"></script>
 
   <script>
+    /* ── Skip hero ── */
+    function skipHero() {
+      const heroZone = document.getElementById('hero-scroll-zone');
+      const target = heroZone.offsetTop + heroZone.offsetHeight;
+      window.scrollTo({ top: target, behavior: 'smooth' });
+    }
+
     /* ── Hero photo scroll ── */
     (function () {
       const canvas   = document.getElementById('hero-lightpass');
