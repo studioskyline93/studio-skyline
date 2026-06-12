@@ -78,6 +78,7 @@
 </head>
 <body>
   <div id="site-header"></div>
+  <div id="adminContent" style="display:none">
 
   <div class="site-main">
     <div class="toolbar">
@@ -110,6 +111,7 @@
     </div>
   </div>
 
+  </div><!-- end adminContent -->
   <div id="site-footer"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -414,7 +416,9 @@
     }
 
     // --- Init ---
-    loadAll();
+    function onAdminReady() { loadAll(); }
+    document.addEventListener("DOMContentLoaded", initAdminAuth);
   </script>
+  <script src="admin-auth.js"></script>
 </body>
 </html>

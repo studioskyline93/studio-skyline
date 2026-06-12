@@ -22,6 +22,7 @@
 <body>
   <div id="site-header"></div>
 
+  <div id="adminContent" style="display:none">
   <div class="site-main">
     <h1 style="font-size:24px; font-weight:600; letter-spacing:-0.02em">Studio Admin</h1>
     <p style="margin-top:8px; font-size:14px; color:var(--zinc-600)">Manage site content without touching code.</p>
@@ -45,8 +46,14 @@
       </div>
     </div>
   </div>
+  </div>
 
   <div id="site-footer"></div>
+  <script src="supabase-config.js"></script>
   <script src="shared.js"></script>
+  <script src="admin-auth.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", initAdminAuth);
+  </script>
 </body>
 </html>
