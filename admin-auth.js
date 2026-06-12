@@ -58,6 +58,7 @@ function tryLogin() {
 
 function initAdminAuth() {
   if (checkAdminAuth()) {
+    document.getElementById("adminContent").style.display = "";
     if (typeof onAdminReady === "function") onAdminReady();
   } else {
     showLoginScreen();
