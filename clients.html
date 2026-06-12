@@ -29,37 +29,60 @@
 
   <div id="site-footer"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-client.js"></script>
   <script src="shared.js"></script>
   <script src="data.js"></script>
   <script>
-    // Clients
-    var cGrid = document.getElementById("clientsGrid");
-    var cHtml = "";
-    CLIENTS.forEach(function(c) {
-      var inner = c.logo
-        ? '<img src="' + c.logo + '" alt="' + c.name + '">'
-        : '<span class="name">' + c.name + '</span>';
-
-      if (c.url) {
-        cHtml += '<a href="' + c.url + '" target="_blank" rel="noopener noreferrer" class="client-cell">' + inner + '</a>';
-      } else {
-        cHtml += '<div class="client-cell">' + inner + '</div>';
+    function renderClients(clients) {
+      var el = document.getElementById("clientsGrid");
+      if (!clients || clients.length === 0) {
+        el.innerHTML = '<div style="font-size:14px; color:var(--zinc-500); padding:20px">No clients yet.</div>';
+        return;
       }
-    });
-    cGrid.innerHTML = cHtml;
+      var html = "";
+      clients.forEach(function(c) {
+        var inner = c.logo
+          ? '<img src="' + c.logo + '" alt="' + (c.name || '') + '">'
+          : '<span class="name">' + (c.name || '') + '</span>';
 
-    // Videos
-    var vGrid = document.getElementById("videosGrid");
-    var vHtml = "";
-    VIDEOS.forEach(function(v) {
-      vHtml += '<div class="video-card">' +
-        '<div class="aspect"><iframe src="https://www.youtube.com/embed/' + v.youtubeId + '" title="' + v.title + '" ' +
-        'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>' +
-        '<div class="info"><h3>' + v.title + '</h3>' +
-        (v.note ? '<p>' + v.note + '</p>' : '') +
-        '</div></div>';
-    });
-    vGrid.innerHTML = vHtml;
+        if (c.url) {
+          html += '<a href="' + c.url + '" target="_blank" rel="noopener noreferrer" class="client-cell">' + inner + '</a>';
+        } else {
+          html += '<div class="client-cell">' + inner + '</div>';
+        }
+      });
+      el.innerHTML = html;
+    }
+
+    function renderVideos(videos) {
+      var el = document.getElementById("videosGrid");
+      if (!videos || videos.length === 0) {
+        el.innerHTML = '<div style="font-size:14px; color:var(--zinc-500)">No videos yet.</div>';
+        return;
+      }
+      var html = "";
+      videos.forEach(function(v) {
+        html += '<div class="video-card">' +
+          '<div class="aspect"><iframe src="https://www.youtube.com/embed/' + v.youtubeId + '" title="' + (v.title || '') + '" ' +
+          'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>' +
+          '<div class="info"><h3>' + (v.title || '') + '</h3>' +
+          (v.note ? '<p>' + v.note + '</p>' : '') +
+          '</div></div>';
+      });
+      el.innerHTML = html;
+    }
+
+    (async function() {
+      var site = await loadSiteContent();
+
+      var clients = (site && Array.isArray(site.clients)) ? site.clients : CLIENTS;
+      renderClients(clients);
+
+      var videos = (site && Array.isArray(site.videos)) ? site.videos : VIDEOS;
+      renderVideos(videos);
+    })();
   </script>
 </body>
 </html>

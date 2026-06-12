@@ -24,14 +24,14 @@
     .field-group input:focus, .field-group textarea:focus { border-color: var(--zinc-400); }
     .field-group textarea { min-height: 80px; resize: vertical; }
 
-    .testimonial-row {
+    .item-row {
       border-radius: 12px; border: 1px solid rgba(228,228,231,0.6);
       padding: 16px; margin-top: 12px;
     }
-    .testimonial-row .field-group { margin-top: 8px; }
-    .testimonial-header { display: flex; align-items: center; justify-content: space-between; }
-    .testimonial-header span { font-size: 14px; font-weight: 500; }
-    .testimonial-header button { font-size: 13px; color: #dc2626; background: none; border: none; cursor: pointer; text-decoration: underline; }
+    .item-row .field-group { margin-top: 8px; }
+    .item-header { display: flex; align-items: center; justify-content: space-between; }
+    .item-header span { font-size: 14px; font-weight: 500; }
+    .item-header button { font-size: 13px; color: #dc2626; background: none; border: none; cursor: pointer; text-decoration: underline; }
 
     .status-bar {
       margin-top: 24px; border-radius: 12px; border: 1px solid rgba(228,228,231,0.6);
@@ -41,6 +41,20 @@
 
     .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .toolbar .spacer { flex: 1; }
+
+    .field-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .media-item {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      border-radius: 12px; border: 1px solid rgba(228,228,231,0.6);
+      padding: 12px; margin-top: 8px;
+    }
+    .media-item-info { flex: 1; min-width: 0; }
+    .media-item-info .name { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .media-item-info .meta { font-size: 12px; color: var(--zinc-500); }
+    .media-item-actions { display: flex; gap: 8px; }
+    .media-item-actions button { font-size: 13px; background: none; border: none; cursor: pointer; text-decoration: underline; }
+    .media-item-actions .danger { color: #dc2626; }
   </style>
 </head>
 <body>
@@ -51,7 +65,7 @@
     <div class="toolbar">
       <div>
         <h1 style="font-size:24px; font-weight:600; letter-spacing:-0.02em">Site Content</h1>
-        <p style="margin-top:4px; font-size:14px; color:var(--zinc-600)">Edit testimonials, contact info, and about section</p>
+        <p style="margin-top:4px; font-size:14px; color:var(--zinc-600)">Edit all site content — contact, about, testimonials, clients, production house, videos</p>
       </div>
       <div class="spacer"></div>
       <a href="admin.html" style="font-size:14px; text-decoration:underline">&larr; Back</a>
@@ -90,6 +104,31 @@
       <div id="testimonialsList"></div>
       <button class="btn-secondary" onclick="addTestimonial()" style="margin-top:16px">+ Add testimonial</button>
     </div>
+
+    <!-- CLIENTS -->
+    <div class="editor-section">
+      <h2>Clients</h2>
+      <div class="desc">Client logos shown on the Clients page. Logo URL can be a full URL or a path like public/clients/logos/name.png</div>
+      <div id="clientsList"></div>
+      <button class="btn-secondary" onclick="addClient()" style="margin-top:16px">+ Add client</button>
+    </div>
+
+    <!-- YOUTUBE VIDEOS -->
+    <div class="editor-section">
+      <h2>YouTube Videos</h2>
+      <div class="desc">Embedded videos shown on the Clients page. Paste the YouTube video ID (the part after v= in the URL).</div>
+      <div id="videosList"></div>
+      <button class="btn-secondary" onclick="addVideo()" style="margin-top:16px">+ Add video</button>
+    </div>
+
+    <!-- PRODUCTION HOUSE -->
+    <div class="editor-section">
+      <h2>Production House Media</h2>
+      <div class="desc">Videos and photos shown on the Production House page. Use paths like public/production-house/hero/videos/file.mp4</div>
+      <div id="phMediaList"></div>
+      <button class="btn-secondary" onclick="addPHMedia('video')" style="margin-top:16px">+ Add video</button>
+      <button class="btn-secondary" onclick="addPHMedia('photo')" style="margin-top:16px; margin-left:8px">+ Add photo</button>
+    </div>
   </div>
 
   </div><!-- end adminContent -->
@@ -106,7 +145,7 @@
       var data = await loadSiteContent();
       if (data) siteData = data;
 
-      // Populate contact
+      // Contact
       var c = siteData.contact || {};
       document.getElementById("cEmail").value = c.email || "";
       document.getElementById("cPhone").value = c.phone || "";
@@ -114,15 +153,19 @@
       document.getElementById("cAddress").value = c.address || "";
       document.getElementById("cMapUrl").value = c.mapUrl || "";
 
-      // Populate about
+      // About
       var a = siteData.about || {};
       document.getElementById("aIntro").value = a.intro || "";
       document.getElementById("aBody").value = a.body || "";
 
-      // Render testimonials
+      // Render all lists
       renderTestimonials();
+      renderClients();
+      renderVideos();
+      renderPHMedia();
     }
 
+    // ---- TESTIMONIALS ----
     function renderTestimonials() {
       var list = siteData.testimonials || [];
       var el = document.getElementById("testimonialsList");
@@ -132,13 +175,13 @@
       }
       var html = "";
       list.forEach(function(t, i) {
-        html += '<div class="testimonial-row">' +
-          '<div class="testimonial-header"><span>Testimonial ' + (i + 1) + '</span>' +
+        html += '<div class="item-row">' +
+          '<div class="item-header"><span>Testimonial ' + (i + 1) + '</span>' +
           '<button onclick="removeTestimonial(' + i + ')">Remove</button></div>' +
           '<div class="field-group">' +
-          '<label><span>Quote</span><textarea id="tQuote' + i + '">' + (t.quote || '') + '</textarea></label>' +
-          '<label><span>Author</span><input id="tAuthor' + i + '" value="' + (t.author || '') + '"></label>' +
-          '<label><span>Company</span><input id="tCompany' + i + '" value="' + (t.company || '') + '"></label>' +
+          '<label><span>Quote</span><textarea id="tQuote' + i + '">' + esc(t.quote) + '</textarea></label>' +
+          '<label><span>Author</span><input id="tAuthor' + i + '" value="' + esc(t.author) + '"></label>' +
+          '<label><span>Company</span><input id="tCompany' + i + '" value="' + esc(t.company) + '"></label>' +
           '</div></div>';
       });
       el.innerHTML = html;
@@ -157,6 +200,112 @@
       renderTestimonials();
     }
 
+    // ---- CLIENTS ----
+    function renderClients() {
+      var list = siteData.clients || [];
+      var el = document.getElementById("clientsList");
+      if (list.length === 0) {
+        el.innerHTML = '<div style="margin-top:12px; font-size:14px; color:var(--zinc-500)">No clients yet.</div>';
+        return;
+      }
+      var html = "";
+      list.forEach(function(c, i) {
+        html += '<div class="item-row">' +
+          '<div class="item-header"><span>Client ' + (i + 1) + '</span>' +
+          '<button onclick="removeClient(' + i + ')">Remove</button></div>' +
+          '<div class="field-group">' +
+          '<label><span>Name</span><input id="clName' + i + '" value="' + esc(c.name) + '" placeholder="Brand Name"></label>' +
+          '<label><span>Logo URL</span><input id="clLogo' + i + '" value="' + esc(c.logo) + '" placeholder="public/clients/logos/name.png"></label>' +
+          '<label><span>Website URL (optional)</span><input id="clUrl' + i + '" value="' + esc(c.url) + '" placeholder="https://..."></label>' +
+          '</div></div>';
+      });
+      el.innerHTML = html;
+    }
+
+    function addClient() {
+      if (!siteData.clients) siteData.clients = [];
+      collectFromForm();
+      siteData.clients.push({ name: "", logo: "", url: "" });
+      renderClients();
+    }
+
+    function removeClient(idx) {
+      collectFromForm();
+      siteData.clients.splice(idx, 1);
+      renderClients();
+    }
+
+    // ---- YOUTUBE VIDEOS ----
+    function renderVideos() {
+      var list = siteData.videos || [];
+      var el = document.getElementById("videosList");
+      if (list.length === 0) {
+        el.innerHTML = '<div style="margin-top:12px; font-size:14px; color:var(--zinc-500)">No videos yet.</div>';
+        return;
+      }
+      var html = "";
+      list.forEach(function(v, i) {
+        html += '<div class="item-row">' +
+          '<div class="item-header"><span>Video ' + (i + 1) + '</span>' +
+          '<button onclick="removeVideo(' + i + ')">Remove</button></div>' +
+          '<div class="field-group">' +
+          '<label><span>Title</span><input id="vTitle' + i + '" value="' + esc(v.title) + '" placeholder="Studio Film"></label>' +
+          '<label><span>YouTube ID (e.g. sGJJgBfHy5E)</span><input id="vId' + i + '" value="' + esc(v.youtubeId) + '" placeholder="sGJJgBfHy5E"></label>' +
+          '<label><span>Note (optional)</span><input id="vNote' + i + '" value="' + esc(v.note) + '" placeholder="Short description"></label>' +
+          '</div></div>';
+      });
+      el.innerHTML = html;
+    }
+
+    function addVideo() {
+      if (!siteData.videos) siteData.videos = [];
+      collectFromForm();
+      siteData.videos.push({ title: "", youtubeId: "", note: "" });
+      renderVideos();
+    }
+
+    function removeVideo(idx) {
+      collectFromForm();
+      siteData.videos.splice(idx, 1);
+      renderVideos();
+    }
+
+    // ---- PRODUCTION HOUSE MEDIA ----
+    function renderPHMedia() {
+      var list = siteData.productionHouseMedia || [];
+      var el = document.getElementById("phMediaList");
+      if (list.length === 0) {
+        el.innerHTML = '<div style="margin-top:12px; font-size:14px; color:var(--zinc-500)">No media yet.</div>';
+        return;
+      }
+      var html = "";
+      list.forEach(function(m, i) {
+        html += '<div class="item-row">' +
+          '<div class="item-header"><span>' + (m.type === "video" ? "Video" : "Photo") + ' ' + (i + 1) + '</span>' +
+          '<button onclick="removePHMedia(' + i + ')">Remove</button></div>' +
+          '<div class="field-group">' +
+          '<label><span>Type</span><input id="phType' + i + '" value="' + esc(m.type) + '" readonly style="background:#fafafa"></label>' +
+          '<label><span>File path</span><input id="phSrc' + i + '" value="' + esc(m.src) + '" placeholder="public/production-house/hero/videos/file.mp4"></label>' +
+          '<label><span>Alt text / caption</span><input id="phAlt' + i + '" value="' + esc(m.alt) + '" placeholder="Machine running"></label>' +
+          '</div></div>';
+      });
+      el.innerHTML = html;
+    }
+
+    function addPHMedia(type) {
+      if (!siteData.productionHouseMedia) siteData.productionHouseMedia = [];
+      collectFromForm();
+      siteData.productionHouseMedia.push({ type: type, src: "", alt: "" });
+      renderPHMedia();
+    }
+
+    function removePHMedia(idx) {
+      collectFromForm();
+      siteData.productionHouseMedia.splice(idx, 1);
+      renderPHMedia();
+    }
+
+    // ---- COLLECT ALL FORM DATA ----
     function collectFromForm() {
       // Contact
       if (!siteData.contact) siteData.contact = {};
@@ -172,17 +321,51 @@
       siteData.about.body = document.getElementById("aBody").value.trim();
 
       // Testimonials
-      var list = siteData.testimonials || [];
-      for (var i = 0; i < list.length; i++) {
+      var tList = siteData.testimonials || [];
+      for (var i = 0; i < tList.length; i++) {
         var qEl = document.getElementById("tQuote" + i);
         var aEl = document.getElementById("tAuthor" + i);
         var coEl = document.getElementById("tCompany" + i);
-        if (qEl) list[i].quote = qEl.value.trim();
-        if (aEl) list[i].author = aEl.value.trim();
-        if (coEl) list[i].company = coEl.value.trim();
+        if (qEl) tList[i].quote = qEl.value.trim();
+        if (aEl) tList[i].author = aEl.value.trim();
+        if (coEl) tList[i].company = coEl.value.trim();
+      }
+
+      // Clients
+      var cList = siteData.clients || [];
+      for (var j = 0; j < cList.length; j++) {
+        var nEl = document.getElementById("clName" + j);
+        var lEl = document.getElementById("clLogo" + j);
+        var uEl = document.getElementById("clUrl" + j);
+        if (nEl) cList[j].name = nEl.value.trim();
+        if (lEl) cList[j].logo = lEl.value.trim();
+        if (uEl) cList[j].url = uEl.value.trim();
+      }
+
+      // Videos
+      var vList = siteData.videos || [];
+      for (var k = 0; k < vList.length; k++) {
+        var vtEl = document.getElementById("vTitle" + k);
+        var viEl = document.getElementById("vId" + k);
+        var vnEl = document.getElementById("vNote" + k);
+        if (vtEl) vList[k].title = vtEl.value.trim();
+        if (viEl) vList[k].youtubeId = viEl.value.trim();
+        if (vnEl) vList[k].note = vnEl.value.trim();
+      }
+
+      // Production House Media
+      var phList = siteData.productionHouseMedia || [];
+      for (var p = 0; p < phList.length; p++) {
+        var ptEl = document.getElementById("phType" + p);
+        var psEl = document.getElementById("phSrc" + p);
+        var paEl = document.getElementById("phAlt" + p);
+        if (ptEl) phList[p].type = ptEl.value.trim();
+        if (psEl) phList[p].src = psEl.value.trim();
+        if (paEl) phList[p].alt = paEl.value.trim();
       }
     }
 
+    // ---- SAVE ----
     async function saveAll() {
       collectFromForm();
       document.getElementById("saveBtn").textContent = "Saving...";
@@ -191,8 +374,10 @@
       document.getElementById("status").textContent = ok ? "Saved." : "Save failed.";
     }
 
-    function setStatus(msg) {
-      document.getElementById("status").textContent = msg;
+    // ---- HELPERS ----
+    function esc(str) {
+      if (!str) return "";
+      return String(str).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
     function onAdminReady() { loadAll(); }

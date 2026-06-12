@@ -12,3 +12,10 @@ var SUPABASE_BUCKET = "work";
 // ADMIN PASSWORD — change this to something only you know
 // ============================================================
 var ADMIN_PASSWORD = "changeme123";
+
+// ============================================================
+// CONTACT FORM — Formspree (optional, free at formspree.io)
+// ============================================================
+// Create a form at formspree.io and paste the ID here (e.g. "xpzvQrLk")
+// If left empty, the contact form will open a mailto: link instead
+var FORMSPREE_ID = "";

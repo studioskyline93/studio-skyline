@@ -5,6 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact — Studio Skyline</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .form-success {
+      margin-top: 20px; padding: 16px; border-radius: 12px;
+      background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534;
+      font-size: 14px; display: none;
+    }
+    .form-error {
+      margin-top: 20px; padding: 16px; border-radius: 12px;
+      background: #fef2f2; border: 1px solid #fecaca; color: #991b1b;
+      font-size: 14px; display: none;
+    }
+  </style>
 </head>
 <body>
   <div id="site-header"></div>
@@ -17,7 +29,7 @@
     </div>
 
     <div class="contact-grid">
-      <div class="contact-info">
+      <div class="contact-info" id="contactInfo">
         <div class="kicker">Enquiries</div>
         <h2>Contact</h2>
         <div class="details">
@@ -38,13 +50,15 @@
       <div class="contact-form-card">
         <div class="card-title">Quick enquiry form</div>
         <div class="card-note">Fill out the form below and we'll get back to you.</div>
-        <form class="contact-form" onsubmit="return false;">
-          <input placeholder="Name">
-          <input placeholder="Email" type="email">
-          <input placeholder="What do you need? (boxes, bags, books...)">
-          <textarea placeholder="Details, quantities, timelines, finishes..."></textarea>
-          <button type="button" class="btn-primary">Submit</button>
+        <form class="contact-form" id="contactForm" onsubmit="return submitForm(event)">
+          <input name="name" placeholder="Name" required>
+          <input name="email" placeholder="Email" type="email" required>
+          <input name="need" placeholder="What do you need? (boxes, bags, books...)">
+          <textarea name="message" placeholder="Details, quantities, timelines, finishes..."></textarea>
+          <button type="submit" class="btn-primary" id="submitBtn">Submit</button>
         </form>
+        <div class="form-success" id="formSuccess">Thank you! We'll get back to you soon.</div>
+        <div class="form-error" id="formError">Something went wrong. Please email us directly.</div>
       </div>
     </div>
   </div>
@@ -56,11 +70,12 @@
   <script src="supabase-client.js"></script>
   <script src="shared.js"></script>
   <script>
+    // Load contact info from Supabase
     (async function() {
       var site = await loadSiteContent();
       if (!site || !site.contact) return;
       var c = site.contact;
-      var el = document.querySelector(".contact-info");
+      var el = document.getElementById("contactInfo");
       if (!el) return;
 
       var html = '<div class="kicker">' + (c.subtitle || "Enquiries") + '</div>';
@@ -75,6 +90,56 @@
       html += '</div>';
       el.innerHTML = html;
     })();
+
+    // Contact form submission via Formspree
+    function submitForm(e) {
+      e.preventDefault();
+      var form = document.getElementById("contactForm");
+      var btn = document.getElementById("submitBtn");
+      var successEl = document.getElementById("formSuccess");
+      var errorEl = document.getElementById("formError");
+
+      successEl.style.display = "none";
+      errorEl.style.display = "none";
+      btn.textContent = "Sending...";
+      btn.disabled = true;
+
+      var formData = new FormData(form);
+
+      // Uses Formspree — replace YOUR_FORM_ID with your actual Formspree form ID
+      // Sign up free at formspree.io, create a form, and paste the ID below
+      var formspreeId = typeof FORMSPREE_ID !== "undefined" ? FORMSPREE_ID : "";
+
+      if (!formspreeId) {
+        // No Formspree configured — fall back to mailto
+        var subject = "Enquiry from " + (formData.get("name") || "Website");
+        var body = "Name: " + formData.get("name") + "\nEmail: " + formData.get("email") + "\nNeed: " + formData.get("need") + "\nDetails: " + formData.get("message");
+        window.location.href = "mailto:studioskyline93@gmail.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+        btn.textContent = "Submit";
+        btn.disabled = false;
+        return false;
+      }
+
+      fetch("https://formspree.io/f/" + formspreeId, {
+        method: "POST",
+        body: formData,
+        headers: { "Accept": "application/json" }
+      }).then(function(res) {
+        if (res.ok) {
+          successEl.style.display = "block";
+          form.reset();
+        } else {
+          errorEl.style.display = "block";
+        }
+      }).catch(function() {
+        errorEl.style.display = "block";
+      }).finally(function() {
+        btn.textContent = "Submit";
+        btn.disabled = false;
+      });
+
+      return false;
+    }
   </script>
 </body>
 </html>

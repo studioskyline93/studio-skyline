@@ -35,20 +35,23 @@
 
   <div id="site-footer"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-client.js"></script>
   <script src="shared.js"></script>
   <script src="data.js"></script>
   <script>
-    var media = PRODUCTION_HOUSE_MEDIA;
+    var media = [];
     var phIndex = -1;
 
     function renderPHGrid() {
-      if (media.length === 0) return;
+      if (media.length === 0) {
+        document.getElementById("phGrid").innerHTML = '<div style="font-size:14px; color:var(--zinc-500)">No media yet.</div>';
+        return;
+      }
+
       var html = '<div class="ph-grid">';
-
-      // Main tile
       html += '<div onclick="openPH(0)" class="ph-tile">' + mediaTile(media[0]) + '</div>';
-
-      // Side tiles
       html += '<div class="ph-side">';
       for (var i = 1; i < Math.min(3, media.length); i++) {
         html += '<div onclick="openPH(' + i + ')" class="ph-tile">' + mediaTile(media[i]) + '</div>';
@@ -57,7 +60,6 @@
 
       document.getElementById("phGrid").innerHTML = html;
 
-      // Walkthrough
       var wHtml = '';
       for (var j = 0; j < media.length; j++) {
         if (j > 0) wHtml += '<span class="ph-line"></span>';
@@ -93,7 +95,7 @@
       document.body.style.overflow = "hidden";
 
       if (item.type === "video") {
-        mediaEl.innerHTML = '<video src="' + item.src + '" controls autoplay class="ph-modal-media video" style="width:100%;height:100%;object-fit:contain"></video>';
+        mediaEl.innerHTML = '<video src="' + item.src + '" controls autoplay style="width:100%;height:100%;object-fit:contain"></video>';
       } else {
         mediaEl.innerHTML = '<img src="' + item.src + '" alt="' + (item.alt || '') + '" style="width:100%;height:100%;object-fit:contain">';
       }
@@ -122,7 +124,12 @@
       if (e.target === this) closePH();
     });
 
-    renderPHGrid();
+    // Load from Supabase, fallback to data.js
+    (async function() {
+      var site = await loadSiteContent();
+      media = (site && Array.isArray(site.productionHouseMedia)) ? site.productionHouseMedia : PRODUCTION_HOUSE_MEDIA;
+      renderPHGrid();
+    })();
   </script>
 </body>
 </html>
