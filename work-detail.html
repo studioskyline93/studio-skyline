@@ -33,20 +33,32 @@
 
   <div id="site-footer"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-client.js"></script>
   <script src="shared.js"></script>
   <script src="data.js"></script>
   <script>
     var params = new URLSearchParams(window.location.search);
     var slug = params.get("slug");
-    var collection = null;
 
-    for (var i = 0; i < WORK_COLLECTIONS.length; i++) {
-      if (WORK_COLLECTIONS[i].slug === slug) { collection = WORK_COLLECTIONS[i]; break; }
+    function findCollection(collections) {
+      for (var i = 0; i < collections.length; i++) {
+        if (collections[i].slug === slug) return collections[i];
+      }
+      return null;
     }
+
+    (async function() {
+    var workData = await loadWorkContent();
+    var allCollections = (workData && workData.collections) ? workData.collections : WORK_COLLECTIONS;
+    var collection = findCollection(allCollections);
 
     if (!collection) {
       document.getElementById("detailHeader").innerHTML = '<h1 class="detail-title">Collection not found</h1>';
-    } else {
+      return;
+    }
+    {
       document.title = collection.title + " — Studio Skyline";
 
       // Header
@@ -204,6 +216,7 @@
 
       renderTriple();
     }
+    })();
   </script>
 </body>
 </html>

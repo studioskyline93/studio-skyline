@@ -84,18 +84,21 @@
 
   <div id="site-footer"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-client.js"></script>
   <script src="shared.js"></script>
   <script src="data.js"></script>
   <script>
-    // Render reel
-    function renderReel() {
+    function renderReel(collections) {
       var track = document.getElementById("reelTrack");
       var counter = document.getElementById("reelCounter");
       if (!track) return;
 
       var html = "";
-      WORK_COLLECTIONS.forEach(function(c) {
-        var preview = c.videos && c.videos.length > 0 ? c.videos[0].src : "";
+      collections.forEach(function(c) {
+        var vids = c.videos || [];
+        var preview = vids.length > 0 ? vids[0].src : "";
         var mediaHtml = preview
           ? '<video src="' + preview + '" autoplay loop muted playsinline preload="metadata"></video>'
           : '<div class="no-vid">No video yet</div>';
@@ -103,12 +106,12 @@
           '<div class="reel-card-media">' + mediaHtml + '</div>' +
           '<div class="reel-card-info">' +
             '<div><div class="reel-card-title">' + c.title + '</div>' +
-            '<div class="reel-card-count">' + c.videos.length + ' video' + (c.videos.length === 1 ? '' : 's') + '</div></div>' +
+            '<div class="reel-card-count">' + vids.length + ' video' + (vids.length === 1 ? '' : 's') + '</div></div>' +
             '<div class="reel-card-view">View</div>' +
           '</div></a>';
       });
       track.innerHTML = html;
-      counter.textContent = "01 / " + String(WORK_COLLECTIONS.length).padStart(2, "0");
+      counter.textContent = "01 / " + String(collections.length).padStart(2, "0");
     }
 
     function scrollReel(dir) {
@@ -118,12 +121,11 @@
       track.scrollBy({ left: dir * cardWidth, behavior: "smooth" });
     }
 
-    // Render testimonials
-    function renderTestimonials() {
+    function renderTestimonials(items) {
       var el = document.getElementById("testimonials");
       if (!el) return;
       var html = "";
-      TESTIMONIALS.forEach(function(t) {
+      items.forEach(function(t) {
         html += '<figure class="testimonial-card">' +
           '<blockquote>&ldquo;' + t.quote + '&rdquo;</blockquote>' +
           '<figcaption><span class="author">' + t.author + '</span>' +
@@ -133,8 +135,16 @@
       el.innerHTML = html;
     }
 
-    renderReel();
-    renderTestimonials();
+    // Load from Supabase, fall back to local data.js
+    (async function() {
+      var workData = await loadWorkContent();
+      var collections = (workData && workData.collections) ? workData.collections : WORK_COLLECTIONS;
+      renderReel(collections);
+
+      var siteData = await loadSiteContent();
+      var testimonials = (siteData && Array.isArray(siteData.testimonials)) ? siteData.testimonials : TESTIMONIALS;
+      renderTestimonials(testimonials);
+    })();
   </script>
 </body>
 </html>

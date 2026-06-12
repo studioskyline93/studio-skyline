@@ -51,6 +51,30 @@
 
   <div id="site-footer"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-client.js"></script>
   <script src="shared.js"></script>
+  <script>
+    (async function() {
+      var site = await loadSiteContent();
+      if (!site || !site.contact) return;
+      var c = site.contact;
+      var el = document.querySelector(".contact-info");
+      if (!el) return;
+
+      var html = '<div class="kicker">' + (c.subtitle || "Enquiries") + '</div>';
+      html += '<h2>' + (c.title || "Contact") + '</h2>';
+      if (c.intro) html += '<p style="margin-top:16px; font-size:14px; line-height:1.6; color:var(--zinc-600)">' + c.intro + '</p>';
+      html += '<div class="details">';
+      if (c.email) html += '<div><span class="label-text">Email:</span> <a href="mailto:' + c.email + '">' + c.email + '</a></div>';
+      if (c.phone) html += '<div><span class="label-text">Phone:</span> <a href="tel:' + c.phone + '">' + c.phone + '</a></div>';
+      if (c.whatsapp) html += '<div><span class="label-text">WhatsApp:</span> <a href="https://wa.me/' + c.whatsapp.replace(/\D/g, '') + '">' + c.whatsapp + '</a></div>';
+      if (c.address) html += '<div><span class="label-text">Address:</span> ' + c.address + '</div>';
+      if (c.mapUrl) html += '<div><a href="' + c.mapUrl + '" target="_blank" rel="noreferrer">Open map</a></div>';
+      html += '</div>';
+      el.innerHTML = html;
+    })();
+  </script>
 </body>
 </html>

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Work — Studio Skyline</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-layout { display: grid; gap: 24px; margin-top: 32px; }
+    @media(min-width:1024px){ .admin-layout { grid-template-columns: 360px 1fr; } }
+
+    .panel {
+      border-radius: 16px; border: 1px solid rgba(228,228,231,0.6);
+      background: rgba(255,255,255,0.7); backdrop-filter: blur(12px);
+      padding: 20px;
+    }
+
+    .cat-item {
+      display: flex; align-items: stretch; gap: 8px; border-radius: 12px;
+      border: 1px solid rgba(228,228,231,0.6); margin-top: 8px; cursor: pointer;
+    }
+    .cat-item.active { border-color: var(--zinc-400); background: var(--zinc-50); }
+    .cat-item:hover { background: var(--zinc-50); }
+    .cat-item-info { flex: 1; padding: 8px 12px; }
+    .cat-item-title { font-size: 14px; font-weight: 500; }
+    .cat-item-slug { font-size: 12px; color: var(--zinc-500); font-family: monospace; }
+    .cat-item-arrows { display: flex; flex-direction: column; justify-content: center; gap: 4px; padding-right: 8px; }
+    .cat-item-arrows button {
+      font-size: 12px; color: var(--zinc-500); background: none; border: none; cursor: pointer; padding: 2px;
+    }
+    .cat-item-arrows button:hover { color: var(--zinc-800); }
+
+    .field-group { display: grid; gap: 12px; margin-top: 16px; }
+    .field-group label { display: grid; gap: 4px; }
+    .field-group label span { font-size: 12px; color: var(--zinc-500); }
+    .field-group input, .field-group textarea {
+      width: 100%; border-radius: 8px; border: 1px solid rgba(228,228,231,0.6);
+      background: #fff; padding: 8px 12px; font-size: 14px; font-family: inherit;
+      outline: none;
+    }
+    .field-group input:focus, .field-group textarea:focus { border-color: var(--zinc-400); }
+    .field-group textarea { min-height: 80px; resize: vertical; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .vid-item {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      border-radius: 12px; border: 1px solid rgba(228,228,231,0.6); padding: 12px;
+      margin-top: 8px;
+    }
+    .vid-item-info { min-width: 0; flex: 1; }
+    .vid-item-name { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .vid-item-src { font-size: 12px; color: var(--zinc-500); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .vid-item video { width: 80px; height: 48px; border-radius: 8px; border: 1px solid rgba(228,228,231,0.6); object-fit: cover; }
+    .vid-item-actions { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+    .vid-item-actions button { font-size: 13px; background: none; border: none; cursor: pointer; text-decoration: underline; padding: 2px 0; }
+    .vid-item-actions .danger { color: #dc2626; }
+    .vid-item-arrows { display: flex; flex-direction: column; gap: 4px; }
+    .vid-item-arrows button { font-size: 12px; color: var(--zinc-500); background: none; border: none; cursor: pointer; }
+    .vid-item-arrows button:hover { color: var(--zinc-800); }
+
+    .status-bar {
+      margin-top: 24px; border-radius: 12px; border: 1px solid rgba(228,228,231,0.6);
+      background: rgba(255,255,255,0.7); padding: 16px; font-size: 14px; color: var(--zinc-700);
+    }
+    .status-bar:empty { display: none; }
+
+    .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .toolbar .spacer { flex: 1; }
+
+    .file-item {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      border-radius: 12px; border: 1px solid rgba(228,228,231,0.6); padding: 12px;
+      margin-top: 8px;
+    }
+    .file-item-name { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-item button { font-size: 13px; background: none; border: none; cursor: pointer; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <div class="site-main">
+    <div class="toolbar">
+      <div>
+        <h1 style="font-size:24px; font-weight:600; letter-spacing:-0.02em">Work</h1>
+        <p style="margin-top:4px; font-size:14px; color:var(--zinc-600)">Manage categories and videos</p>
+      </div>
+      <div class="spacer"></div>
+      <a href="admin.html" style="font-size:14px; text-decoration:underline">&larr; Back</a>
+      <button class="btn-secondary" onclick="saveAll()" id="saveBtn">Save changes</button>
+    </div>
+
+    <div class="status-bar" id="status"></div>
+
+    <div class="admin-layout">
+      <!-- LEFT: Categories list -->
+      <div class="panel">
+        <div class="toolbar">
+          <span style="font-size:14px; font-weight:500">Categories</span>
+          <div class="spacer"></div>
+          <button class="btn-secondary" onclick="createCategory()">+ New</button>
+        </div>
+        <div id="catList"><div style="font-size:14px; color:var(--zinc-500)">Loading...</div></div>
+      </div>
+
+      <!-- RIGHT: Category editor -->
+      <div class="panel" id="editorPanel">
+        <div style="font-size:14px; color:var(--zinc-500)">Select a category.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="shared.js"></script>
+  <script>
+    var work = { collections: [] };
+    var activeSlug = "";
+    var availableFiles = [];
+
+    // --- Load ---
+    async function loadAll() {
+      var data = await loadWorkContent();
+      if (data && data.collections) {
+        work = data;
+      }
+      if (work.collections.length > 0 && !activeSlug) {
+        activeSlug = work.collections[0].slug;
+      }
+      renderCats();
+      renderEditor();
+    }
+
+    // --- Save ---
+    async function saveAll() {
+      document.getElementById("saveBtn").textContent = "Saving...";
+      var ok = await saveWorkContent(work);
+      document.getElementById("saveBtn").textContent = "Save changes";
+      setStatus(ok ? "Saved." : "Save failed.");
+    }
+
+    function setStatus(msg) {
+      document.getElementById("status").textContent = msg;
+    }
+
+    function getActive() {
+      for (var i = 0; i < work.collections.length; i++) {
+        if (work.collections[i].slug === activeSlug) return work.collections[i];
+      }
+      return null;
+    }
+
+    // --- Render categories sidebar ---
+    function renderCats() {
+      var el = document.getElementById("catList");
+      if (work.collections.length === 0) {
+        el.innerHTML = '<div style="font-size:14px; color:var(--zinc-500); margin-top:12px">No categories yet.</div>';
+        return;
+      }
+      var html = "";
+      work.collections.forEach(function(c, idx) {
+        html += '<div class="cat-item' + (c.slug === activeSlug ? ' active' : '') + '" onclick="selectCat(\'' + c.slug + '\')">' +
+          '<div class="cat-item-info"><div class="cat-item-title">' + c.title + '</div>' +
+          '<div class="cat-item-slug">/' + c.slug + '</div></div>' +
+          '<div class="cat-item-arrows">' +
+          '<button onclick="event.stopPropagation(); moveCat(' + idx + ',-1)" title="Move up">&uarr;</button>' +
+          '<button onclick="event.stopPropagation(); moveCat(' + idx + ',1)" title="Move down">&darr;</button>' +
+          '</div></div>';
+      });
+      el.innerHTML = html;
+    }
+
+    function selectCat(slug) {
+      activeSlug = slug;
+      renderCats();
+      renderEditor();
+      loadFiles();
+    }
+
+    function moveCat(idx, dir) {
+      var target = idx + dir;
+      if (target < 0 || target >= work.collections.length) return;
+      var tmp = work.collections[idx];
+      work.collections[idx] = work.collections[target];
+      work.collections[target] = tmp;
+      renderCats();
+    }
+
+    function createCategory() {
+      var slug = prompt("New category slug (lowercase, numbers, hyphens):");
+      if (!slug) return;
+      slug = slug.trim().toLowerCase();
+      if (!/^[a-z0-9-]+$/.test(slug)) { setStatus("Invalid slug."); return; }
+      if (work.collections.some(function(c) { return c.slug === slug; })) { setStatus("Slug already exists."); return; }
+
+      var title = prompt("Title for this category?", "");
+      if (!title) { setStatus("Title is required."); return; }
+
+      work.collections.push({ slug: slug, index: "", title: title.trim(), subtitle: "", description: "", videos: [] });
+      activeSlug = slug;
+      renderCats();
+      renderEditor();
+      setStatus("Category created. Add videos, then Save.");
+    }
+
+    function deleteCategory() {
+      var c = getActive();
+      if (!c) return;
+      if (!confirm('Delete category "' + c.title + '"?')) return;
+      work.collections = work.collections.filter(function(x) { return x.slug !== c.slug; });
+      activeSlug = work.collections.length > 0 ? work.collections[0].slug : "";
+      renderCats();
+      renderEditor();
+      setStatus("Category removed. Click Save to persist.");
+    }
+
+    // --- Render editor ---
+    function renderEditor() {
+      var panel = document.getElementById("editorPanel");
+      var c = getActive();
+      if (!c) {
+        panel.innerHTML = '<div style="font-size:14px; color:var(--zinc-500)">Select a category.</div>';
+        return;
+      }
+
+      var html = '';
+
+      // Category fields
+      html += '<div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px">' +
+        '<div><div style="font-size:14px; font-weight:500">Category details</div></div>' +
+        '<div style="display:flex; gap:12px">' +
+        '<button onclick="deleteCategory()" style="font-size:13px; color:#dc2626; background:none; border:none; cursor:pointer; text-decoration:underline">Delete category</button>' +
+        '<button class="btn-secondary" onclick="applyEdits()">Apply</button>' +
+        '</div></div>';
+
+      html += '<div class="field-group">' +
+        '<div class="field-row">' +
+        '<label><span>Index</span><input id="editIndex" value="' + (c.index || '') + '" placeholder="01"></label>' +
+        '<label><span>Slug</span><input id="editSlug" value="' + c.slug + '" placeholder="paper-bags" style="font-family:monospace"></label>' +
+        '</div>' +
+        '<label><span>Title</span><input id="editTitle" value="' + c.title + '" placeholder="Paper Bags"></label>' +
+        '<label><span>Subtitle</span><input id="editSubtitle" value="' + (c.subtitle || '') + '" placeholder="Luxury paper bags"></label>' +
+        '<label><span>Description</span><textarea id="editDesc" placeholder="Short description...">' + (c.description || '') + '</textarea></label>' +
+        '</div>';
+
+      // Upload
+      html += '<div style="margin-top:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px">' +
+        '<div><div style="font-size:14px; font-weight:500">' + c.title + '</div></div>' +
+        '<div><input type="file" accept="video/mp4" multiple id="uploadInput" style="display:none" onchange="uploadFiles(this.files)">' +
+        '<button class="btn-secondary" onclick="document.getElementById(\'uploadInput\').click()">Upload MP4</button></div>' +
+        '</div>';
+
+      // Current videos
+      html += '<div style="margin-top:24px"><div style="font-size:14px; font-weight:500">Current videos</div>';
+      var vids = c.videos || [];
+      if (vids.length === 0) {
+        html += '<div style="margin-top:8px; font-size:14px; color:var(--zinc-500)">No videos in this category yet.</div>';
+      } else {
+        vids.forEach(function(v, idx) {
+          var name = v.title || v.src.split("/").pop();
+          html += '<div class="vid-item">' +
+            '<div class="vid-item-arrows">' +
+            '<button onclick="moveVid(' + idx + ',-1)" title="Move up">&uarr;</button>' +
+            '<button onclick="moveVid(' + idx + ',1)" title="Move down">&darr;</button>' +
+            '</div>' +
+            '<div class="vid-item-info"><div class="vid-item-name">' + name + '</div>' +
+            '<div class="vid-item-src">' + v.src + '</div></div>' +
+            '<video src="' + v.src + '" muted playsinline style="width:80px; height:48px; border-radius:8px; border:1px solid rgba(228,228,231,0.6); object-fit:cover"></video>' +
+            '<div class="vid-item-actions">' +
+            '<button onclick="removeVid(' + idx + ')">Remove</button>' +
+            '<button class="danger" onclick="deleteVidForever(' + idx + ')">Delete forever</button>' +
+            '</div></div>';
+        });
+      }
+      html += '</div>';
+
+      // Available files from storage
+      html += '<div style="margin-top:40px"><div style="font-size:14px; font-weight:500">Uploaded videos (Storage)</div>' +
+        '<div style="margin-top:4px; font-size:12px; color:var(--zinc-500)">Files in ' + c.slug + '/videos/</div>' +
+        '<div id="fileList"><div style="margin-top:8px; font-size:14px; color:var(--zinc-500)">Loading...</div></div></div>';
+
+      panel.innerHTML = html;
+      loadFiles();
+    }
+
+    function applyEdits() {
+      var c = getActive();
+      if (!c) return;
+      var newSlug = document.getElementById("editSlug").value.trim().toLowerCase();
+      if (!newSlug || !/^[a-z0-9-]+$/.test(newSlug)) { setStatus("Invalid slug."); return; }
+      var newTitle = document.getElementById("editTitle").value.trim();
+      if (!newTitle) { setStatus("Title cannot be empty."); return; }
+
+      if (newSlug !== c.slug && work.collections.some(function(x) { return x.slug === newSlug; })) {
+        setStatus("Slug already exists."); return;
+      }
+
+      c.index = document.getElementById("editIndex").value.trim();
+      c.title = newTitle;
+      c.subtitle = document.getElementById("editSubtitle").value.trim();
+      c.description = document.getElementById("editDesc").value.trim();
+      c.slug = newSlug;
+      activeSlug = newSlug;
+
+      renderCats();
+      renderEditor();
+      setStatus("Updated. Click Save to persist.");
+    }
+
+    // --- Videos ---
+    function moveVid(idx, dir) {
+      var c = getActive();
+      if (!c) return;
+      var target = idx + dir;
+      if (target < 0 || target >= c.videos.length) return;
+      var tmp = c.videos[idx];
+      c.videos[idx] = c.videos[target];
+      c.videos[target] = tmp;
+      renderEditor();
+    }
+
+    function removeVid(idx) {
+      var c = getActive();
+      if (!c) return;
+      c.videos.splice(idx, 1);
+      renderEditor();
+      setStatus("Video removed. Click Save to persist.");
+    }
+
+    async function deleteVidForever(idx) {
+      var c = getActive();
+      if (!c) return;
+      var v = c.videos[idx];
+      if (!confirm("Permanently delete this file from storage?\n" + v.src)) return;
+
+      // Extract storage path from public URL
+      var path = "";
+      if (SUPABASE_URL && v.src.indexOf(SUPABASE_URL) === 0) {
+        path = v.src.replace(SUPABASE_URL + "/storage/v1/object/public/" + SUPABASE_BUCKET + "/", "");
+      }
+
+      if (path) {
+        var ok = await deleteFromStorage(path);
+        if (!ok) { setStatus("Delete from storage failed."); return; }
+      }
+
+      c.videos.splice(idx, 1);
+      renderEditor();
+      setStatus("Deleted forever. Click Save to persist.");
+    }
+
+    async function uploadFiles(files) {
+      if (!files || files.length === 0) return;
+      var c = getActive();
+      if (!c) return;
+
+      setStatus("Uploading...");
+      for (var i = 0; i < files.length; i++) {
+        var result = await uploadToStorage(c.slug, files[i]);
+        if (result) {
+          c.videos.push({ src: result.src });
+        } else {
+          setStatus("Upload failed for " + files[i].name);
+          return;
+        }
+      }
+      renderEditor();
+      setStatus("Upload complete. Click Save to persist.");
+    }
+
+    // --- Available files in storage ---
+    async function loadFiles() {
+      var c = getActive();
+      if (!c) return;
+      var el = document.getElementById("fileList");
+      if (!el) return;
+
+      var files = await listStorageFiles(c.slug + "/videos");
+      availableFiles = files;
+
+      var existingSrcs = {};
+      (c.videos || []).forEach(function(v) { existingSrcs[v.src] = true; });
+
+      var addable = files.filter(function(f) {
+        var url = storagePublicUrl(c.slug, f);
+        return !existingSrcs[url];
+      });
+
+      if (files.length === 0) {
+        el.innerHTML = '<div style="margin-top:8px; font-size:14px; color:var(--zinc-500)">No files found.</div>';
+      } else if (addable.length === 0) {
+        el.innerHTML = '<div style="margin-top:8px; font-size:14px; color:var(--zinc-500)">All uploaded files are already added.</div>';
+      } else {
+        var html = "";
+        addable.forEach(function(f) {
+          html += '<div class="file-item"><div class="file-item-name">' + f + '</div>' +
+            '<button onclick="addFileToCollection(\'' + f.replace(/'/g, "\\'") + '\')">Add</button></div>';
+        });
+        el.innerHTML = html;
+      }
+    }
+
+    function addFileToCollection(filename) {
+      var c = getActive();
+      if (!c) return;
+      var src = storagePublicUrl(c.slug, filename);
+      if (!src) { setStatus("Could not build URL."); return; }
+      if (c.videos.some(function(v) { return v.src === src; })) return;
+      c.videos.push({ src: src });
+      renderEditor();
+    }
+
+    // --- Init ---
+    loadAll();
+  </script>
+</body>
+</html>

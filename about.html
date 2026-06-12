@@ -16,7 +16,7 @@
       <div class="section-desc">A premium print + packaging studio focused on detail, consistency, and production-ready execution.</div>
     </div>
 
-    <div class="about-grid">
+    <div class="about-grid" id="aboutGrid">
       <div class="about-card">
         <div class="card-title">What we do</div>
         <p>We design and manufacture premium fancy boxes, paper bags, invitation cards, stationery, and high-quality book printing for brands that care about detail.</p>
@@ -29,7 +29,7 @@
         </ul>
       </div>
 
-      <div class="about-card">
+      <div class="about-card" id="aboutContact">
         <div class="card-title">Contact</div>
         <div style="margin-top:12px; font-size:14px; color:var(--zinc-700); line-height:1.8">
           <div>Okhla Industrial Area, New Delhi</div>
@@ -44,6 +44,43 @@
 
   <div id="site-footer"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-client.js"></script>
   <script src="shared.js"></script>
+  <script>
+    (async function() {
+      var site = await loadSiteContent();
+      if (!site) return;
+
+      // Update about card with dynamic content
+      var about = site.about || {};
+      var contact = site.contact || {};
+
+      if (about.intro || about.body) {
+        var card = document.querySelector("#aboutGrid .about-card");
+        var html = '<div class="card-title">' + (about.subtitle || "What we do") + '</div>';
+        if (about.intro) html += '<p>' + about.intro + '</p>';
+        if (about.body) html += '<p style="white-space:pre-line">' + about.body + '</p>';
+        var highlights = Array.isArray(about.highlights) ? about.highlights : [];
+        if (highlights.length > 0) {
+          html += '<ul>';
+          highlights.forEach(function(h) { html += '<li>' + h + '</li>'; });
+          html += '</ul>';
+        }
+        card.innerHTML = html;
+      }
+
+      if (contact.address || contact.email || contact.phone) {
+        var cEl = document.getElementById("aboutContact");
+        var cHtml = '<div class="card-title">Contact</div><div style="margin-top:12px; font-size:14px; color:var(--zinc-700); line-height:1.8">';
+        if (contact.address) cHtml += '<div style="white-space:pre-line">' + contact.address + '</div>';
+        if (contact.email) cHtml += '<div style="margin-top:8px"><a href="mailto:' + contact.email + '">' + contact.email + '</a></div>';
+        if (contact.phone) cHtml += '<div style="margin-top:4px">' + contact.phone + '</div>';
+        cHtml += '</div>';
+        cEl.innerHTML = cHtml;
+      }
+    })();
+  </script>
 </body>
 </html>
