@@ -21,26 +21,38 @@
 
   <div id="site-footer"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-client.js"></script>
   <script src="shared.js"></script>
   <script src="data.js"></script>
   <script>
-    var grid = document.getElementById("workGrid");
-    var html = "";
-    WORK_COLLECTIONS.forEach(function(c) {
-      html += '<a href="work-detail.html?slug=' + c.slug + '" class="work-card">' +
-        '<div class="work-card-inner">' +
-          '<div>' +
-            (c.index ? '<div class="work-card-idx">' + c.index + '</div>' : '') +
-            '<div class="work-card-title">' + c.title + '</div>' +
-            (c.subtitle ? '<div class="work-card-sub">' + c.subtitle + '</div>' : '') +
-          '</div>' +
-          '<div class="work-card-bottom">' +
-            '<span>' + c.videos.length + ' video' + (c.videos.length === 1 ? '' : 's') + '</span>' +
-            '<span class="work-card-arrow">View &rarr;</span>' +
-          '</div>' +
-        '</div></a>';
-    });
-    grid.innerHTML = html;
+    function renderWorkGrid(collections) {
+      var grid = document.getElementById("workGrid");
+      var html = "";
+      collections.forEach(function(c) {
+        var vids = c.videos || [];
+        html += '<a href="work-detail.html?slug=' + c.slug + '" class="work-card">' +
+          '<div class="work-card-inner">' +
+            '<div>' +
+              (c.index ? '<div class="work-card-idx">' + c.index + '</div>' : '') +
+              '<div class="work-card-title">' + c.title + '</div>' +
+              (c.subtitle ? '<div class="work-card-sub">' + c.subtitle + '</div>' : '') +
+            '</div>' +
+            '<div class="work-card-bottom">' +
+              '<span>' + vids.length + ' video' + (vids.length === 1 ? '' : 's') + '</span>' +
+              '<span class="work-card-arrow">View &rarr;</span>' +
+            '</div>' +
+          '</div></a>';
+      });
+      grid.innerHTML = html;
+    }
+
+    (async function() {
+      var workData = await loadWorkContent();
+      var collections = (workData && workData.collections) ? workData.collections : WORK_COLLECTIONS;
+      renderWorkGrid(collections);
+    })();
   </script>
 </body>
 </html>

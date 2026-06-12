@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Site Content — Studio Skyline</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .editor-section {
+      border-radius: 16px; border: 1px solid rgba(228,228,231,0.6);
+      background: rgba(255,255,255,0.7); backdrop-filter: blur(12px);
+      padding: 24px; margin-top: 24px;
+    }
+    .editor-section h2 { font-size: 16px; font-weight: 600; }
+    .editor-section .desc { font-size: 12px; color: var(--zinc-500); margin-top: 4px; }
+
+    .field-group { display: grid; gap: 12px; margin-top: 16px; }
+    .field-group label { display: grid; gap: 4px; }
+    .field-group label span { font-size: 12px; color: var(--zinc-500); }
+    .field-group input, .field-group textarea {
+      width: 100%; border-radius: 8px; border: 1px solid rgba(228,228,231,0.6);
+      background: #fff; padding: 8px 12px; font-size: 14px; font-family: inherit; outline: none;
+    }
+    .field-group input:focus, .field-group textarea:focus { border-color: var(--zinc-400); }
+    .field-group textarea { min-height: 80px; resize: vertical; }
+
+    .testimonial-row {
+      border-radius: 12px; border: 1px solid rgba(228,228,231,0.6);
+      padding: 16px; margin-top: 12px;
+    }
+    .testimonial-row .field-group { margin-top: 8px; }
+    .testimonial-header { display: flex; align-items: center; justify-content: space-between; }
+    .testimonial-header span { font-size: 14px; font-weight: 500; }
+    .testimonial-header button { font-size: 13px; color: #dc2626; background: none; border: none; cursor: pointer; text-decoration: underline; }
+
+    .status-bar {
+      margin-top: 24px; border-radius: 12px; border: 1px solid rgba(228,228,231,0.6);
+      background: rgba(255,255,255,0.7); padding: 16px; font-size: 14px; color: var(--zinc-700);
+    }
+    .status-bar:empty { display: none; }
+
+    .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .toolbar .spacer { flex: 1; }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <div class="site-main">
+    <div class="toolbar">
+      <div>
+        <h1 style="font-size:24px; font-weight:600; letter-spacing:-0.02em">Site Content</h1>
+        <p style="margin-top:4px; font-size:14px; color:var(--zinc-600)">Edit testimonials, contact info, and about section</p>
+      </div>
+      <div class="spacer"></div>
+      <a href="admin.html" style="font-size:14px; text-decoration:underline">&larr; Back</a>
+      <button class="btn-secondary" onclick="saveAll()" id="saveBtn">Save changes</button>
+    </div>
+
+    <div class="status-bar" id="status"></div>
+
+    <!-- CONTACT -->
+    <div class="editor-section">
+      <h2>Contact Info</h2>
+      <div class="desc">Shown on the Contact and About pages</div>
+      <div class="field-group">
+        <label><span>Email</span><input id="cEmail" placeholder="you@example.com"></label>
+        <label><span>Phone</span><input id="cPhone" placeholder="+91-..."></label>
+        <label><span>WhatsApp</span><input id="cWhatsapp" placeholder="+91..."></label>
+        <label><span>Address</span><input id="cAddress" placeholder="Okhla Industrial Area, New Delhi"></label>
+        <label><span>Map URL</span><input id="cMapUrl" placeholder="https://maps.google.com/..."></label>
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="editor-section">
+      <h2>About</h2>
+      <div class="desc">Content for the About page</div>
+      <div class="field-group">
+        <label><span>Intro</span><textarea id="aIntro" placeholder="Short intro..."></textarea></label>
+        <label><span>Body</span><textarea id="aBody" placeholder="Detailed description..." style="min-height:120px"></textarea></label>
+      </div>
+    </div>
+
+    <!-- TESTIMONIALS -->
+    <div class="editor-section">
+      <h2>Testimonials</h2>
+      <div class="desc">Shown on the home page</div>
+      <div id="testimonialsList"></div>
+      <button class="btn-secondary" onclick="addTestimonial()" style="margin-top:16px">+ Add testimonial</button>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="shared.js"></script>
+  <script>
+    var siteData = {};
+
+    async function loadAll() {
+      var data = await loadSiteContent();
+      if (data) siteData = data;
+
+      // Populate contact
+      var c = siteData.contact || {};
+      document.getElementById("cEmail").value = c.email || "";
+      document.getElementById("cPhone").value = c.phone || "";
+      document.getElementById("cWhatsapp").value = c.whatsapp || "";
+      document.getElementById("cAddress").value = c.address || "";
+      document.getElementById("cMapUrl").value = c.mapUrl || "";
+
+      // Populate about
+      var a = siteData.about || {};
+      document.getElementById("aIntro").value = a.intro || "";
+      document.getElementById("aBody").value = a.body || "";
+
+      // Render testimonials
+      renderTestimonials();
+    }
+
+    function renderTestimonials() {
+      var list = siteData.testimonials || [];
+      var el = document.getElementById("testimonialsList");
+      if (list.length === 0) {
+        el.innerHTML = '<div style="margin-top:12px; font-size:14px; color:var(--zinc-500)">No testimonials yet.</div>';
+        return;
+      }
+      var html = "";
+      list.forEach(function(t, i) {
+        html += '<div class="testimonial-row">' +
+          '<div class="testimonial-header"><span>Testimonial ' + (i + 1) + '</span>' +
+          '<button onclick="removeTestimonial(' + i + ')">Remove</button></div>' +
+          '<div class="field-group">' +
+          '<label><span>Quote</span><textarea id="tQuote' + i + '">' + (t.quote || '') + '</textarea></label>' +
+          '<label><span>Author</span><input id="tAuthor' + i + '" value="' + (t.author || '') + '"></label>' +
+          '<label><span>Company</span><input id="tCompany' + i + '" value="' + (t.company || '') + '"></label>' +
+          '</div></div>';
+      });
+      el.innerHTML = html;
+    }
+
+    function addTestimonial() {
+      if (!siteData.testimonials) siteData.testimonials = [];
+      collectFromForm();
+      siteData.testimonials.push({ quote: "", author: "", company: "" });
+      renderTestimonials();
+    }
+
+    function removeTestimonial(idx) {
+      collectFromForm();
+      siteData.testimonials.splice(idx, 1);
+      renderTestimonials();
+    }
+
+    function collectFromForm() {
+      // Contact
+      if (!siteData.contact) siteData.contact = {};
+      siteData.contact.email = document.getElementById("cEmail").value.trim();
+      siteData.contact.phone = document.getElementById("cPhone").value.trim();
+      siteData.contact.whatsapp = document.getElementById("cWhatsapp").value.trim();
+      siteData.contact.address = document.getElementById("cAddress").value.trim();
+      siteData.contact.mapUrl = document.getElementById("cMapUrl").value.trim();
+
+      // About
+      if (!siteData.about) siteData.about = {};
+      siteData.about.intro = document.getElementById("aIntro").value.trim();
+      siteData.about.body = document.getElementById("aBody").value.trim();
+
+      // Testimonials
+      var list = siteData.testimonials || [];
+      for (var i = 0; i < list.length; i++) {
+        var qEl = document.getElementById("tQuote" + i);
+        var aEl = document.getElementById("tAuthor" + i);
+        var coEl = document.getElementById("tCompany" + i);
+        if (qEl) list[i].quote = qEl.value.trim();
+        if (aEl) list[i].author = aEl.value.trim();
+        if (coEl) list[i].company = coEl.value.trim();
+      }
+    }
+
+    async function saveAll() {
+      collectFromForm();
+      document.getElementById("saveBtn").textContent = "Saving...";
+      var ok = await saveSiteContent(siteData);
+      document.getElementById("saveBtn").textContent = "Save changes";
+      document.getElementById("status").textContent = ok ? "Saved." : "Save failed.";
+    }
+
+    function setStatus(msg) {
+      document.getElementById("status").textContent = msg;
+    }
+
+    loadAll();
+  </script>
+</body>
+</html>
