@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clients — Studio Skyline</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <div class="site-main">
+    <div class="section">
+      <div class="section-kicker">Trust</div>
+      <div class="section-title">Clients</div>
+      <div class="section-desc">Selected clients and collaborators</div>
+    </div>
+
+    <div class="clients-grid" id="clientsGrid"></div>
+
+    <div class="section" style="margin-top:64px">
+      <div class="section-kicker">Film</div>
+      <div class="section-title">Videos</div>
+      <div class="section-desc">Manufacturing, finishing, behind-the-scenes, and highlights.</div>
+    </div>
+
+    <div class="videos-grid" id="videosGrid"></div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script src="shared.js"></script>
+  <script src="data.js"></script>
+  <script>
+    // Clients
+    var cGrid = document.getElementById("clientsGrid");
+    var cHtml = "";
+    CLIENTS.forEach(function(c) {
+      var inner = c.logo
+        ? '<img src="' + c.logo + '" alt="' + c.name + '">'
+        : '<span class="name">' + c.name + '</span>';
+
+      if (c.url) {
+        cHtml += '<a href="' + c.url + '" target="_blank" rel="noopener noreferrer" class="client-cell">' + inner + '</a>';
+      } else {
+        cHtml += '<div class="client-cell">' + inner + '</div>';
+      }
+    });
+    cGrid.innerHTML = cHtml;
+
+    // Videos
+    var vGrid = document.getElementById("videosGrid");
+    var vHtml = "";
+    VIDEOS.forEach(function(v) {
+      vHtml += '<div class="video-card">' +
+        '<div class="aspect"><iframe src="https://www.youtube.com/embed/' + v.youtubeId + '" title="' + v.title + '" ' +
+        'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>' +
+        '<div class="info"><h3>' + v.title + '</h3>' +
+        (v.note ? '<p>' + v.note + '</p>' : '') +
+        '</div></div>';
+    });
+    vGrid.innerHTML = vHtml;
+  </script>
+</body>
+</html>
