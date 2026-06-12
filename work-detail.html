@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Work Detail — Studio Skyline</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <div class="site-main">
+    <div class="detail-header" id="detailHeader"></div>
+    <div id="tripleView"></div>
+    <div id="detailDesc"></div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay hidden" id="videoModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="counter" id="modalCounter"></div>
+        <div class="modal-controls">
+          <button class="modal-btn" onclick="modalNav(-1)" aria-label="Previous">&#8249;</button>
+          <button class="modal-btn" onclick="modalNav(1)" aria-label="Next">&#8250;</button>
+          <button class="modal-close" onclick="closeModal()">Close</button>
+        </div>
+      </div>
+      <video id="modalVideo" controls playsinline preload="auto" class="modal-video"></video>
+      <div class="modal-caption" id="modalCaption"></div>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script src="shared.js"></script>
+  <script src="data.js"></script>
+  <script>
+    var params = new URLSearchParams(window.location.search);
+    var slug = params.get("slug");
+    var collection = null;
+
+    for (var i = 0; i < WORK_COLLECTIONS.length; i++) {
+      if (WORK_COLLECTIONS[i].slug === slug) { collection = WORK_COLLECTIONS[i]; break; }
+    }
+
+    if (!collection) {
+      document.getElementById("detailHeader").innerHTML = '<h1 class="detail-title">Collection not found</h1>';
+    } else {
+      document.title = collection.title + " — Studio Skyline";
+
+      // Header
+      var headerHtml = '';
+      if (collection.index) headerHtml += '<div class="detail-idx">' + collection.index + '</div>';
+      headerHtml += '<h1 class="detail-title">' + collection.title + '</h1>';
+      if (collection.subtitle) headerHtml += '<p class="detail-sub">' + collection.subtitle + '</p>';
+      document.getElementById("detailHeader").innerHTML = headerHtml;
+
+      // Description
+      if (collection.description) {
+        document.getElementById("detailDesc").innerHTML = '<p class="detail-desc">' + collection.description + '</p>';
+      }
+
+      var videos = collection.videos;
+      var active = 0;
+      var modalIndex = -1;
+
+      function pad(n) { return String(n).padStart(2, "0"); }
+
+      function clamp(i) {
+        if (videos.length === 0) return 0;
+        return ((i % videos.length) + videos.length) % videos.length;
+      }
+
+      function renderTriple() {
+        if (videos.length === 0) return;
+        var len = videos.length;
+        var prevI = clamp(active - 1);
+        var nextI = clamp(active + 1);
+        var current = videos[active];
+
+        var html = '<div class="triple-top"><span>' +
+          (collection.index ? collection.index + ' &bull; ' : '') + 'LOOK</span>' +
+          '<span>' + pad(active + 1) + ' / ' + pad(len) + '</span></div>';
+
+        html += '<div class="triple-view">';
+
+        // Left ghost
+        if (len > 1) {
+          html += '<button class="triple-ghost left" onclick="setActive(' + prevI + ')" aria-label="Previous">' +
+            '<div class="triple-ghost-inner" style="position:relative">' +
+            '<video src="' + videos[prevI].src + '" autoplay loop muted playsinline preload="metadata"></video>' +
+            '<div class="fade-left"></div></div></button>';
+        }
+
+        // Right ghost
+        if (len > 1) {
+          html += '<button class="triple-ghost right" onclick="setActive(' + nextI + ')" aria-label="Next">' +
+            '<div class="triple-ghost-inner" style="position:relative">' +
+            '<video src="' + videos[nextI].src + '" autoplay loop muted playsinline preload="metadata"></video>' +
+            '<div class="fade-right"></div></div></button>';
+        }
+
+        // Center
+        html += '<div class="triple-center"><div class="triple-center-inner">' +
+          '<video src="' + current.src + '" autoplay loop muted playsinline preload="auto"></video>' +
+          '</div></div>';
+
+        // Nav buttons
+        if (len > 1) {
+          html += '<div class="triple-nav">' +
+            '<button class="nav-circle" onclick="setActive(' + prevI + ')" aria-label="Previous">&#8249;</button>' +
+            '<button class="nav-circle" onclick="setActive(' + nextI + ')" aria-label="Next">&#8250;</button>' +
+            '</div>';
+        }
+
+        html += '</div>';
+
+        // Caption
+        html += '<div class="triple-caption">' +
+          '<div class="sel">SELECTED</div>' +
+          '<div class="name">' + (current.title || 'Video ' + pad(active + 1)) + '</div>' +
+          (len > 1 ? '<div class="tip">Tip: click left/right sides or use &larr; &rarr; (Esc closes popup)</div>' : '') +
+          '</div>';
+
+        // All videos grid
+        html += '<div class="all-grid-header"><span>ALL</span><span style="letter-spacing:normal">Click to open</span></div>';
+        html += '<div class="all-grid">';
+        videos.forEach(function(v, i) {
+          var isActive = i === active;
+          html += '<button class="vid-card' + (isActive ? ' active' : '') + '" onclick="openModal(' + i + ')">' +
+            '<div class="vid-card-media">' +
+            '<video src="' + v.src + '" autoplay loop muted playsinline preload="metadata"></video>' +
+            '<div class="overlay"></div>' +
+            '<div class="bottom-info"><span class="num">' + pad(i + 1) + '</span>' +
+            '<span class="status">' + (isActive ? 'Selected' : '') + '</span></div>' +
+            '</div><div class="vid-card-body">' +
+            '<div class="title">' + (v.title || 'Video ' + pad(i + 1)) + '</div>' +
+            '<div class="bar"></div></div></button>';
+        });
+        html += '</div>';
+
+        document.getElementById("tripleView").innerHTML = html;
+      }
+
+      window.setActive = function(i) {
+        active = clamp(i);
+        renderTriple();
+      };
+
+      window.openModal = function(i) {
+        active = clamp(i);
+        modalIndex = i;
+        renderTriple();
+        showModal();
+      };
+
+      function showModal() {
+        var modal = document.getElementById("videoModal");
+        var vid = document.getElementById("modalVideo");
+        var cap = document.getElementById("modalCaption");
+        var cnt = document.getElementById("modalCounter");
+
+        modal.classList.remove("hidden");
+        vid.src = videos[modalIndex].src;
+        cnt.textContent = pad(modalIndex + 1) + " / " + pad(videos.length);
+
+        var t = videos[modalIndex].title;
+        cap.innerHTML = t ? '<div class="title">' + t + '</div>' : '';
+        cap.style.display = t ? '' : 'none';
+      }
+
+      window.closeModal = function() {
+        var modal = document.getElementById("videoModal");
+        var vid = document.getElementById("modalVideo");
+        modal.classList.add("hidden");
+        vid.pause();
+        vid.removeAttribute("src");
+        modalIndex = -1;
+      };
+
+      window.modalNav = function(dir) {
+        modalIndex = clamp(modalIndex + dir);
+        active = modalIndex;
+        renderTriple();
+        showModal();
+      };
+
+      document.addEventListener("keydown", function(e) {
+        if (e.key === "Escape") closeModal();
+        if (e.key === "ArrowLeft") {
+          if (modalIndex >= 0) { modalNav(-1); }
+          else { setActive(active - 1); }
+        }
+        if (e.key === "ArrowRight") {
+          if (modalIndex >= 0) { modalNav(1); }
+          else { setActive(active + 1); }
+        }
+      });
+
+      document.getElementById("videoModal").addEventListener("click", function(e) {
+        if (e.target === this) closeModal();
+      });
+
+      renderTriple();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Production House — Studio Skyline</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <div class="site-main">
+    <div style="margin-bottom:24px">
+      <div class="section-kicker">Machines &bull; Finishing &bull; Packaging</div>
+      <h1 class="section-title" style="margin-top:12px">Production House</h1>
+    </div>
+
+    <div id="phGrid"></div>
+
+    <div class="ph-walkthrough" id="phWalkthrough"></div>
+
+    <p class="detail-desc">A look inside the production floor: machinery, setup, finishing, and packaging workflows.</p>
+  </div>
+
+  <!-- PH Modal -->
+  <div class="ph-modal" id="phModal">
+    <div class="ph-modal-content">
+      <button class="ph-modal-close" onclick="closePH()">Close</button>
+      <button class="ph-modal-prev" onclick="navPH(-1)">&#8249;</button>
+      <button class="ph-modal-next" onclick="navPH(1)">&#8250;</button>
+      <div class="ph-modal-media" id="phModalMedia"></div>
+      <div class="ph-modal-alt" id="phModalAlt"></div>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script src="shared.js"></script>
+  <script src="data.js"></script>
+  <script>
+    var media = PRODUCTION_HOUSE_MEDIA;
+    var phIndex = -1;
+
+    function renderPHGrid() {
+      if (media.length === 0) return;
+      var html = '<div class="ph-grid">';
+
+      // Main tile
+      html += '<div onclick="openPH(0)" class="ph-tile">' + mediaTile(media[0]) + '</div>';
+
+      // Side tiles
+      html += '<div class="ph-side">';
+      for (var i = 1; i < Math.min(3, media.length); i++) {
+        html += '<div onclick="openPH(' + i + ')" class="ph-tile">' + mediaTile(media[i]) + '</div>';
+      }
+      html += '</div></div>';
+
+      document.getElementById("phGrid").innerHTML = html;
+
+      // Walkthrough
+      var wHtml = '';
+      for (var j = 0; j < media.length; j++) {
+        if (j > 0) wHtml += '<span class="ph-line"></span>';
+        wHtml += '<span class="ph-step">' + (j + 1) + '</span>';
+      }
+      wHtml += '<span style="margin-left:8px">Click to open. Use &larr; &rarr; to walk through.</span>';
+      document.getElementById("phWalkthrough").innerHTML = wHtml;
+    }
+
+    function mediaTile(item) {
+      var html = '<div class="media">';
+      if (item.type === "video") {
+        html += '<video src="' + item.src + '" autoplay loop muted playsinline></video>';
+      } else {
+        html += '<img src="' + item.src + '" alt="' + (item.alt || '') + '">';
+      }
+      html += '</div><div class="play-overlay"><div class="play-circle">&#9654;</div></div>';
+      return html;
+    }
+
+    window.openPH = function(i) {
+      phIndex = i;
+      showPHModal();
+    };
+
+    function showPHModal() {
+      var modal = document.getElementById("phModal");
+      var mediaEl = document.getElementById("phModalMedia");
+      var altEl = document.getElementById("phModalAlt");
+      var item = media[phIndex];
+
+      modal.classList.add("open");
+      document.body.style.overflow = "hidden";
+
+      if (item.type === "video") {
+        mediaEl.innerHTML = '<video src="' + item.src + '" controls autoplay class="ph-modal-media video" style="width:100%;height:100%;object-fit:contain"></video>';
+      } else {
+        mediaEl.innerHTML = '<img src="' + item.src + '" alt="' + (item.alt || '') + '" style="width:100%;height:100%;object-fit:contain">';
+      }
+      altEl.textContent = item.alt || '';
+    }
+
+    window.closePH = function() {
+      document.getElementById("phModal").classList.remove("open");
+      document.body.style.overflow = "";
+      phIndex = -1;
+    };
+
+    window.navPH = function(dir) {
+      phIndex = ((phIndex + dir) % media.length + media.length) % media.length;
+      showPHModal();
+    };
+
+    document.addEventListener("keydown", function(e) {
+      if (phIndex < 0) return;
+      if (e.key === "Escape") closePH();
+      if (e.key === "ArrowLeft") navPH(-1);
+      if (e.key === "ArrowRight") navPH(1);
+    });
+
+    document.getElementById("phModal").addEventListener("click", function(e) {
+      if (e.target === this) closePH();
+    });
+
+    renderPHGrid();
+  </script>
+</body>
+</html>

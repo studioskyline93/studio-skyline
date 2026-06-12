@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Studio Skyline — Premium Packaging &amp; Print Production</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <div class="site-main">
+    <!-- HERO -->
+    <div class="hero-card">
+      <div class="hero-grid">
+        <div>
+          <div class="hero-city">New Delhi</div>
+          <div class="hero-line"></div>
+          <h1 class="hero-title">Premium packaging &amp; print production.</h1>
+          <p class="hero-intro">We design and manufacture premium fancy boxes, paper bags, invitation cards, stationery, and high-quality book printing for brands that care about detail.</p>
+          <div class="hero-cta">
+            <a href="work.html" class="btn-primary">View Work</a>
+            <a href="production-house.html" class="btn-secondary">Production House</a>
+            <a href="contact.html" class="btn-secondary">Enquire</a>
+          </div>
+        </div>
+        <div>
+          <div class="cap-card">
+            <div class="cap-title">Capabilities</div>
+            <ul class="cap-list">
+              <li>Fancy rigid boxes &amp; mono cartons</li>
+              <li>Paper bags</li>
+              <li>Invitation cards &amp; stationery</li>
+              <li>Books, catalogues &amp; printing</li>
+              <li>Manufacturing &amp; finishing</li>
+            </ul>
+            <div class="cap-highlight">From concept to manufacturing. Clean finishes, precise color, premium materials.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORK SECTION -->
+    <div class="section">
+      <div class="section-kicker">Work</div>
+      <div class="section-title">Work</div>
+    </div>
+
+    <!-- Work Reel -->
+    <div>
+      <div class="reel-header">
+        <span class="label">Selected work</span>
+        <span class="counter" id="reelCounter">01 / 00</span>
+      </div>
+      <div class="reel-track" id="reelTrack"></div>
+      <div class="reel-footer">
+        <span>Drag / scroll</span>
+        <div class="reel-btns">
+          <button onclick="scrollReel(-1)">Prev</button>
+          <button onclick="scrollReel(1)">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- YouTube Video -->
+    <div class="video-embed">
+      <div class="aspect">
+        <iframe
+          src="https://www.youtube.com/embed/sGJJgBfHy5E"
+          title="Studio Film"
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+      </div>
+    </div>
+
+    <!-- Testimonials -->
+    <div class="testimonials">
+      <h2>Testimonials</h2>
+      <div class="testimonials-track" id="testimonials"></div>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script src="shared.js"></script>
+  <script src="data.js"></script>
+  <script>
+    // Render reel
+    function renderReel() {
+      var track = document.getElementById("reelTrack");
+      var counter = document.getElementById("reelCounter");
+      if (!track) return;
+
+      var html = "";
+      WORK_COLLECTIONS.forEach(function(c) {
+        var preview = c.videos && c.videos.length > 0 ? c.videos[0].src : "";
+        var mediaHtml = preview
+          ? '<video src="' + preview + '" autoplay loop muted playsinline preload="metadata"></video>'
+          : '<div class="no-vid">No video yet</div>';
+        html += '<a href="work-detail.html?slug=' + c.slug + '" class="reel-card">' +
+          '<div class="reel-card-media">' + mediaHtml + '</div>' +
+          '<div class="reel-card-info">' +
+            '<div><div class="reel-card-title">' + c.title + '</div>' +
+            '<div class="reel-card-count">' + c.videos.length + ' video' + (c.videos.length === 1 ? '' : 's') + '</div></div>' +
+            '<div class="reel-card-view">View</div>' +
+          '</div></a>';
+      });
+      track.innerHTML = html;
+      counter.textContent = "01 / " + String(WORK_COLLECTIONS.length).padStart(2, "0");
+    }
+
+    function scrollReel(dir) {
+      var track = document.getElementById("reelTrack");
+      if (!track) return;
+      var cardWidth = track.querySelector(".reel-card") ? track.querySelector(".reel-card").offsetWidth + 12 : 300;
+      track.scrollBy({ left: dir * cardWidth, behavior: "smooth" });
+    }
+
+    // Render testimonials
+    function renderTestimonials() {
+      var el = document.getElementById("testimonials");
+      if (!el) return;
+      var html = "";
+      TESTIMONIALS.forEach(function(t) {
+        html += '<figure class="testimonial-card">' +
+          '<blockquote>&ldquo;' + t.quote + '&rdquo;</blockquote>' +
+          '<figcaption><span class="author">' + t.author + '</span>' +
+          (t.company ? ' &middot; ' + t.company : '') +
+          '</figcaption></figure>';
+      });
+      el.innerHTML = html;
+    }
+
+    renderReel();
+    renderTestimonials();
+  </script>
+</body>
+</html>
