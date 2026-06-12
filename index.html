@@ -7,34 +7,15 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
   <style>
-    :root {
-      --color-red: #cc0000;
-    }
 
-    /* ── Global ── */
-    body {
-      background: #111111;
-      margin: 0;
-      overflow-x: hidden;
-    }
+    /* ══════════════════════════════════════
+       HERO SCROLL ZONE — scoped, no leaks
+    ══════════════════════════════════════ */
 
-    /* ── Float animations ── */
-    @keyframes float {
-      0%   { transform: translateX(0px); }
-      50%  { transform: translateX(8px); }
-      100% { transform: translateX(0px); }
-    }
-    .floating         { animation: float 6s ease-in-out infinite; }
-    .floating-delayed { animation: float 8s ease-in-out infinite; animation-delay: 2s; }
-
-    /* ─────────────────────────────────────────
-       PHOTO SCROLL HERO SECTION
-    ───────────────────────────────────────── */
     #hero-scroll-zone {
       position: relative;
       height: 500vh;
     }
-
     #hero-canvas-wrap {
       position: sticky;
       top: 0;
@@ -42,7 +23,6 @@
       width: 100%;
       overflow: hidden;
     }
-
     #hero-lightpass {
       display: block;
       width: 100%;
@@ -51,8 +31,8 @@
       object-fit: cover;
     }
 
-    /* ── Scenes (fixed overlays during hero scroll) ── */
-    .scene {
+    /* Fixed scene overlays — only visible during hero scroll */
+    .hero-scene {
       position: fixed;
       inset: 0;
       z-index: 22;
@@ -64,65 +44,13 @@
       opacity: 0;
       transition: opacity 0.5s ease;
     }
-    .scene .inner { pointer-events: auto; }
+    .hero-scene .inner { pointer-events: auto; }
 
     /* Scene 1: right-aligned */
-    #scene-1 {
-      align-items: flex-end;
-      padding-right: 4%;
-    }
+    #scene-1 { align-items: flex-end; padding-right: 4%; }
 
-    /* ── Navigation ── */
-    .glass-panel {
-      background: rgba(0,0,0,0.55);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(204,0,0,0.25);
-    }
-
-    nav.skyline-nav {
-      position: fixed !important;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      padding: 20px 44px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      font-size: 11px;
-      font-weight: 700;
-    }
-    .brand-name {
-      font-weight: 900;
-      font-size: clamp(15px, 2vw, 22px);
-      letter-spacing: 0.25em;
-      color: white;
-      text-decoration: none;
-    }
-    .brand-name .skyline-red { color: var(--color-red); font-weight: 300; }
-    .nav-links a {
-      color: rgba(255,255,255,0.80);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--color-red); }
-    .nav-links .cta {
-      background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
-      color: #ffffff !important;
-      padding: 10px 24px;
-      border-radius: 999px;
-      font-weight: 700;
-      box-shadow: 0 4px 15px rgba(204,0,0,0.35);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .nav-links .cta:hover {
-      background: linear-gradient(135deg, #e60000 0%, #b30000 100%);
-      box-shadow: 0 6px 20px rgba(204,0,0,0.55);
-      transform: translateY(-2px);
-    }
-
-    /* ── Glass card ── */
-    .glass-card {
+    /* Glass overlay card */
+    .hero-glass-card {
       background: rgba(0,0,0,0.60);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(204,0,0,0.25);
@@ -131,12 +59,12 @@
       max-width: 420px;
       box-sizing: border-box;
     }
-    #scene-1 .glass-card { text-align: right; }
-    #scene-2 .glass-card,
-    #scene-3 .glass-card { text-align: center; }
+    #scene-1 .hero-glass-card { text-align: right; }
+    #scene-2 .hero-glass-card,
+    #scene-3 .hero-glass-card { text-align: center; }
 
-    /* ── Scene text ── */
-    h1.hero-title {
+    /* Scene headings — scoped, won't touch site content */
+    .hero-scene h1 {
       font-size: clamp(28px, 4vw, 52px);
       font-weight: 900;
       text-transform: uppercase;
@@ -145,64 +73,52 @@
       word-break: break-word;
       color: #ffffff;
       text-shadow: 0 2px 20px rgba(0,0,0,0.8);
+      margin: 0;
     }
-    h1.hero-title .red-text { color: var(--color-red); }
-    .hero-sub {
+    .hero-scene h1 .red { color: #cc0000; }
+    .hero-scene h2 {
+      font-size: clamp(18px, 2.5vw, 30px);
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #cc0000;
+      letter-spacing: 0.08em;
+      margin: 0 0 14px;
+      line-height: 1.2;
+    }
+    .hero-scene h2.lg {
+      font-size: clamp(26px, 4vw, 52px);
+      font-weight: 900;
+      color: #ffffff;
+      margin-bottom: 28px;
+    }
+    .hero-scene h2.lg .red { color: #cc0000; }
+    .hero-scene p.sub {
       font-size: clamp(10px, 1.2vw, 13px);
       font-weight: 300;
       letter-spacing: 0.4em;
       text-transform: uppercase;
       opacity: 0.90;
       color: white;
+      margin: 10px 0 0;
     }
-    h2.section-title {
-      font-size: clamp(18px, 2.5vw, 30px);
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--color-red);
-      letter-spacing: 0.08em;
-      margin-bottom: 14px;
-      line-height: 1.2;
-    }
-    h2.section-title-lg {
-      font-size: clamp(26px, 4vw, 52px);
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #ffffff;
-      line-height: 1.1;
-      margin-bottom: 28px;
-    }
-    h2.section-title-lg .red-text { color: var(--color-red); }
-    .section-body {
+    .hero-scene p.body-text {
       font-size: clamp(13px, 1.5vw, 15px);
       font-weight: 300;
       line-height: 1.75;
       color: rgba(230,230,230,0.90);
+      margin: 0;
     }
 
-    /* ── Scroll indicator ── */
-    .scroll-mouse {
-      width: 26px; height: 40px;
-      border: 2px solid rgba(204,0,0,0.55);
-      border-radius: 999px;
-      display: flex; justify-content: center;
-      padding-top: 6px;
-      margin: 0 auto;
+    /* Float animations */
+    @keyframes ss-float {
+      0%   { transform: translateX(0px); }
+      50%  { transform: translateX(8px); }
+      100% { transform: translateX(0px); }
     }
-    .scroll-wheel {
-      width: 4px; height: 8px;
-      background: var(--color-red);
-      border-radius: 999px;
-      animation: wheelDrop 1.8s ease-in-out infinite;
-    }
-    @keyframes wheelDrop {
-      0%   { transform: translateY(0);   opacity: 1; }
-      80%  { transform: translateY(12px); opacity: 0; }
-      100% { transform: translateY(0);   opacity: 0; }
-    }
+    .ss-floating         { animation: ss-float 6s ease-in-out infinite; }
+    .ss-floating-delayed { animation: ss-float 8s ease-in-out infinite; animation-delay: 2s; }
 
-    /* ── Kicker pill ── */
+    /* Kicker pill */
     .kicker-pill {
       display: inline-flex; align-items: center; gap: 8px;
       font-size: 10px; font-weight: 700; letter-spacing: 0.25em;
@@ -213,62 +129,95 @@
     }
     .kicker-dot {
       width: 6px; height: 6px; border-radius: 50%;
-      background: var(--color-red);
-      animation: pulse 1.8s ease-in-out infinite;
+      background: #cc0000;
+      animation: ss-pulse 1.8s ease-in-out infinite;
     }
-    @keyframes pulse { 0%,100% { opacity:0.5; } 50% { opacity:1; } }
+    @keyframes ss-pulse { 0%,100% { opacity:0.5; } 50% { opacity:1; } }
 
-    /* ── CTA button in scene 3 ── */
-    .btn-scene-red {
-      background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
-      color: #ffffff;
-      border: none; cursor: pointer;
-      padding: 14px 36px;
+    /* Scroll mouse indicator */
+    .scroll-mouse {
+      width: 26px; height: 40px;
+      border: 2px solid rgba(204,0,0,0.55);
       border-radius: 999px;
+      display: flex; justify-content: center;
+      padding-top: 6px; margin: 0 auto;
+    }
+    .scroll-wheel {
+      width: 4px; height: 8px;
+      background: #cc0000; border-radius: 999px;
+      animation: wheelDrop 1.8s ease-in-out infinite;
+    }
+    @keyframes wheelDrop {
+      0%   { transform: translateY(0);    opacity: 1; }
+      80%  { transform: translateY(12px); opacity: 0; }
+      100% { transform: translateY(0);    opacity: 0; }
+    }
+
+    /* Scene 3 CTA button */
+    .btn-hero-cta {
+      background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+      color: #fff; border: none; cursor: pointer;
+      padding: 14px 36px; border-radius: 999px;
       font-size: 15px; font-weight: 700;
       letter-spacing: 0.1em; text-transform: uppercase;
       box-shadow: 0 4px 15px rgba(204,0,0,0.35);
       transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
     }
-    .btn-scene-red:hover {
+    .btn-hero-cta:hover {
       background: linear-gradient(135deg, #e60000 0%, #b30000 100%);
       box-shadow: 0 6px 20px rgba(204,0,0,0.55);
       transform: translateY(-2px) scale(1.04);
     }
 
-    /* ── "Scenes active" state: scenes visible only while hero zone is active ── */
-    body.hero-done .scene { display: none !important; }
+    /* Hide scenes once hero is scrolled past */
+    body.hero-done .hero-scene { display: none !important; }
 
-    /* ─────────────────────────────────────────
-       SITE CONTENT (from index.html)
-       — no top padding; it scrolls up naturally
-    ───────────────────────────────────────── */
-    .site-main {
-      background: #111111;
-      position: relative;
-      z-index: 10;
+    /* Navigation override (glass + fixed, sits above everything) */
+    nav.skyline-nav {
+      position: fixed !important;
+      top: 0; left: 0; right: 0; z-index: 100;
+      padding: 20px 44px;
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(204,0,0,0.25);
+      text-transform: uppercase; letter-spacing: 0.2em;
+      font-size: 11px; font-weight: 700;
     }
-
-    /* smooth scroll anchor */
-    #site-content {
-      scroll-margin-top: 0;
+    .brand-name {
+      font-weight: 900; font-size: clamp(15px, 2vw, 22px);
+      letter-spacing: 0.25em; color: white; text-decoration: none;
+    }
+    .brand-name .skyline-red { color: #cc0000; font-weight: 300; }
+    .nav-links a {
+      color: rgba(255,255,255,0.80); text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: #cc0000; }
+    .nav-links .cta {
+      background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+      color: #fff !important; padding: 10px 24px; border-radius: 999px;
+      font-weight: 700; box-shadow: 0 4px 15px rgba(204,0,0,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .nav-links .cta:hover {
+      background: linear-gradient(135deg, #e60000 0%, #b30000 100%);
+      box-shadow: 0 6px 20px rgba(204,0,0,0.55);
+      transform: translateY(-2px);
     }
 
     @media (max-width: 720px) {
       nav.skyline-nav { padding: 16px 20px; }
-      .glass-card { padding: 28px 24px; }
+      .hero-glass-card { padding: 28px 24px; }
       #scene-1 { align-items: center; padding-right: 0; }
-      #scene-1 .glass-card { text-align: center; }
+      #scene-1 .hero-glass-card { text-align: center; }
     }
   </style>
 </head>
 <body class="text-white font-sans antialiased overflow-x-hidden">
 
-  <!-- ── Navigation (always fixed) ── -->
-  <nav class="skyline-nav glass-panel pointer-events-auto">
-    <div class="brand-name">
-      STUDIO <span class="skyline-red">SKYLINE</span>
-    </div>
+  <!-- Navigation -->
+  <nav class="skyline-nav pointer-events-auto">
+    <div class="brand-name">STUDIO <span class="skyline-red">SKYLINE</span></div>
     <div class="nav-links hidden md:flex space-x-10 items-center">
       <a href="#">Services</a>
       <a href="work.html">Portfolio</a>
@@ -277,49 +226,41 @@
     </div>
   </nav>
 
-  <!-- ══════════════════════════════════════
-       PHOTO SCROLL HERO ZONE
-  ══════════════════════════════════════ -->
+  <!-- ══════════════════════════════
+       PHOTO SCROLL HERO
+  ══════════════════════════════ -->
   <div id="hero-scroll-zone">
     <div id="hero-canvas-wrap">
       <canvas id="hero-lightpass"></canvas>
     </div>
   </div>
 
-  <!-- Scene overlays (fixed, hidden via JS once hero is done) -->
-
-  <!-- Scene 1: Hero — right side -->
-  <div id="scene-1" class="scene" style="opacity:1;">
-    <div class="inner floating">
-      <div class="glass-card shadow-2xl" style="margin-top:52px;">
+  <!-- Scene 1: Studio Skyline intro -->
+  <div id="scene-1" class="hero-scene" style="opacity:1;">
+    <div class="inner ss-floating">
+      <div class="hero-glass-card shadow-2xl" style="margin-top:52px;">
         <div class="kicker-pill">
           <span class="kicker-dot"></span>
           Graphics &nbsp;✦&nbsp; Design &nbsp;✦&nbsp; Fabrication
         </div>
-        <h1 class="hero-title">
-          STUDIO <span class="red-text">SKYLINE</span>
-        </h1>
-        <p class="hero-sub" style="margin-top:10px;">
-          Graphics &nbsp;•&nbsp; Signage &nbsp;•&nbsp; Fabrication
-        </p>
+        <h1>STUDIO <span class="red">SKYLINE</span></h1>
+        <p class="sub">Graphics &nbsp;•&nbsp; Signage &nbsp;•&nbsp; Fabrication</p>
         <div style="margin-top:28px;">
           <p style="font-size:11px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(180,180,180,0.7);margin-bottom:12px;">
             Scroll to explore
           </p>
-          <div class="scroll-mouse">
-            <div class="scroll-wheel"></div>
-          </div>
+          <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Scene 2: Engineering Vision -->
-  <div id="scene-2" class="scene">
-    <div class="inner floating-delayed">
-      <div class="glass-card shadow-2xl">
-        <h2 class="section-title">Engineering Vision</h2>
-        <p class="section-body">
+  <div id="scene-2" class="hero-scene">
+    <div class="inner ss-floating-delayed">
+      <div class="hero-glass-card shadow-2xl">
+        <h2>Engineering Vision</h2>
+        <p class="body-text">
           Bridging the gap between raw mechanics and refined aesthetic beauty.
           Every frame we craft tells a story of meticulous design and structural integrity.
         </p>
@@ -328,114 +269,102 @@
   </div>
 
   <!-- Scene 3: Start Your Project -->
-  <div id="scene-3" class="scene">
-    <div class="inner floating">
-      <div class="glass-card shadow-2xl">
-        <h2 class="section-title-lg">
-          Start Your<br><span class="red-text">Project</span>
-        </h2>
-        <button class="btn-scene-red">GET A QUOTE</button>
+  <div id="scene-3" class="hero-scene">
+    <div class="inner ss-floating">
+      <div class="hero-glass-card shadow-2xl">
+        <h2 class="lg">Start Your<br><span class="red">Project</span></h2>
+        <button class="btn-hero-cta">GET A QUOTE</button>
       </div>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════
-       SITE CONTENT (index.html body)
-  ══════════════════════════════════════ -->
-  <div id="site-content">
-    <div class="site-main">
+  <!-- ══════════════════════════════
+       SITE CONTENT (original index)
+  ══════════════════════════════ -->
+  <div id="site-header"></div>
 
-      <!-- HERO CARD -->
-      <div class="hero-card">
-        <div class="hero-grid">
-          <div>
-            <div class="hero-city">New Delhi</div>
-            <div class="hero-line"></div>
-            <h1 class="hero-title" style="font-size:clamp(28px,4vw,52px);color:#fff;text-shadow:none;">
-              Premium packaging &amp; print production.
-            </h1>
-            <p class="hero-intro">We design and manufacture premium fancy boxes, paper bags, invitation cards, stationery, and high-quality book printing for brands that care about detail.</p>
-            <div class="hero-cta">
-              <a href="work.html" class="btn-primary">View Work</a>
-              <a href="production-house.html" class="btn-secondary">Production House</a>
-              <a href="contact.html" class="btn-secondary">Enquire</a>
-            </div>
+  <div class="site-main">
+
+    <div class="hero-card">
+      <div class="hero-grid">
+        <div>
+          <div class="hero-city">New Delhi</div>
+          <div class="hero-line"></div>
+          <h1 class="hero-title">Premium packaging &amp; print production.</h1>
+          <p class="hero-intro">We design and manufacture premium fancy boxes, paper bags, invitation cards, stationery, and high-quality book printing for brands that care about detail.</p>
+          <div class="hero-cta">
+            <a href="work.html" class="btn-primary">View Work</a>
+            <a href="production-house.html" class="btn-secondary">Production House</a>
+            <a href="contact.html" class="btn-secondary">Enquire</a>
           </div>
-          <div>
-            <div class="cap-card">
-              <div class="cap-title">Capabilities</div>
-              <ul class="cap-list">
-                <li>Fancy rigid boxes &amp; mono cartons</li>
-                <li>Paper bags</li>
-                <li>Invitation cards &amp; stationery</li>
-                <li>Books, catalogues &amp; printing</li>
-                <li>Manufacturing &amp; finishing</li>
-              </ul>
-              <div class="cap-highlight">From concept to manufacturing. Clean finishes, precise color, premium materials.</div>
-            </div>
+        </div>
+        <div>
+          <div class="cap-card">
+            <div class="cap-title">Capabilities</div>
+            <ul class="cap-list">
+              <li>Fancy rigid boxes &amp; mono cartons</li>
+              <li>Paper bags</li>
+              <li>Invitation cards &amp; stationery</li>
+              <li>Books, catalogues &amp; printing</li>
+              <li>Manufacturing &amp; finishing</li>
+            </ul>
+            <div class="cap-highlight">From concept to manufacturing. Clean finishes, precise color, premium materials.</div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- WORK SECTION -->
-      <div class="section">
-        <div class="section-kicker">Work</div>
-        <div class="section-title">Work</div>
+    <div class="section">
+      <div class="section-kicker">Work</div>
+      <div class="section-title">Work</div>
+    </div>
+
+    <div>
+      <div class="reel-header">
+        <span class="label">Selected work</span>
+        <span class="counter" id="reelCounter">01 / 00</span>
       </div>
-
-      <!-- Work Reel -->
-      <div>
-        <div class="reel-header">
-          <span class="label">Selected work</span>
-          <span class="counter" id="reelCounter">01 / 00</span>
-        </div>
-        <div class="reel-track" id="reelTrack"></div>
-        <div class="reel-footer">
-          <span>Drag / scroll</span>
-          <div class="reel-btns">
-            <button onclick="scrollReel(-1)">Prev</button>
-            <button onclick="scrollReel(1)">Next</button>
-          </div>
+      <div class="reel-track" id="reelTrack"></div>
+      <div class="reel-footer">
+        <span>Drag / scroll</span>
+        <div class="reel-btns">
+          <button onclick="scrollReel(-1)">Prev</button>
+          <button onclick="scrollReel(1)">Next</button>
         </div>
       </div>
+    </div>
 
-      <!-- YouTube Video -->
-      <div class="video-embed">
-        <div class="aspect">
-          <iframe
-            src="https://www.youtube.com/embed/sGJJgBfHy5E"
-            title="Studio Film"
-            loading="lazy"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen></iframe>
-        </div>
+    <div class="video-embed">
+      <div class="aspect">
+        <iframe
+          src="https://www.youtube.com/embed/sGJJgBfHy5E"
+          title="Studio Film"
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
       </div>
+    </div>
 
-      <!-- Testimonials -->
-      <div class="testimonials">
-        <h2>Testimonials</h2>
-        <div class="testimonials-track" id="testimonials"></div>
-      </div>
+    <div class="testimonials">
+      <h2>Testimonials</h2>
+      <div class="testimonials-track" id="testimonials"></div>
+    </div>
 
-    </div><!-- /.site-main -->
-  </div><!-- /#site-content -->
+  </div><!-- /.site-main -->
 
   <div id="site-footer"></div>
 
-  <!-- ══════════════════════════════════════
-       SCRIPTS
-  ══════════════════════════════════════ -->
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="supabase-client.js"></script>
   <script src="shared.js"></script>
   <script src="data.js"></script>
 
-  <!-- Photo scroll hero logic -->
   <script>
+    /* ── Hero photo scroll ── */
     (function () {
-      const htmlEl   = document.documentElement;
       const canvas   = document.getElementById('hero-lightpass');
       const ctx      = canvas.getContext('2d');
       const heroZone = document.getElementById('hero-scroll-zone');
@@ -444,26 +373,22 @@
       const s3 = document.getElementById('scene-3');
 
       const frameCount = 200;
-      canvas.width  = 1920;
-      canvas.height = 1080;
+      canvas.width = 1920; canvas.height = 1080;
 
-      const currentFrame = i => `studio/ezgif-frame-${i.toString().padStart(3, '0')}.jpg`;
-
+      const src = i => `studio/ezgif-frame-${i.toString().padStart(3,'0')}.jpg`;
       const images = [];
       for (let i = 1; i <= frameCount; i++) {
         const img = new Image();
-        img.src = currentFrame(i);
-        if (i === 1) {
-          img.onload = () => {
-            canvas.width  = img.width  || 1920;
-            canvas.height = img.height || 1080;
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          };
-        }
+        img.src = src(i);
+        if (i === 1) img.onload = () => {
+          canvas.width  = img.width  || 1920;
+          canvas.height = img.height || 1080;
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        };
         images.push(img);
       }
 
-      const updateImage = index => {
+      const draw = index => {
         const fi = images[index - 1];
         if (fi && fi.complete && fi.naturalWidth) {
           ctx.drawImage(fi, 0, 0, canvas.width, canvas.height);
@@ -475,72 +400,41 @@
       let heroDone = false;
 
       window.addEventListener('scroll', () => {
-        const heroBottom = heroZone.getBoundingClientRect().bottom;
-        const heroHeight = heroZone.offsetHeight;
-        const heroTop    = heroZone.offsetTop;
+        const heroH  = heroZone.offsetHeight;
+        const sf     = Math.max(0, Math.min(1, window.scrollY / (heroH - window.innerHeight)));
+        const bottom = heroZone.getBoundingClientRect().bottom;
 
-        // sf = 0 at top of hero zone, 1 at bottom
-        const sf = Math.max(0, Math.min(1, window.scrollY / (heroHeight - window.innerHeight)));
+        requestAnimationFrame(() => draw(Math.min(frameCount, Math.max(1, Math.ceil(sf * frameCount)))));
 
-        // Advance frames
-        requestAnimationFrame(() =>
-          updateImage(Math.min(frameCount, Math.max(1, Math.ceil(sf * frameCount))))
-        );
-
-        // Scene fade logic (same thresholds as original)
-        if (sf < 0.25) {
-          s1.style.opacity = 1 - (sf / 0.25);
-        } else {
-          s1.style.opacity = 0;
-        }
+        s1.style.opacity = sf < 0.25 ? 1 - (sf / 0.25) : 0;
 
         if (sf >= 0.25 && sf <= 0.65) {
-          if (sf < 0.35) {
-            s2.style.opacity = (sf - 0.25) / 0.1;
-          } else if (sf > 0.55) {
-            s2.style.opacity = 1 - ((sf - 0.55) / 0.1);
-          } else {
-            s2.style.opacity = 1;
-          }
-        } else {
-          s2.style.opacity = 0;
-        }
+          s2.style.opacity = sf < 0.35 ? (sf-0.25)/0.1 : sf > 0.55 ? 1-((sf-0.55)/0.1) : 1;
+        } else { s2.style.opacity = 0; }
 
-        s3.style.opacity = sf >= 0.65 ? Math.min(1, (sf - 0.65) / 0.15) : 0;
+        s3.style.opacity = sf >= 0.65 ? Math.min(1,(sf-0.65)/0.15) : 0;
 
-        // Once user scrolls past the hero zone, hide fixed scenes so they
-        // don't float over the site content
-        if (heroBottom <= 0 && !heroDone) {
-          heroDone = true;
-          document.body.classList.add('hero-done');
-        }
-        if (heroBottom > 0 && heroDone) {
-          heroDone = false;
-          document.body.classList.remove('hero-done');
-          s1.style.opacity = 0; // keep scenes hidden when scrolling back up mid-hero
-        }
+        if (bottom <= 0 && !heroDone) { heroDone = true;  document.body.classList.add('hero-done'); }
+        if (bottom >  0 &&  heroDone) { heroDone = false; document.body.classList.remove('hero-done'); s1.style.opacity = 0; }
       });
 
-      // Parallax mouse movement
       document.addEventListener('mousemove', e => {
         const mx = (e.clientX - window.innerWidth  / 2) * 0.008;
         const my = (e.clientY - window.innerHeight / 2) * 0.008;
-        document.querySelectorAll('.glass-card').forEach(el => {
+        document.querySelectorAll('.hero-glass-card').forEach(el => {
           el.style.transform = `translateY(${my}px) translateX(${mx}px)`;
         });
       });
     })();
-  </script>
 
-  <!-- Site content scripts (from original index.html) -->
-  <script>
+    /* ── Site content ── */
     function renderReel(collections) {
-      var track   = document.getElementById('reelTrack');
+      var track = document.getElementById('reelTrack');
       var counter = document.getElementById('reelCounter');
       if (!track) return;
       var html = '';
-      collections.forEach(function (c) {
-        var vids    = c.videos || [];
+      collections.forEach(function(c) {
+        var vids = c.videos || [];
         var preview = vids.length > 0 ? vids[0].src : '';
         var mediaHtml = preview
           ? '<video src="' + preview + '" autoplay loop muted playsinline preload="metadata"></video>'
@@ -549,44 +443,39 @@
           '<div class="reel-card-media">' + mediaHtml + '</div>' +
           '<div class="reel-card-info">' +
             '<div><div class="reel-card-title">' + c.title + '</div>' +
-            '<div class="reel-card-count">' + vids.length + ' video' + (vids.length === 1 ? '' : 's') + '</div></div>' +
+            '<div class="reel-card-count">' + vids.length + ' video' + (vids.length===1?'':'s') + '</div></div>' +
             '<div class="reel-card-view">View</div>' +
           '</div></a>';
       });
       track.innerHTML = html;
-      counter.textContent = '01 / ' + String(collections.length).padStart(2, '0');
+      counter.textContent = '01 / ' + String(collections.length).padStart(2,'0');
     }
 
     function scrollReel(dir) {
       var track = document.getElementById('reelTrack');
       if (!track) return;
       var card = track.querySelector('.reel-card');
-      var cardWidth = card ? card.offsetWidth + 12 : 300;
-      track.scrollBy({ left: dir * cardWidth, behavior: 'smooth' });
+      track.scrollBy({ left: dir * ((card ? card.offsetWidth : 300) + 12), behavior: 'smooth' });
     }
 
     function renderTestimonials(items) {
       var el = document.getElementById('testimonials');
       if (!el) return;
       var html = '';
-      items.forEach(function (t) {
+      items.forEach(function(t) {
         html += '<figure class="testimonial-card">' +
           '<blockquote>&ldquo;' + t.quote + '&rdquo;</blockquote>' +
           '<figcaption><span class="author">' + t.author + '</span>' +
-          (t.company ? ' &middot; ' + t.company : '') +
-          '</figcaption></figure>';
+          (t.company ? ' &middot; ' + t.company : '') + '</figcaption></figure>';
       });
       el.innerHTML = html;
     }
 
-    (async function () {
-      var workData     = await loadWorkContent();
-      var collections  = (workData && workData.collections) ? workData.collections : WORK_COLLECTIONS;
-      renderReel(collections);
-
-      var siteData     = await loadSiteContent();
-      var testimonials = (siteData && Array.isArray(siteData.testimonials)) ? siteData.testimonials : TESTIMONIALS;
-      renderTestimonials(testimonials);
+    (async function() {
+      var workData = await loadWorkContent();
+      renderReel((workData && workData.collections) ? workData.collections : WORK_COLLECTIONS);
+      var siteData = await loadSiteContent();
+      renderTestimonials((siteData && Array.isArray(siteData.testimonials)) ? siteData.testimonials : TESTIMONIALS);
     })();
   </script>
 
