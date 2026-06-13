@@ -138,12 +138,35 @@
   <script src="supabase-config.js"></script>
   <script src="supabase-client.js"></script>
   <script src="shared.js"></script>
+  <script src="data.js"></script>
   <script>
     var siteData = {};
 
     async function loadAll() {
       var data = await loadSiteContent();
       if (data) siteData = data;
+
+      if (!siteData.testimonials || siteData.testimonials.length === 0) {
+        siteData.testimonials = TESTIMONIALS;
+      }
+      if (!siteData.clients || siteData.clients.length === 0) {
+        siteData.clients = CLIENTS;
+      }
+      if (!siteData.videos || siteData.videos.length === 0) {
+        siteData.videos = VIDEOS;
+      }
+      if (!siteData.productionHouseMedia || siteData.productionHouseMedia.length === 0) {
+        siteData.productionHouseMedia = PRODUCTION_HOUSE_MEDIA;
+      }
+      if (!siteData.contact || !siteData.contact.email) {
+        siteData.contact = {
+          email: "studioskyline93@gmail.com",
+          phone: "+91-9810264240",
+          whatsapp: "+919810264240",
+          address: "Okhla Industrial Area, New Delhi",
+          mapUrl: ""
+        };
+      }
 
       // Contact
       var c = siteData.contact || {};
