@@ -44,11 +44,11 @@
       var html = "";
       clients.forEach(function(c) {
         var inner = c.logo
-          ? '<img src="' + c.logo + '" alt="' + (c.name || '') + '">'
-          : '<span class="name">' + (c.name || '') + '</span>';
+          ? '<img src="' + esc(c.logo) + '" alt="' + esc(c.name || '') + '">'
+          : '<span class="name">' + esc(c.name || '') + '</span>';
 
         if (c.url) {
-          html += '<a href="' + c.url + '" target="_blank" rel="noopener noreferrer" class="client-cell">' + inner + '</a>';
+          html += '<a href="' + esc(c.url) + '" target="_blank" rel="noopener noreferrer" class="client-cell">' + inner + '</a>';
         } else {
           html += '<div class="client-cell">' + inner + '</div>';
         }
@@ -65,10 +65,10 @@
       var html = "";
       videos.forEach(function(v) {
         html += '<div class="video-card">' +
-          '<div class="aspect"><iframe src="https://www.youtube.com/embed/' + v.youtubeId + '" title="' + (v.title || '') + '" ' +
+          '<div class="aspect"><iframe src="https://www.youtube.com/embed/' + encodeURIComponent(v.youtubeId) + '" title="' + esc(v.title || '') + '" ' +
           'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>' +
-          '<div class="info"><h3>' + (v.title || '') + '</h3>' +
-          (v.note ? '<p>' + v.note + '</p>' : '') +
+          '<div class="info"><h3>' + esc(v.title || '') + '</h3>' +
+          (v.note ? '<p>' + esc(v.note) + '</p>' : '') +
           '</div></div>';
       });
       el.innerHTML = html;

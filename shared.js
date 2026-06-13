@@ -1,5 +1,10 @@
 // Shared header, footer, and mobile menu logic
 
+function esc(str) {
+  if (!str) return "";
+  return String(str).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 const NAV = [
   { href: "index.html", label: "Home" },
   { href: "work.html", label: "Work" },

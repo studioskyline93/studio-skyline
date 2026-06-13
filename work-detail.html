@@ -63,14 +63,14 @@
 
       // Header
       var headerHtml = '';
-      if (collection.index) headerHtml += '<div class="detail-idx">' + collection.index + '</div>';
-      headerHtml += '<h1 class="detail-title">' + collection.title + '</h1>';
-      if (collection.subtitle) headerHtml += '<p class="detail-sub">' + collection.subtitle + '</p>';
+      if (collection.index) headerHtml += '<div class="detail-idx">' + esc(collection.index) + '</div>';
+      headerHtml += '<h1 class="detail-title">' + esc(collection.title) + '</h1>';
+      if (collection.subtitle) headerHtml += '<p class="detail-sub">' + esc(collection.subtitle) + '</p>';
       document.getElementById("detailHeader").innerHTML = headerHtml;
 
       // Description
       if (collection.description) {
-        document.getElementById("detailDesc").innerHTML = '<p class="detail-desc">' + collection.description + '</p>';
+        document.getElementById("detailDesc").innerHTML = '<p class="detail-desc">' + esc(collection.description) + '</p>';
       }
 
       var videos = collection.videos;
@@ -92,7 +92,7 @@
         var current = videos[active];
 
         var html = '<div class="triple-top"><span>' +
-          (collection.index ? collection.index + ' &bull; ' : '') + 'LOOK</span>' +
+          (collection.index ? esc(collection.index) + ' &bull; ' : '') + 'LOOK</span>' +
           '<span>' + pad(active + 1) + ' / ' + pad(len) + '</span></div>';
 
         html += '<div class="triple-view">';
@@ -131,7 +131,7 @@
         // Caption
         html += '<div class="triple-caption">' +
           '<div class="sel">SELECTED</div>' +
-          '<div class="name">' + (current.title || 'Video ' + pad(active + 1)) + '</div>' +
+          '<div class="name">' + esc(current.title || 'Video ' + pad(active + 1)) + '</div>' +
           (len > 1 ? '<div class="tip">Tip: click left/right sides or use &larr; &rarr; (Esc closes popup)</div>' : '') +
           '</div>';
 
@@ -147,7 +147,7 @@
             '<div class="bottom-info"><span class="num">' + pad(i + 1) + '</span>' +
             '<span class="status">' + (isActive ? 'Selected' : '') + '</span></div>' +
             '</div><div class="vid-card-body">' +
-            '<div class="title">' + (v.title || 'Video ' + pad(i + 1)) + '</div>' +
+            '<div class="title">' + esc(v.title || 'Video ' + pad(i + 1)) + '</div>' +
             '<div class="bar"></div></div></button>';
         });
         html += '</div>';
@@ -178,7 +178,7 @@
         cnt.textContent = pad(modalIndex + 1) + " / " + pad(videos.length);
 
         var t = videos[modalIndex].title;
-        cap.innerHTML = t ? '<div class="title">' + t + '</div>' : '';
+        cap.innerHTML = t ? '<div class="title">' + esc(t) + '</div>' : '';
         cap.style.display = t ? '' : 'none';
       }
 

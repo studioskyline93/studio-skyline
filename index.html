@@ -421,10 +421,10 @@
         var mediaHtml = preview
           ? '<video src="' + preview + '" autoplay loop muted playsinline preload="metadata"></video>'
           : '<div class="no-vid">No video yet</div>';
-        html += '<a href="work-detail.html?slug=' + c.slug + '" class="reel-card">' +
+        html += '<a href="work-detail.html?slug=' + encodeURIComponent(c.slug) + '" class="reel-card">' +
           '<div class="reel-card-media">' + mediaHtml + '</div>' +
           '<div class="reel-card-info">' +
-            '<div><div class="reel-card-title">' + c.title + '</div>' +
+            '<div><div class="reel-card-title">' + esc(c.title) + '</div>' +
             '<div class="reel-card-count">' + vids.length + ' video' + (vids.length===1?'':'s') + '</div></div>' +
             '<div class="reel-card-view">View</div>' +
           '</div></a>';
@@ -446,9 +446,9 @@
       var html = '';
       items.forEach(function(t) {
         html += '<figure class="testimonial-card">' +
-          '<blockquote>&ldquo;' + t.quote + '&rdquo;</blockquote>' +
-          '<figcaption><span class="author">' + t.author + '</span>' +
-          (t.company ? ' &middot; ' + t.company : '') + '</figcaption></figure>';
+          '<blockquote>&ldquo;' + esc(t.quote) + '&rdquo;</blockquote>' +
+          '<figcaption><span class="author">' + esc(t.author) + '</span>' +
+          (t.company ? ' &middot; ' + esc(t.company) : '') + '</figcaption></figure>';
       });
       el.innerHTML = html;
     }

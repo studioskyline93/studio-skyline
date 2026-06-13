@@ -72,9 +72,9 @@
     function mediaTile(item) {
       var html = '<div class="media">';
       if (item.type === "video") {
-        html += '<video src="' + item.src + '" autoplay loop muted playsinline></video>';
+        html += '<video src="' + esc(item.src) + '" autoplay loop muted playsinline></video>';
       } else {
-        html += '<img src="' + item.src + '" alt="' + (item.alt || '') + '">';
+        html += '<img src="' + esc(item.src) + '" alt="' + esc(item.alt || '') + '">';
       }
       html += '</div><div class="play-overlay"><div class="play-circle">&#9654;</div></div>';
       return html;
@@ -95,9 +95,9 @@
       document.body.style.overflow = "hidden";
 
       if (item.type === "video") {
-        mediaEl.innerHTML = '<video src="' + item.src + '" controls autoplay style="width:100%;height:100%;object-fit:contain"></video>';
+        mediaEl.innerHTML = '<video src="' + esc(item.src) + '" controls autoplay style="width:100%;height:100%;object-fit:contain"></video>';
       } else {
-        mediaEl.innerHTML = '<img src="' + item.src + '" alt="' + (item.alt || '') + '" style="width:100%;height:100%;object-fit:contain">';
+        mediaEl.innerHTML = '<img src="' + esc(item.src) + '" alt="' + esc(item.alt || '') + '" style="width:100%;height:100%;object-fit:contain">';
       }
       altEl.textContent = item.alt || '';
     }
