@@ -95,13 +95,13 @@
 
     /* Dark gradient at bottom to cover pixelated area */
     #hero-canvas-wrap::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 32%;
-background: linear-gradient(to top, rgba(0,0,0,1) 0%, transparent 100%);
-      pointer-events: none;
-    }
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 40%;
+  background: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 40%, transparent 100%);
+  pointer-events: none;
+}
 
     /* Scene text — fully scoped */
     .hero-scene h1 {
