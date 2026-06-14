@@ -28,7 +28,7 @@
       display: block;
       width: 100%;
       height: 100%;
-filter: brightness(1.1) contrast(1.1);
+      filter: brightness(1.1) contrast(1.1);
       object-fit: cover;
     }
 
@@ -46,20 +46,62 @@ filter: brightness(1.1) contrast(1.1);
       transition: opacity 0.5s ease;
     }
     .hero-scene .inner { pointer-events: auto; }
-    #scene-1 { align-items: flex-end; padding-right: 4%; }
+    #scene-1 { align-items: center; justify-content: center; padding-right: 0; }
 
-    /* Glass card */
+    /* Glass card — scene 2 only */
     .hero-glass-card {
       background: rgba(0,0,0,0.60);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(204,0,0,0.25);
       border-radius: 16px;
-      padding: 36px 48px;
-      max-width: 420px;
+      padding: 40px 80px;
+      max-width: 720px;
+      width: 90%;
       box-sizing: border-box;
     }
-    #scene-1 .hero-glass-card { text-align: center; }
     #scene-2 .hero-glass-card { text-align: center; }
+
+    /* Scene 1: open floating layout, no card */
+    #scene-1 .hero-open {
+      text-align: center;
+      padding: 0 24px;
+    }
+    #scene-1 .hero-open h1 {
+      font-size: clamp(52px, 9vw, 110px);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      line-height: 1.0;
+      color: #ffffff;
+      text-shadow: 0 4px 40px rgba(0,0,0,0.6);
+      margin: 0 0 16px;
+    }
+    #scene-1 .hero-open h1 .red { color: #cc0000; }
+    #scene-1 .hero-open .sub {
+      font-size: clamp(11px, 1.6vw, 16px);
+      font-weight: 300;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+      margin: 0 0 36px;
+    }
+    #scene-1 .hero-open .scroll-label {
+      font-size: 11px;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: rgba(180,180,180,0.65);
+      margin-bottom: 12px;
+    }
+
+    /* Dark gradient at bottom to cover pixelated area */
+    #hero-canvas-wrap::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 22%;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+      pointer-events: none;
+    }
 
     /* Scene text — fully scoped */
     .hero-scene h1 {
@@ -208,19 +250,15 @@ filter: brightness(1.1) contrast(1.1);
   <!-- Scene 1: Studio Skyline intro -->
   <div id="scene-1" class="hero-scene" style="opacity:1;">
     <div class="inner ss-floating">
-      <div class="hero-glass-card" style="margin-top:52px;">
-        <div class="kicker-pill">
+      <div class="hero-open">
+        <div class="kicker-pill" style="justify-content:center;">
           <span class="kicker-dot"></span>
           Graphics &nbsp;✦&nbsp; Design &nbsp;✦&nbsp; Fabrication
         </div>
         <h1>STUDIO <span class="red">SKYLINE</span></h1>
         <p class="sub">Graphics &nbsp;•&nbsp; Signage &nbsp;•&nbsp; Fabrication</p>
-        <div style="margin-top:28px;">
-          <p style="font-size:11px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(180,180,180,0.7);margin-bottom:12px;">
-            Scroll to explore
-          </p>
-          <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
-        </div>
+        <p class="scroll-label">Scroll to explore</p>
+        <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
       </div>
     </div>
   </div>
