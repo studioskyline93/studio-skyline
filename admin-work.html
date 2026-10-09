@@ -67,6 +67,27 @@
     .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .toolbar .spacer { flex: 1; }
 
+    .angles-row {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      margin: 6px 0 0 12px; padding-left: 12px; border-left: 2px solid rgba(228,228,231,0.9);
+    }
+    .angles-label { font-size: 12px; color: var(--zinc-500); width: 44px; }
+    .angle-thumb {
+      position: relative; width: 56px; height: 56px; border-radius: 8px; overflow: hidden;
+      border: 1px solid rgba(228,228,231,0.9); background: #f4f4f5;
+    }
+    .angle-thumb img, .angle-thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .angle-x {
+      position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; line-height: 16px;
+      border: none; border-radius: 50%; background: rgba(0,0,0,0.65); color: #fff;
+      font-size: 13px; cursor: pointer; padding: 0;
+    }
+    .angle-add {
+      width: 56px; height: 56px; border-radius: 8px; border: 1px dashed var(--zinc-400);
+      background: none; font-size: 11px; color: var(--zinc-600); cursor: pointer; line-height: 1.2;
+    }
+    .angle-add:hover { background: var(--zinc-50); }
+
     .file-item {
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
       border-radius: 12px; border: 1px solid rgba(228,228,231,0.6); padding: 12px;
@@ -275,6 +296,21 @@
             '<button onclick="removeVid(' + idx + ')">Remove</button>' +
             '<button class="danger" onclick="deleteVidForever(' + idx + ')">Delete forever</button>' +
             '</div></div>';
+
+          // Extra angles for this item
+          var angs = v.angles || [];
+          html += '<div class="angles-row"><span class="angles-label">Angles</span>';
+          angs.forEach(function(a, j) {
+            var src = (typeof a === "string") ? a : a.src;
+            var media = /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(src)
+              ? '<video src="' + src + '" muted playsinline></video>'
+              : '<img src="' + src + '" alt="">';
+            html += '<div class="angle-thumb">' + media +
+              '<button class="angle-x" onclick="removeAngle(' + idx + ',' + j + ')" title="Remove angle">&times;</button></div>';
+          });
+          html += '<input type="file" accept="image/*,video/mp4" multiple id="angleInput' + idx + '" style="display:none" onchange="uploadAngles(' + idx + ', this.files)">' +
+            '<button class="angle-add" onclick="document.getElementById(\'angleInput' + idx + '\').click()">+ Add angles</button>' +
+            '</div>';
         });
       }
       html += '</div>';
@@ -354,6 +390,37 @@
       setStatus("Deleted forever. Click Save to persist.");
     }
 
+    // --- Angles (extra pictures per item) ---
+    async function uploadAngles(idx, files) {
+      if (!files || files.length === 0) return;
+      var c = getActive();
+      if (!c) return;
+      var v = c.videos[idx];
+      if (!v.angles) v.angles = [];
+
+      setStatus("Uploading angles...");
+      for (var i = 0; i < files.length; i++) {
+        var result = await uploadToStorage(c.slug, files[i]);
+        if (result) {
+          v.angles.push(result.src);
+        } else {
+          renderEditor();
+          setStatus("Upload failed for " + files[i].name);
+          return;
+        }
+      }
+      renderEditor();
+      setStatus("Angles added. Click Save changes to persist.");
+    }
+
+    function removeAngle(idx, j) {
+      var c = getActive();
+      if (!c) return;
+      c.videos[idx].angles.splice(j, 1);
+      renderEditor();
+      setStatus("Angle removed. Click Save changes to persist.");
+    }
+
     async function uploadFiles(files) {
       if (!files || files.length === 0) return;
       var c = getActive();
@@ -381,6 +448,8 @@
       if (!el) return;
 
       var files = await listStorageFiles(c.slug + "/videos");
+      // Only show videos here (angle pictures are managed under each item)
+      files = (files || []).filter(function(f) { return /\.(mp4|webm|mov|m4v)$/i.test(f); });
       availableFiles = files;
 
       var existingSrcs = {};
