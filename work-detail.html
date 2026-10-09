@@ -14,6 +14,8 @@
     .angle-sq:hover{opacity:1}
     .angle-sq.on{border-color:#fff;opacity:1}
     .angle-sq img,.angle-sq video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+    .triple-center-inner,.triple-ghost-inner{aspect-ratio:16/9;overflow:hidden}
+    .triple-center-inner video,.triple-center-inner img,.triple-ghost-inner video,.triple-ghost-inner img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
     .modal-box{max-height:94vh;overflow-y:auto}
     .modal-client{margin-top:4px;font-size:13px;opacity:.65;letter-spacing:.04em}
     .modal-details{margin-top:10px;font-size:14px;line-height:1.65;opacity:.85;max-width:70ch}
@@ -96,7 +98,6 @@
 
       // Header
       var headerHtml = '';
-      if (collection.index) headerHtml += '<div class="detail-idx">' + esc(collection.index) + '</div>';
       headerHtml += '<h1 class="detail-title">' + esc(collection.title) + '</h1>';
       if (collection.subtitle) headerHtml += '<p class="detail-sub">' + esc(collection.subtitle) + '</p>';
       document.getElementById("detailHeader").innerHTML = headerHtml;
@@ -125,9 +126,7 @@
         var nextI = clamp(active + 1);
         var current = videos[active];
 
-        var html = '<div class="triple-top"><span>' +
-          (collection.index ? esc(collection.index) + ' &bull; ' : '') + 'LOOK</span>' +
-          '<span>' + pad(active + 1) + ' / ' + pad(len) + '</span></div>';
+        var html = '<div class="triple-top"><span>LOOK</span></div>';
 
         html += '<div class="triple-view">';
 
@@ -165,7 +164,7 @@
         // Caption
         html += '<div class="triple-caption">' +
           '<div class="sel">SELECTED</div>' +
-          '<div class="name">' + esc(current.title || 'Video ' + pad(active + 1)) + '</div>' +
+          '<div class="name">' + esc(current.title || '') + '</div>' +
           (current.client ? '<div class="client">' + esc(current.client) + '</div>' : '') +
           (len > 1 ? '<div class="tip">Tip: click left/right sides or use &larr; &rarr; (Esc closes popup)</div>' : '') +
           '</div>';
@@ -179,10 +178,10 @@
             '<div class="vid-card-media">' +
             mediaTag(v.src, 'metadata') +
             '<div class="overlay"></div>' +
-            '<div class="bottom-info"><span class="num">' + pad(i + 1) + '</span>' +
+            '<div class="bottom-info"><span class="num"></span>' +
             '<span class="status">' + (isActive ? 'Selected' : '') + '</span></div>' +
             '</div><div class="vid-card-body">' +
-            '<div class="title">' + esc(v.title || 'Video ' + pad(i + 1)) + '</div>' +
+            '<div class="title">' + esc(v.title || '') + '</div>' +
             (v.client ? '<div class="client">' + esc(v.client) + '</div>' : '') +
             '<div class="bar"></div></div></button>';
         });
@@ -222,7 +221,7 @@
           vid.pause(); vid.removeAttribute("src"); vid.style.display = "none";
           img.src = msrc; img.style.display = "block";
         }
-        cnt.textContent = pad(modalIndex + 1) + " / " + pad(videos.length);
+        cnt.textContent = "";
 
         var cur = videos[modalIndex];
         var ch = '';
