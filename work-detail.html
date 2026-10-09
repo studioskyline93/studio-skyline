@@ -6,7 +6,17 @@
   <title>Work Detail — Studio Skyline</title>
   <link rel="stylesheet" href="style.css">
   <style>.media-img{width:100%;height:100%;object-fit:cover;display:block}
-  #modalImg{max-width:100%;max-height:75vh;margin:0 auto;display:none;object-fit:contain}</style>
+  #modalImg{max-width:100%;max-height:62vh;margin:0 auto;display:none;object-fit:contain}
+    #modalVideo{max-height:62vh}
+    #modalAngles{display:none;gap:10px;flex-wrap:wrap;padding:14px 20px;border-top:1px solid rgba(255,255,255,.12)}
+    .angle-sq{width:72px;height:72px;border-radius:10px;overflow:hidden;padding:0;cursor:pointer;background:#111;
+      border:2px solid rgba(255,255,255,.25);opacity:.7;transition:opacity .15s,border-color .15s}
+    .angle-sq:hover{opacity:1}
+    .angle-sq.on{border-color:#fff;opacity:1}
+    .angle-sq img,.angle-sq video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+    .vid-card-media{aspect-ratio:16/9;overflow:hidden;position:relative}
+    .vid-card-media img,.vid-card-media video{width:100%;height:100%;object-fit:cover;display:block}
+  </style>
 </head>
 <body>
   <div id="site-header"></div>
@@ -30,6 +40,7 @@
       </div>
       <video id="modalVideo" controls playsinline preload="auto" class="modal-video"></video>
       <img id="modalImg" alt="">
+      <div id="modalAngles"></div>
       <div class="modal-caption" id="modalCaption"></div>
     </div>
   </div>
@@ -47,6 +58,11 @@
 
     function isVideoSrc(src) {
       return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(src || "");
+    }
+    function modalSources(item) {
+      var list = [item.src];
+      (item.angles || []).forEach(function(a) { list.push((typeof a === "string") ? a : a.src); });
+      return list;
     }
     function mediaTag(src, preload) {
       if (isVideoSrc(src)) {
@@ -89,6 +105,7 @@
       var videos = collection.videos;
       var active = 0;
       var modalIndex = -1;
+      var angleIdx = 0;
 
       function pad(n) { return String(n).padStart(2, "0"); }
 
@@ -176,6 +193,7 @@
       window.openModal = function(i) {
         active = clamp(i);
         modalIndex = i;
+        angleIdx = 0;
         renderTriple();
         showModal();
       };
@@ -188,7 +206,9 @@
 
         modal.classList.remove("hidden");
         var img = document.getElementById("modalImg");
-        var msrc = videos[modalIndex].src;
+        var sources = modalSources(videos[modalIndex]);
+        if (angleIdx >= sources.length) angleIdx = 0;
+        var msrc = sources[angleIdx];
         if (isVideoSrc(msrc)) {
           img.style.display = "none"; img.removeAttribute("src");
           vid.style.display = ""; vid.src = msrc;
@@ -201,7 +221,27 @@
         var t = videos[modalIndex].title;
         cap.innerHTML = t ? '<div class="title">' + esc(t) + '</div>' : '';
         cap.style.display = t ? '' : 'none';
+
+        var th = document.getElementById("modalAngles");
+        if (sources.length > 1) {
+          var h = '';
+          sources.forEach(function(sr, k) {
+            h += '<button class="angle-sq' + (k === angleIdx ? ' on' : '') + '" onclick="setAngle(' + k + ')" aria-label="' + (k === 0 ? 'Main view' : 'Angle ' + k) + '">' +
+              (isVideoSrc(sr) ? '<video src="' + sr + '" muted playsinline preload="metadata"></video>' : '<img src="' + sr + '" alt="" loading="lazy">') +
+              '</button>';
+          });
+          th.innerHTML = h;
+          th.style.display = 'flex';
+        } else {
+          th.innerHTML = '';
+          th.style.display = 'none';
+        }
       }
+
+      window.setAngle = function(k) {
+        angleIdx = k;
+        showModal();
+      };
 
       window.closeModal = function() {
         var modal = document.getElementById("videoModal");
@@ -211,10 +251,12 @@
         vid.removeAttribute("src");
         document.getElementById("modalImg").removeAttribute("src");
         modalIndex = -1;
+        angleIdx = 0;
       };
 
       window.modalNav = function(dir) {
         modalIndex = clamp(modalIndex + dir);
+        angleIdx = 0;
         active = modalIndex;
         renderTriple();
         showModal();
