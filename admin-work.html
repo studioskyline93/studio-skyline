@@ -88,6 +88,20 @@
     }
     .angle-add:hover { background: var(--zinc-50); }
 
+    .meta-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px;
+      margin: 6px 0 0 12px; padding-left: 12px; border-left: 2px solid rgba(228,228,231,0.9);
+    }
+    .meta-row label { display: grid; gap: 3px; }
+    .meta-row label.wide { grid-column: 1 / -1; }
+    .meta-row span { font-size: 12px; color: var(--zinc-500); }
+    .meta-row input, .meta-row textarea {
+      width: 100%; border-radius: 8px; border: 1px solid rgba(228,228,231,0.6);
+      background: #fff; padding: 7px 10px; font-size: 13px; font-family: inherit; outline: none;
+    }
+    .meta-row input:focus, .meta-row textarea:focus { border-color: var(--zinc-400); }
+    .meta-row textarea { min-height: 64px; resize: vertical; }
+
     .file-item {
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
       border-radius: 12px; border: 1px solid rgba(228,228,231,0.6); padding: 12px;
@@ -299,6 +313,14 @@
             '<button class="danger" onclick="deleteVidForever(' + idx + ')">Delete forever</button>' +
             '</div></div>';
 
+          // Product details for this item
+          html += '<div class="meta-row">' +
+            '<label><span>Product name</span><input value="' + escA(v.title) + '" placeholder="e.g. Magnetic gift box" oninput="setMeta(' + idx + ',\'title\',this.value)"></label>' +
+            '<label><span>Client</span><input value="' + escA(v.client) + '" placeholder="e.g. Crowne Plaza" oninput="setMeta(' + idx + ',\'client\',this.value)"></label>' +
+            '<label class="wide"><span>Details (shown when visitors open this item)</span>' +
+            '<textarea placeholder="Size, material, finish, quantity, turnaround..." oninput="setMeta(' + idx + ',\'details\',this.value)">' + escA(v.details) + '</textarea></label>' +
+            '</div>';
+
           // Extra angles for this item
           var angs = v.angles || [];
           html += '<div class="angles-row"><span class="angles-label">Angles</span>';
@@ -348,6 +370,18 @@
       renderCats();
       renderEditor();
       setStatus("Updated. Click Save to persist.");
+    }
+
+    // --- Item details (product name / client / details) ---
+    function escA(x) {
+      return String(x == null ? "" : x).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+    function setMeta(idx, field, val) {
+      var c = getActive();
+      if (!c || !c.videos[idx]) return;
+      if (val.trim() === "") delete c.videos[idx][field];
+      else c.videos[idx][field] = val;
+      setStatus("Details edited. Click Save changes to persist.");
     }
 
     // --- Videos ---
