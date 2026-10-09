@@ -19,6 +19,18 @@
     @keyframes ssFade{from{opacity:0}to{opacity:1}}
     .triple-center-inner,.triple-ghost-inner{animation:ssFade .7s ease}
     @media (prefers-reduced-motion:reduce){.triple-center-inner,.triple-ghost-inner{animation:none}}
+    .folder-chip{position:absolute;top:10px;left:10px;z-index:2;display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;
+      background:rgba(255,255,255,.9);color:#18181b;font-size:12px;letter-spacing:.02em;backdrop-filter:blur(6px)}
+    .folder-mosaic{display:grid;width:100%;height:100%;gap:3px;grid-template-columns:1fr 1fr;grid-template-rows:1fr}
+    .folder-mosaic.three{grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr}
+    .folder-mosaic.three .fm-cell:first-child{grid-row:1 / span 2}
+    .fm-cell{min-height:0;min-width:0;overflow:hidden}
+    .fm-cell video,.fm-cell img{width:100%;height:100%;object-fit:cover;display:block}
+    #folderBar{display:none;align-items:center;gap:18px;margin:36px 0 4px}
+    #folderBar.on{display:flex}
+    .folder-back{background:none;border:none;cursor:pointer;font:inherit;font-size:14px;text-decoration:underline;padding:0;color:inherit}
+    .folder-title{font-size:20px;font-weight:600;letter-spacing:-.01em}
+    .swap{animation:ssFade .45s ease}
     .modal-box{max-height:94vh;overflow-y:auto}
     .modal-client{margin-top:4px;font-size:13px;opacity:.65;letter-spacing:.04em}
     .modal-details{margin-top:10px;font-size:14px;line-height:1.65;opacity:.85;max-width:70ch}
@@ -186,35 +198,111 @@
         document.getElementById("tripleStage").innerHTML = html;
       }
 
-      function buildGrid() {
-        var html = '';
-        videos.forEach(function(v, i) {
-          html += '<button class="vid-card" onclick="openModal(' + i + ')">' +
-            '<div class="vid-card-media">' +
-            mediaTag(v.src, 'metadata') +
-            '<div class="overlay"></div>' +
-            '</div><div class="vid-card-body">' +
-            '<div class="title">' + esc(v.title || '') + '</div>' +
-            (v.client ? '<div class="client">' + esc(v.client) + '</div>' : '') +
-            '<div class="bar"></div></div></button>';
-        });
-        document.getElementById("allGrid").innerHTML = html;
+      // ---- Grid: single cards + client folders ----
+      var gridScope = null;      // null = top level, otherwise a client key (inside a folder)
+      var folderKeys = [];       // folder index -> client key (rebuilt on each top-level render)
+      var folderNames = {};      // client key -> display name
+
+      function clientKey(v) { return (v.client || "").trim().toLowerCase(); }
+
+      function itemCard(v, i) {
+        return '<button class="vid-card" data-i="' + i + '" onclick="openModal(' + i + ')">' +
+          '<div class="vid-card-media">' + mediaTag(v.src, 'metadata') + '<div class="overlay"></div></div>' +
+          '<div class="vid-card-body">' +
+          '<div class="title">' + esc(v.title || '') + '</div>' +
+          (v.client ? '<div class="client">' + esc(v.client) + '</div>' : '') +
+          '<div class="bar"></div></div></button>';
       }
+
+      function folderCard(key, idxs, n) {
+        var shown = idxs.slice(0, 3);
+        var cells = '';
+        shown.forEach(function(i) { cells += '<div class="fm-cell">' + mediaTag(videos[i].src, 'metadata') + '</div>'; });
+        var icon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
+        return '<button class="vid-card folder-card" onclick="openFolder(' + n + ')">' +
+          '<div class="vid-card-media"><div class="folder-chip">' + icon + '<span>Folder</span></div>' +
+          '<div class="folder-mosaic' + (shown.length >= 3 ? ' three' : '') + '">' + cells + '</div>' +
+          '<div class="overlay"></div></div>' +
+          '<div class="vid-card-body"><div class="title">' + esc(folderNames[key]) + '</div>' +
+          '<div class="bar"></div></div></button>';
+      }
+
+      function scopeList() {
+        var out = [];
+        videos.forEach(function(v, i) { if (gridScope === null || clientKey(v) === gridScope) out.push(i); });
+        return out;
+      }
+
+      function renderGrid() {
+        var grid = document.getElementById("allGrid");
+        var bar = document.getElementById("folderBar");
+        var html = '';
+
+        if (gridScope === null) {
+          bar.className = ''; bar.innerHTML = '';
+          // Clients with 2+ products become a folder; everything else stays a normal card
+          var counts = {}, members = {}, seen = {};
+          folderKeys = [];
+          videos.forEach(function(v, i) {
+            var k = clientKey(v);
+            if (!k) return;
+            counts[k] = (counts[k] || 0) + 1;
+            (members[k] = members[k] || []).push(i);
+            if (!folderNames[k]) folderNames[k] = v.client.trim();
+          });
+          videos.forEach(function(v, i) {
+            var k = clientKey(v);
+            if (k && counts[k] >= 2) {
+              if (seen[k]) return;
+              seen[k] = true;
+              folderKeys.push(k);
+              html += folderCard(k, members[k], folderKeys.length - 1);
+            } else {
+              html += itemCard(v, i);
+            }
+          });
+        } else {
+          bar.className = 'on';
+          bar.innerHTML = '<button class="folder-back" onclick="closeFolder()">&larr; All work</button>' +
+            '<div class="folder-title">' + esc(folderNames[gridScope] || '') + '</div>';
+          scopeList().forEach(function(i) { html += itemCard(videos[i], i); });
+        }
+
+        grid.innerHTML = html;
+        grid.classList.remove("swap"); void grid.offsetWidth; grid.classList.add("swap");
+        markActive();
+      }
+
+      function markActive() {
+        var cards = document.querySelectorAll("#allGrid .vid-card");
+        for (var k = 0; k < cards.length; k++) {
+          var di = cards[k].getAttribute("data-i");
+          cards[k].classList.toggle("active", di !== null && Number(di) === active);
+        }
+      }
+
+      window.openFolder = function(n) {
+        gridScope = folderKeys[n];
+        renderGrid();
+      };
+      window.closeFolder = function() {
+        gridScope = null;
+        renderGrid();
+      };
 
       function renderTriple() {
         if (videos.length === 0) return;
         if (!document.getElementById("tripleStage")) {
           document.getElementById("tripleView").innerHTML =
-            '<div id="tripleStage"></div><div class="all-grid" id="allGrid"></div>';
+            '<div id="tripleStage"></div><div id="folderBar"></div><div class="all-grid" id="allGrid"></div>';
           var st = document.getElementById("tripleStage");
           // Pause auto-advance while a mouse is over the stage (not on touch screens)
           st.addEventListener("pointerenter", function(e) { if (e.pointerType === "mouse") hovering = true; });
           st.addEventListener("pointerleave", function(e) { if (e.pointerType === "mouse") hovering = false; });
-          buildGrid();
+          renderGrid();
         }
         renderStage();
-        var cards = document.querySelectorAll("#allGrid .vid-card");
-        for (var k = 0; k < cards.length; k++) cards[k].classList.toggle("active", k === active);
+        markActive();
         bindAuto();
       }
 
@@ -292,7 +380,10 @@
       };
 
       window.modalNav = function(dir) {
-        modalIndex = clamp(modalIndex + dir);
+        var list = scopeList();
+        var pos = list.indexOf(modalIndex);
+        if (pos < 0) { list = videos.map(function(x, i) { return i; }); pos = list.indexOf(modalIndex); }
+        modalIndex = list[((pos + dir) % list.length + list.length) % list.length];
         angleIdx = 0;
         active = modalIndex;
         renderTriple();
