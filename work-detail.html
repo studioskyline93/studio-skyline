@@ -16,6 +16,9 @@
     .angle-sq img,.angle-sq video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
     .triple-center-inner,.triple-ghost-inner{aspect-ratio:16/9;overflow:hidden}
     .triple-center-inner video,.triple-center-inner img,.triple-ghost-inner video,.triple-ghost-inner img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+    @keyframes ssFade{from{opacity:0}to{opacity:1}}
+    .triple-center-inner,.triple-ghost-inner{animation:ssFade .7s ease}
+    @media (prefers-reduced-motion:reduce){.triple-center-inner,.triple-ghost-inner{animation:none}}
     .modal-box{max-height:94vh;overflow-y:auto}
     .modal-client{margin-top:4px;font-size:13px;opacity:.65;letter-spacing:.04em}
     .modal-details{margin-top:10px;font-size:14px;line-height:1.65;opacity:.85;max-width:70ch}
@@ -70,9 +73,9 @@
       (item.angles || []).forEach(function(a) { list.push((typeof a === "string") ? a : a.src); });
       return list;
     }
-    function mediaTag(src, preload) {
+    function mediaTag(src, preload, noLoop) {
       if (isVideoSrc(src)) {
-        return '<video src="' + src + '" autoplay loop muted playsinline preload="' + preload + '"></video>';
+        return '<video src="' + src + '" autoplay ' + (noLoop ? '' : 'loop ') + 'muted playsinline preload="' + preload + '"></video>';
       }
       return '<img class="media-img" src="' + src + '" alt="" loading="lazy">';
     }
@@ -119,75 +122,100 @@
         return ((i % videos.length) + videos.length) % videos.length;
       }
 
-      function renderTriple() {
-        if (videos.length === 0) return;
+      // ---- Auto-advance ----
+      var hovering = false, autoTimer = null;
+      var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      function autoPaused() { return hovering || modalIndex >= 0 || document.hidden; }
+      function clearAuto() { if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; } }
+
+      function bindAuto() {
+        clearAuto();
+        if (videos.length < 2 || reduceMotion) return;
+        var cv = document.querySelector("#tripleStage .triple-center-inner video");
+        if (cv) {
+          // Videos play through once, then move on
+          cv.onended = function() {
+            if (autoPaused()) { cv.currentTime = 0; cv.play(); } else { setActive(active + 1); }
+          };
+          autoTimer = setTimeout(function() {
+            if (autoPaused()) bindAuto(); else setActive(active + 1);
+          }, 20000);
+        } else {
+          // Photos stay for 5 seconds
+          autoTimer = setTimeout(function tick() {
+            if (autoPaused()) { autoTimer = setTimeout(tick, 1000); } else { setActive(active + 1); }
+          }, 5000);
+        }
+      }
+
+      document.addEventListener("visibilitychange", function() { if (!document.hidden) bindAuto(); });
+
+      // ---- Rendering ----
+      function renderStage() {
         var len = videos.length;
         var prevI = clamp(active - 1);
         var nextI = clamp(active + 1);
         var current = videos[active];
 
-        var html = '<div class="triple-top"><span>LOOK</span></div>';
+        var html = '<div class="triple-view">';
 
-        html += '<div class="triple-view">';
-
-        // Left ghost
         if (len > 1) {
           html += '<button class="triple-ghost left" onclick="setActive(' + prevI + ')" aria-label="Previous">' +
             '<div class="triple-ghost-inner" style="position:relative">' +
             mediaTag(videos[prevI].src, 'metadata') +
             '<div class="fade-left"></div></div></button>';
-        }
-
-        // Right ghost
-        if (len > 1) {
           html += '<button class="triple-ghost right" onclick="setActive(' + nextI + ')" aria-label="Next">' +
             '<div class="triple-ghost-inner" style="position:relative">' +
             mediaTag(videos[nextI].src, 'metadata') +
             '<div class="fade-right"></div></div></button>';
         }
 
-        // Center
         html += '<div class="triple-center"><div class="triple-center-inner">' +
-          mediaTag(current.src, 'auto') +
+          mediaTag(current.src, 'auto', len > 1) +
           '</div></div>';
 
-        // Nav buttons
         if (len > 1) {
           html += '<div class="triple-nav">' +
             '<button class="nav-circle" onclick="setActive(' + prevI + ')" aria-label="Previous">&#8249;</button>' +
             '<button class="nav-circle" onclick="setActive(' + nextI + ')" aria-label="Next">&#8250;</button>' +
             '</div>';
         }
-
         html += '</div>';
 
-        // Caption
-        html += '<div class="triple-caption">' +
-          '<div class="sel">SELECTED</div>' +
-          '<div class="name">' + esc(current.title || '') + '</div>' +
-          (current.client ? '<div class="client">' + esc(current.client) + '</div>' : '') +
-          (len > 1 ? '<div class="tip">Tip: click left/right sides or use &larr; &rarr; (Esc closes popup)</div>' : '') +
-          '</div>';
+        document.getElementById("tripleStage").innerHTML = html;
+      }
 
-        // All videos grid
-        html += '<div class="all-grid-header"><span>ALL</span><span style="letter-spacing:normal">Click to open</span></div>';
-        html += '<div class="all-grid">';
+      function buildGrid() {
+        var html = '';
         videos.forEach(function(v, i) {
-          var isActive = i === active;
-          html += '<button class="vid-card' + (isActive ? ' active' : '') + '" onclick="openModal(' + i + ')">' +
+          html += '<button class="vid-card" onclick="openModal(' + i + ')">' +
             '<div class="vid-card-media">' +
             mediaTag(v.src, 'metadata') +
             '<div class="overlay"></div>' +
-            '<div class="bottom-info"><span class="num"></span>' +
-            '<span class="status">' + (isActive ? 'Selected' : '') + '</span></div>' +
             '</div><div class="vid-card-body">' +
             '<div class="title">' + esc(v.title || '') + '</div>' +
             (v.client ? '<div class="client">' + esc(v.client) + '</div>' : '') +
             '<div class="bar"></div></div></button>';
         });
-        html += '</div>';
+        document.getElementById("allGrid").innerHTML = html;
+      }
 
-        document.getElementById("tripleView").innerHTML = html;
+      function renderTriple() {
+        if (videos.length === 0) return;
+        if (!document.getElementById("tripleStage")) {
+          document.getElementById("tripleView").innerHTML =
+            '<div id="tripleStage"></div><div class="all-grid" id="allGrid"></div>';
+          var st = document.getElementById("tripleStage");
+          // Pause auto-advance while a mouse is over the stage (not on touch screens)
+          st.addEventListener("pointerenter", function(e) { if (e.pointerType === "mouse") hovering = true; });
+          st.addEventListener("pointerleave", function(e) { if (e.pointerType === "mouse") hovering = false; });
+          buildGrid();
+        }
+        renderStage();
+        var cards = document.querySelectorAll("#allGrid .vid-card");
+        for (var k = 0; k < cards.length; k++) cards[k].classList.toggle("active", k === active);
+        bindAuto();
       }
 
       window.setActive = function(i) {
