@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Work Detail — Studio Skyline</title>
   <link rel="stylesheet" href="style.css">
+  <style>.media-img{width:100%;height:100%;object-fit:cover;display:block}
+  #modalImg{max-width:100%;max-height:75vh;margin:0 auto;display:none;object-fit:contain}</style>
 </head>
 <body>
   <div id="site-header"></div>
@@ -27,6 +29,7 @@
         </div>
       </div>
       <video id="modalVideo" controls playsinline preload="auto" class="modal-video"></video>
+      <img id="modalImg" alt="">
       <div class="modal-caption" id="modalCaption"></div>
     </div>
   </div>
@@ -41,6 +44,16 @@
   <script>
     var params = new URLSearchParams(window.location.search);
     var slug = params.get("slug");
+
+    function isVideoSrc(src) {
+      return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(src || "");
+    }
+    function mediaTag(src, preload) {
+      if (isVideoSrc(src)) {
+        return '<video src="' + src + '" autoplay loop muted playsinline preload="' + preload + '"></video>';
+      }
+      return '<img class="media-img" src="' + src + '" alt="" loading="lazy">';
+    }
 
     function findCollection(collections) {
       for (var i = 0; i < collections.length; i++) {
@@ -101,7 +114,7 @@
         if (len > 1) {
           html += '<button class="triple-ghost left" onclick="setActive(' + prevI + ')" aria-label="Previous">' +
             '<div class="triple-ghost-inner" style="position:relative">' +
-            '<video src="' + videos[prevI].src + '" autoplay loop muted playsinline preload="metadata"></video>' +
+            mediaTag(videos[prevI].src, 'metadata') +
             '<div class="fade-left"></div></div></button>';
         }
 
@@ -109,13 +122,13 @@
         if (len > 1) {
           html += '<button class="triple-ghost right" onclick="setActive(' + nextI + ')" aria-label="Next">' +
             '<div class="triple-ghost-inner" style="position:relative">' +
-            '<video src="' + videos[nextI].src + '" autoplay loop muted playsinline preload="metadata"></video>' +
+            mediaTag(videos[nextI].src, 'metadata') +
             '<div class="fade-right"></div></div></button>';
         }
 
         // Center
         html += '<div class="triple-center"><div class="triple-center-inner">' +
-          '<video src="' + current.src + '" autoplay loop muted playsinline preload="auto"></video>' +
+          mediaTag(current.src, 'auto') +
           '</div></div>';
 
         // Nav buttons
@@ -142,7 +155,7 @@
           var isActive = i === active;
           html += '<button class="vid-card' + (isActive ? ' active' : '') + '" onclick="openModal(' + i + ')">' +
             '<div class="vid-card-media">' +
-            '<video src="' + v.src + '" autoplay loop muted playsinline preload="metadata"></video>' +
+            mediaTag(v.src, 'metadata') +
             '<div class="overlay"></div>' +
             '<div class="bottom-info"><span class="num">' + pad(i + 1) + '</span>' +
             '<span class="status">' + (isActive ? 'Selected' : '') + '</span></div>' +
@@ -174,7 +187,15 @@
         var cnt = document.getElementById("modalCounter");
 
         modal.classList.remove("hidden");
-        vid.src = videos[modalIndex].src;
+        var img = document.getElementById("modalImg");
+        var msrc = videos[modalIndex].src;
+        if (isVideoSrc(msrc)) {
+          img.style.display = "none"; img.removeAttribute("src");
+          vid.style.display = ""; vid.src = msrc;
+        } else {
+          vid.pause(); vid.removeAttribute("src"); vid.style.display = "none";
+          img.src = msrc; img.style.display = "block";
+        }
         cnt.textContent = pad(modalIndex + 1) + " / " + pad(videos.length);
 
         var t = videos[modalIndex].title;
@@ -188,6 +209,7 @@
         modal.classList.add("hidden");
         vid.pause();
         vid.removeAttribute("src");
+        document.getElementById("modalImg").removeAttribute("src");
         modalIndex = -1;
       };
 
