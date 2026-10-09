@@ -130,7 +130,7 @@ async function listStorageFiles(prefix) {
     });
     if (result.error) throw result.error;
     return (result.data || []).map(function(f) { return f.name; }).filter(function(n) {
-      return n.toLowerCase().endsWith(".mp4");
+      return /\.(mp4|webm|mov|m4v|jpe?g|png|webp|gif|avif)$/i.test(n);
     });
   } catch (e) {
     console.error("List files failed:", e);
