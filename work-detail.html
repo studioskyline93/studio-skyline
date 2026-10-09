@@ -14,6 +14,10 @@
     .angle-sq:hover{opacity:1}
     .angle-sq.on{border-color:#fff;opacity:1}
     .angle-sq img,.angle-sq video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+    .modal-box{max-height:94vh;overflow-y:auto}
+    .modal-client{margin-top:4px;font-size:13px;opacity:.65;letter-spacing:.04em}
+    .modal-details{margin-top:10px;font-size:14px;line-height:1.65;opacity:.85;max-width:70ch}
+    .vid-card-body .client,.triple-caption .client{font-size:12px;opacity:.6;margin-top:2px}
     .vid-card-media{aspect-ratio:16/9;overflow:hidden;position:relative}
     .vid-card-media img,.vid-card-media video{width:100%;height:100%;object-fit:cover;display:block}
   </style>
@@ -162,6 +166,7 @@
         html += '<div class="triple-caption">' +
           '<div class="sel">SELECTED</div>' +
           '<div class="name">' + esc(current.title || 'Video ' + pad(active + 1)) + '</div>' +
+          (current.client ? '<div class="client">' + esc(current.client) + '</div>' : '') +
           (len > 1 ? '<div class="tip">Tip: click left/right sides or use &larr; &rarr; (Esc closes popup)</div>' : '') +
           '</div>';
 
@@ -178,6 +183,7 @@
             '<span class="status">' + (isActive ? 'Selected' : '') + '</span></div>' +
             '</div><div class="vid-card-body">' +
             '<div class="title">' + esc(v.title || 'Video ' + pad(i + 1)) + '</div>' +
+            (v.client ? '<div class="client">' + esc(v.client) + '</div>' : '') +
             '<div class="bar"></div></div></button>';
         });
         html += '</div>';
@@ -218,9 +224,13 @@
         }
         cnt.textContent = pad(modalIndex + 1) + " / " + pad(videos.length);
 
-        var t = videos[modalIndex].title;
-        cap.innerHTML = t ? '<div class="title">' + esc(t) + '</div>' : '';
-        cap.style.display = t ? '' : 'none';
+        var cur = videos[modalIndex];
+        var ch = '';
+        if (cur.title) ch += '<div class="title">' + esc(cur.title) + '</div>';
+        if (cur.client) ch += '<div class="modal-client">Client &middot; ' + esc(cur.client) + '</div>';
+        if (cur.details) ch += '<div class="modal-details">' + esc(cur.details).replace(/\n/g, '<br>') + '</div>';
+        cap.innerHTML = ch;
+        cap.style.display = ch ? '' : 'none';
 
         var th = document.getElementById("modalAngles");
         if (sources.length > 1) {
