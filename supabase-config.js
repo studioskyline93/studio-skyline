@@ -11,7 +11,7 @@ var SUPABASE_BUCKET = "work";
 // ============================================================
 // ADMIN PASSWORD — change this to something only you know
 // ============================================================
-var ADMIN_PASSWORD = "changeme123";
+var ADMIN_PASSWORD = "93skylinestudio";
 
 // ============================================================
 // CONTACT FORM — Formspree (optional, free at formspree.io)
