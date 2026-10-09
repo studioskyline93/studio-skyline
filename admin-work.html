@@ -105,7 +105,7 @@
     <div class="toolbar">
       <div>
         <h1 style="font-size:24px; font-weight:600; letter-spacing:-0.02em">Work</h1>
-        <p style="margin-top:4px; font-size:14px; color:var(--zinc-600)">Manage categories and videos</p>
+        <p style="margin-top:4px; font-size:14px; color:var(--zinc-600)">Manage categories, photos and videos</p>
       </div>
       <div class="spacer"></div>
       <a href="admin.html" style="font-size:14px; text-decoration:underline">&larr; Back</a>
@@ -272,12 +272,12 @@
       // Upload
       html += '<div style="margin-top:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px">' +
         '<div><div style="font-size:14px; font-weight:500">' + c.title + '</div></div>' +
-        '<div><input type="file" accept="video/mp4" multiple id="uploadInput" style="display:none" onchange="uploadFiles(this.files)">' +
-        '<button class="btn-secondary" onclick="document.getElementById(\'uploadInput\').click()">Upload MP4</button></div>' +
+        '<div><input type="file" accept="video/mp4,image/*" multiple id="uploadInput" style="display:none" onchange="uploadFiles(this.files)">' +
+        '<button class="btn-secondary" onclick="document.getElementById(\'uploadInput\').click()">Upload photos / videos</button></div>' +
         '</div>';
 
       // Current videos
-      html += '<div style="margin-top:24px"><div style="font-size:14px; font-weight:500">Current videos</div>';
+      html += '<div style="margin-top:24px"><div style="font-size:14px; font-weight:500">Current items</div>';
       var vids = c.videos || [];
       if (vids.length === 0) {
         html += '<div style="margin-top:8px; font-size:14px; color:var(--zinc-500)">No videos in this category yet.</div>';
@@ -291,7 +291,9 @@
             '</div>' +
             '<div class="vid-item-info"><div class="vid-item-name">' + name + '</div>' +
             '<div class="vid-item-src">' + v.src + '</div></div>' +
-            '<video src="' + v.src + '" muted playsinline style="width:80px; height:48px; border-radius:8px; border:1px solid rgba(228,228,231,0.6); object-fit:cover"></video>' +
+            (/\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(v.src)
+              ? '<video src="' + v.src + '" muted playsinline style="width:80px; height:48px; border-radius:8px; border:1px solid rgba(228,228,231,0.6); object-fit:cover"></video>'
+              : '<img src="' + v.src + '" alt="" style="width:80px; height:48px; border-radius:8px; border:1px solid rgba(228,228,231,0.6); object-fit:cover">') +
             '<div class="vid-item-actions">' +
             '<button onclick="removeVid(' + idx + ')">Remove</button>' +
             '<button class="danger" onclick="deleteVidForever(' + idx + ')">Delete forever</button>' +
@@ -316,7 +318,7 @@
       html += '</div>';
 
       // Available files from storage
-      html += '<div style="margin-top:40px"><div style="font-size:14px; font-weight:500">Uploaded videos (Storage)</div>' +
+      html += '<div style="margin-top:40px"><div style="font-size:14px; font-weight:500">Uploaded files (Storage)</div>' +
         '<div style="margin-top:4px; font-size:12px; color:var(--zinc-500)">Files in ' + c.slug + '/videos/</div>' +
         '<div id="fileList"><div style="margin-top:8px; font-size:14px; color:var(--zinc-500)">Loading...</div></div></div>';
 
@@ -448,12 +450,15 @@
       if (!el) return;
 
       var files = await listStorageFiles(c.slug + "/videos");
-      // Only show videos here (angle pictures are managed under each item)
-      files = (files || []).filter(function(f) { return /\.(mp4|webm|mov|m4v)$/i.test(f); });
+      files = files || [];
       availableFiles = files;
 
+      // Files already used, either as an item or as one of its angles
       var existingSrcs = {};
-      (c.videos || []).forEach(function(v) { existingSrcs[v.src] = true; });
+      (c.videos || []).forEach(function(v) {
+        existingSrcs[v.src] = true;
+        (v.angles || []).forEach(function(a) { existingSrcs[(typeof a === "string") ? a : a.src] = true; });
+      });
 
       var addable = files.filter(function(f) {
         var url = storagePublicUrl(c.slug, f);
