@@ -316,7 +316,7 @@
           // Product details for this item
           html += '<div class="meta-row">' +
             '<label><span>Product name</span><input value="' + escA(v.title) + '" placeholder="e.g. Magnetic gift box" oninput="setMeta(' + idx + ',\'title\',this.value)"></label>' +
-            '<label><span>Client</span><input value="' + escA(v.client) + '" placeholder="e.g. Crowne Plaza" oninput="setMeta(' + idx + ',\'client\',this.value)"></label>' +
+            '<label><span>Client</span><input list="clientList" value="' + escA(v.client) + '" placeholder="e.g. Crowne Plaza" oninput="setMeta(' + idx + ',\'client\',this.value)"></label>' +
             '<label class="wide"><span>Details (shown when visitors open this item)</span>' +
             '<textarea placeholder="Size, material, finish, quantity, turnaround..." oninput="setMeta(' + idx + ',\'details\',this.value)">' + escA(v.details) + '</textarea></label>' +
             '</div>';
@@ -343,6 +343,14 @@
       html += '<div style="margin-top:40px"><div style="font-size:14px; font-weight:500">Uploaded files (Storage)</div>' +
         '<div style="margin-top:4px; font-size:12px; color:var(--zinc-500)">Files in ' + c.slug + '/videos/</div>' +
         '<div id="fileList"><div style="margin-top:8px; font-size:14px; color:var(--zinc-500)">Loading...</div></div></div>';
+
+      // Suggest existing client names so the same client is always spelled the same way
+      var seenClients = {}, opts = '';
+      (c.videos || []).forEach(function(v) {
+        var n = (v.client || "").trim();
+        if (n && !seenClients[n.toLowerCase()]) { seenClients[n.toLowerCase()] = true; opts += '<option value="' + escA(n) + '">'; }
+      });
+      html += '<datalist id="clientList">' + opts + '</datalist>';
 
       panel.innerHTML = html;
       loadFiles();
