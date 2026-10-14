@@ -95,6 +95,26 @@
     @media (prefers-reduced-motion:reduce){
       .fb-cat-media img,.fb-cat-media video,.fb-btn svg{transition:none}
     }
+
+    /* ---------- Smooth, premium motion (same as work-detail) ---------- */
+    html{scroll-behavior:smooth;scrollbar-gutter:stable}
+    body.fb-page{animation:fbPageIn .6s ease backwards}
+    html.fb-leave body.fb-page{opacity:0;transition:opacity .25s ease}
+    @keyframes fbPageIn{from{opacity:0}to{opacity:1}}
+    @keyframes fbOverlayIn{from{opacity:0}to{opacity:1}}
+    @keyframes fbSwapIn{from{opacity:0}to{opacity:1}}
+    /* Blocks rise gently into view as you scroll */
+    body.fb-page .fb-rv{opacity:0;transform:translateY(22px);
+      transition:opacity .9s ease,transform 1s cubic-bezier(.2,.7,.2,1),border-color .35s ease,box-shadow .5s ease;
+      transition-delay:var(--rvd,0s),var(--rvd,0s),0s,0s}
+    body.fb-page .fb-rv.in{opacity:1;transform:none}
+    @media (prefers-reduced-motion:reduce){
+      html{scroll-behavior:auto}
+      body.fb-page{animation:none}
+      body.fb-page .fb-rv{opacity:1;transform:none;transition:none}
+    }
+
+    @media (prefers-reduced-motion:reduce){.fb-cat-media img,.fb-cat-media video{transition:none}}
   </style>
 </head>
 <body class="fb-page">
@@ -225,6 +245,75 @@
       var collections = (workData && workData.collections) ? workData.collections : WORK_COLLECTIONS;
       renderWorkGrid(collections);
     })();
+  </script>
+
+  <script>
+  /* Smooth, premium motion: scroll reveals, media fade-in, page fade between pages */
+  (function() {
+    var HERO = ".fb-intro .fb-eyebrow, .fb-intro .fb-h2, .fb-intro .fb-rule, .fb-intro p", ITEMS = ".fb-cat, .fb-cap-item, .fb-cta", MEDIA = "";
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var main = document.querySelector("main, .site-main");
+
+    var io = ("IntersectionObserver" in window && !reduce) ? new IntersectionObserver(function(entries) {
+      var n = 0;
+      entries.forEach(function(en) {
+        if (!en.isIntersecting) return;
+        var el = en.target;
+        if (!el.hasAttribute("data-rvd")) el.style.setProperty("--rvd", (Math.min(n, 6) * 70) + "ms");
+        n++; el.classList.add("in"); io.unobserve(el);
+      });
+    }, { rootMargin: "0px 0px -6% 0px", threshold: 0.02 }) : null;
+
+    function reveal(el, delay) {
+      if (el.__rv) return; el.__rv = 1;
+      if (!io) { el.classList.add("fb-rv", "in"); return; }
+      if (delay != null) { el.setAttribute("data-rvd", "1"); el.style.setProperty("--rvd", delay + "ms"); }
+      el.classList.add("fb-rv"); io.observe(el);
+    }
+    function markLd(el) {
+      el.classList.add("ld");
+      var p = el.parentNode;
+      if (p && p.classList && p.classList.contains("media")) p.classList.add("is-ld");
+    }
+    function tag() {
+      if (!main) return;
+      if (HERO) main.querySelectorAll(HERO).forEach(function(el, i) { reveal(el, i * 80); });
+      if (ITEMS) main.querySelectorAll(ITEMS).forEach(function(el) { reveal(el); });
+      if (MEDIA) main.querySelectorAll(MEDIA).forEach(function(el) {
+        if (el.__pm) return; el.__pm = 1; el.classList.add("fb-pm");
+        if (el.tagName === "IMG" ? (el.complete && el.naturalWidth > 0) : el.readyState >= 2) markLd(el);
+        setTimeout(function() { markLd(el); }, 4000); /* safety net: nothing stays hidden */
+      });
+    }
+    document.addEventListener("load", function(e) { var t = e.target; if (t && t.tagName === "IMG" && t.classList.contains("fb-pm")) markLd(t); }, true);
+    document.addEventListener("loadeddata", function(e) { var t = e.target; if (t && t.tagName === "VIDEO" && t.classList.contains("fb-pm")) markLd(t); }, true);
+    document.addEventListener("error", function(e) { var t = e.target; if (t && t.classList && t.classList.contains("fb-pm")) markLd(t); }, true);
+
+    tag();
+    if (main && "MutationObserver" in window) {
+      var queued = false;
+      new MutationObserver(function() {
+        if (queued) return; queued = true;
+        requestAnimationFrame(function() { queued = false; tag(); });
+      }).observe(main, { childList: true, subtree: true });
+    }
+
+    /* Soft fade between pages */
+    document.addEventListener("click", function(e) {
+      if (reduce || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var a = e.target.closest ? e.target.closest("a[href]") : null;
+      if (!a || (a.target && a.target !== "_self") || a.hasAttribute("download")) return;
+      var href = a.getAttribute("href");
+      if (!href || href.charAt(0) === "#" || /^(mailto:|tel:|javascript:)/i.test(href)) return;
+      var u; try { u = new URL(a.href, location.href); } catch (x) { return; }
+      if (u.origin !== location.origin) return;
+      if (u.pathname === location.pathname && u.search === location.search) return;
+      e.preventDefault();
+      document.documentElement.classList.add("fb-leave");
+      setTimeout(function() { location.href = u.href; }, 260);
+    });
+    window.addEventListener("pageshow", function(e) { if (e.persisted) document.documentElement.classList.remove("fb-leave"); });
+  })();
   </script>
 </body>
 </html>
