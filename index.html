@@ -219,6 +219,29 @@
     @media (max-width:700px){body.ix-themed::after{display:none}body.ix-themed .hero-card::before{top:-24px;bottom:-48px}}
     @media print{body.ix-themed::before,body.ix-themed::after,body.ix-themed .hero-card::before{display:none}}
 
+
+    /* ============ Hero: light card with black text (replaces burgundy/white) ============ */
+    body.ix-themed .hero-card{background:transparent;color:#111;border-color:transparent;box-shadow:none}
+    body.ix-themed .hero-city{color:#111}
+    body.ix-themed .hero-line{background:#111}
+    body.ix-themed .hero-title{color:#000}
+    body.ix-themed .hero-intro{color:#111}
+    body.ix-themed .hero-card .btn-primary{background:#111;color:#fff;border-color:#111}
+    body.ix-themed .hero-card .btn-primary:hover{background:var(--burgundy);color:#fff;border-color:var(--burgundy)}
+    body.ix-themed .hero-card .btn-secondary{background:transparent;color:#111;border-color:#111}
+    body.ix-themed .hero-card .btn-secondary:hover{background:#111;color:#fff}
+    /* keep black text readable over the backdrop photo */
+    body.ix-themed .hero-card::before{
+      background:
+        linear-gradient(180deg,rgba(250,246,239,.62) 0%,rgba(250,246,239,.55) 60%,rgba(250,246,239,.95) 100%),
+        url("images/hero-backdrop.jpg") center 35%/cover no-repeat}
+
+    /* ============ Collection cards: no white box, clean square-edged photos ============ */
+    body.ix-themed .reel-card{background:transparent;border-color:transparent;box-shadow:none;border-radius:0}
+    body.ix-themed .reel-card-media{border-radius:0;border:0;box-shadow:0 14px 30px -18px rgba(60,35,20,.35)}
+    body.ix-themed .reel-card-media img,body.ix-themed .reel-card-media video{border-radius:0}
+    body.ix-themed .reel-card-info{background:transparent}
+
     @media (prefers-reduced-motion:reduce){
       body.ix-themed .reel-btns button:hover,body.ix-themed .reel-btns button:active{transform:none}
       body.ix-themed .reel-prog i{transition:none}
