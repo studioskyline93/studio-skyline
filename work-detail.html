@@ -245,6 +245,12 @@
       .fb-grid-swap{animation:none}
       .fb-more-btn,.fb-more-ico svg,.fb-float{transition:none}
     }
+
+    /* Soft fade between pages (shared with the other pages) */
+    body.fb-page{animation:fbPageIn .6s ease backwards}
+    html.fb-leave body.fb-page{opacity:0;transition:opacity .25s ease}
+    @keyframes fbPageIn{from{opacity:0}to{opacity:1}}
+    @media (prefers-reduced-motion:reduce){body.fb-page{animation:none}}
   </style>
 </head>
 <body class="fb-page">
@@ -900,6 +906,26 @@
 
       renderGrid();
     })();
+  </script>
+
+  <script>
+  (function() {
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.addEventListener("click", function(e) {
+      if (reduce || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var a = e.target.closest ? e.target.closest("a[href]") : null;
+      if (!a || (a.target && a.target !== "_self") || a.hasAttribute("download")) return;
+      var href = a.getAttribute("href");
+      if (!href || href.charAt(0) === "#" || /^(mailto:|tel:|javascript:)/i.test(href)) return;
+      var u; try { u = new URL(a.href, location.href); } catch (x) { return; }
+      if (u.origin !== location.origin) return;
+      if (u.pathname === location.pathname && u.search === location.search) return;
+      e.preventDefault();
+      document.documentElement.classList.add("fb-leave");
+      setTimeout(function() { location.href = u.href; }, 260);
+    });
+    window.addEventListener("pageshow", function(e) { if (e.persisted) document.documentElement.classList.remove("fb-leave"); });
+  })();
   </script>
 </body>
 </html>
