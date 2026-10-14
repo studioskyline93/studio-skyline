@@ -4,20 +4,143 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Work — Studio Skyline</title>
+  <meta name="description" content="Packaging, print and production by Studio Skyline Graphics. Explore our work by category.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* ============ Studio Skyline — Work (categories) ============ */
+    :root{
+      --burgundy:#800D1B; --burgundy-deep:#6a0a16;
+      --ivory:#FAF7F3; --white:#fff; --ink:#262222; --muted:#77716F; --line:#E9E0DC;
+      --serif:"Cormorant Garamond","Cormorant",Georgia,"Times New Roman",serif;
+      --sans:"Inter","Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+      --pad:clamp(20px,4.6vw,72px);
+    }
+    body.fb-page{margin:0;background:var(--ivory);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+    body.fb-page *{box-sizing:border-box}
+    /* Header / footer are injected by shared.js: restyle by element so existing links and markup stay intact */
+    body.fb-page #site-header{background:var(--ivory);color:var(--ink);border-bottom:1px solid var(--line);font-family:var(--sans)}
+    body.fb-page #site-header a{color:inherit}
+    body.fb-page #site-footer{background:var(--ivory);color:var(--ink);border-top:1px solid var(--line);font-family:var(--sans)}
+    body.fb-page #site-footer a{color:inherit}
+
+    .fb a:focus-visible,.fb button:focus-visible{outline:2px solid var(--burgundy);outline-offset:3px}
+    .fb button{font-family:inherit;cursor:pointer}
+    .fb-media img,.fb-media video,.fb-slide img,.fb-slide video,.fb-cta-img img,.fb-banner-img img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+    .fb a:focus-visible,.fb button:focus-visible{outline:2px solid var(--burgundy);outline-offset:3px}
+    .fb-eyebrow{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--burgundy);font-weight:500}
+    .fb-btn{display:inline-flex;align-items:center;gap:14px;align-self:flex-start;background:var(--burgundy);color:#fff;border:1px solid var(--burgundy);padding:12px 22px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;text-decoration:none;transition:background .25s,color .25s}
+    .fb-btn svg{width:14px;height:14px;transition:transform .25s}
+    .fb-btn:hover{background:var(--burgundy-deep)}
+    .fb-btn:hover svg{transform:translateX(4px)}
+    .fb-btn.light{background:transparent;color:#fff;border-color:rgba(255,255,255,.7)}
+    /* ---------- Intro ---------- */
+    .fb-wrap{padding-left:var(--pad);padding-right:var(--pad)}
+    .fb-intro{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(24px,6vw,110px);align-items:end;padding-top:clamp(32px,4vw,56px);padding-bottom:clamp(20px,2.2vw,30px);border-bottom:1px solid var(--line);margin-bottom:22px}
+    .fb-h2{font-family:var(--serif);font-weight:500;color:var(--burgundy);font-size:clamp(30px,3.1vw,44px);line-height:1.05;margin:10px 0 16px}
+    .fb-rule{display:block;width:62px;height:1px;background:var(--burgundy)}
+    .fb-intro p{font-family:var(--serif);font-size:clamp(16px,1.2vw,19px);line-height:1.5;color:#4a4443;margin:0;max-width:30em}
+
+
+    /* ---------- Category cards ---------- */
+    .fb-cats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(28px,3vw,44px) clamp(16px,2vw,32px);padding-bottom:clamp(36px,4.5vw,64px)}
+    .fb-cat{display:block;color:inherit;text-decoration:none;min-width:0}
+    .fb-cat-media{position:relative;display:block;width:100%;aspect-ratio:5/4;overflow:hidden;background:#ece4df}
+    .fb-cat-media img,.fb-cat-media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity 1s ease,transform 1.2s cubic-bezier(.2,.7,.2,1)}
+    .fb-cat-media .on{opacity:1}
+    .fb-cat:hover .fb-cat-media img,.fb-cat:hover .fb-cat-media video{transform:scale(1.03)}
+    .fb-cat-dots{position:absolute;left:14px;bottom:12px;display:flex;gap:5px;z-index:2}
+    .fb-cat-dots i{width:16px;height:2px;background:rgba(255,255,255,.5);transition:background .3s,width .3s}
+    .fb-cat-dots i.on{background:#fff;width:26px}
+    .fb-cat-cap{display:block;padding-top:12px}
+    .fb-cat-title{display:block;font-family:var(--serif);font-size:clamp(21px,1.8vw,26px);font-weight:600;line-height:1.15;color:var(--ink);transition:color .25s}
+    .fb-cat:hover .fb-cat-title{color:var(--burgundy)}
+    .fb-cat-sub{display:block;margin-top:5px;font-size:12.5px;color:var(--muted)}
+    .fb-cat-count{display:block;margin-top:8px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--burgundy);font-weight:500}
+    .fb-empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:60px 0;font-family:var(--serif);font-size:20px}
+
+    /* ---------- Capabilities ---------- */
+    .fb-caps{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--white)}
+    .fb-cap-item{padding:clamp(20px,2vw,30px) clamp(16px,2vw,28px);text-align:center;border-left:1px solid var(--line)}
+    .fb-cap-item:first-child{border-left:0}
+    .fb-cap-item svg{width:32px;height:32px;color:var(--burgundy);stroke:currentColor;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+    .fb-cap-item h3{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);font-weight:600;margin:12px 0 6px}
+    .fb-cap-item p{font-size:13px;line-height:1.5;color:var(--muted);margin:0 auto;max-width:17em}
+
+    /* ---------- Enquiry ---------- */
+    .fb-cta{position:relative;overflow:hidden;background:var(--burgundy);color:#fff;padding:clamp(28px,3.2vw,44px) var(--pad)}
+    .fb-cta h2{font-family:var(--serif);font-weight:500;font-size:clamp(24px,2.4vw,34px);line-height:1.05;margin:0 0 8px}
+    .fb-cta p{font-family:var(--serif);font-size:clamp(14px,1.05vw,17px);line-height:1.45;color:rgba(255,255,255,.86);max-width:30em;margin:0 0 16px}
+    .fb-cta .fb-btn{padding:10px 20px;font-size:10px}
+    .fb-cta .fb-btn.light:hover{background:#fff;color:var(--burgundy)}
+    .fb-cta .fb-leaf{filter:brightness(0) invert(1);opacity:.25}
+    .fb-leaf{position:absolute;right:clamp(16px,3vw,48px);bottom:14px;width:84px;height:auto;opacity:.55;pointer-events:none}
+    .fb-hidden{display:none!important}
+
+    @media (max-width:1024px){
+      .fb-cats{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .fb-intro{grid-template-columns:1fr 1fr}
+      .fb-caps{grid-template-columns:repeat(2,1fr)}
+      .fb-cap-item:nth-child(3){border-left:0}
+      .fb-cap-item:nth-child(n+3){border-top:1px solid var(--line)}
+    }
+    @media (max-width:720px){
+      .fb-cats{grid-template-columns:1fr}
+      .fb-intro{grid-template-columns:1fr;gap:20px;align-items:start}
+      .fb-caps{grid-template-columns:1fr 1fr}
+      .fb-leaf{display:none}
+    }
+    @media (prefers-reduced-motion:reduce){
+      .fb-cat-media img,.fb-cat-media video,.fb-btn svg{transition:none}
+    }
+  </style>
 </head>
-<body>
+<body class="fb-page">
   <div id="site-header"></div>
 
-  <div class="site-main">
-    <div class="section">
-      <div class="section-kicker">Archive</div>
-      <div class="section-title">Work</div>
-      <div class="section-desc">Packaging, print, and production. Click a project to view images.</div>
-    </div>
+  <main class="fb" id="fbMain">
+    <section class="fb-wrap" aria-labelledby="fbWorkTitle">
+      <div class="fb-intro">
+        <div>
+          <div class="fb-eyebrow">Archive</div>
+          <h1 class="fb-h2" id="fbWorkTitle">Our work</h1>
+          <span class="fb-rule" aria-hidden="true"></span>
+        </div>
+        <p>Packaging, print and production. Choose a category to explore the projects inside it.</p>
+      </div>
+      <div class="fb-cats" id="workGrid"></div>
+    </section>
 
-    <div class="work-grid" id="workGrid"></div>
-  </div>
+    <!-- Capabilities -->
+    <section class="fb-caps" aria-label="Craftsmanship">
+      <div class="fb-cap-item">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 6 5 13.5 20 21l15-7.500z"/><path d="m5 20 15 7.500L35 20"/><path d="m5 26.500 15 7.500 15-7.500"/></svg>
+        <h3>Premium materials</h3><p>A curated range of luxury papers and finishes</p>
+      </div>
+      <div class="fb-cap-item">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 32V8h8v24z"/><path d="M12 14v-0M8 14h4M8 20h4M8 26h4"/><path d="m24 31 2-9 9-13 3 2-9 13z"/><path d="m26 22 3 2"/></svg>
+        <h3>Custom structures</h3><p>Tailored to your product and brand</p>
+      </div>
+      <div class="fb-cap-item">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="5.500"/><path d="M20 5v5M20 30v5M5 20h5M30 20h5M9.400 9.400l3.500 3.500M27.100 27.100l3.500 3.500M30.600 9.400l-3.500 3.500M12.900 27.100l-3.500 3.500"/><circle cx="20" cy="20" r="11"/></svg>
+        <h3>Precision manufacturing</h3><p>Consistent quality at every stage</p>
+      </div>
+      <div class="fb-cap-item">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="6" y="16" width="28" height="18"/><path d="M4 11h32v5H4zM20 11v23"/><path d="M20 11c-3-7-10-6-8-2 1 2 5 2 8 2zM20 11c3-7 10-6 8-2-1 2-5 2-8 2z"/></svg>
+        <h3>Bespoke inserts</h3><p>Designed for a complete unboxing experience</p>
+      </div>
+    </section>
+
+    <section class="fb-cta" aria-labelledby="fbCtaTitle">
+      <h2 id="fbCtaTitle">Let&rsquo;s create something exceptional.</h2>
+      <p>Whether you have a ready design or just a concept, we can help you bring it to life with the right structure, materials and finishing.</p>
+      <a class="fb-btn light" href="contact.html">Enquire now
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg></a>
+      <svg class="fb-leaf" viewBox="0 0 120 160" fill="#800D1B" fill-opacity=".1" stroke="#800D1B" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M60 156C58 118 62 70 71 10" fill="none"/><g transform="translate(59 138) scale(0.95) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(61 104) scale(0.9) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(65 70) scale(0.8) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(68 42) scale(0.65) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(59 122) scale(-0.95 0.95) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(62 88) scale(-0.85 0.85) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(66 56) scale(-0.72 0.72) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(69 30) scale(-0.55 0.55) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(71 12) rotate(-80) scale(.55)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g></svg>
+    </section>
+  </main>
 
   <div id="site-footer"></div>
 
@@ -27,25 +150,74 @@
   <script src="shared.js"></script>
   <script src="data.js"></script>
   <script>
+    var SLIDE_MS = 3200;      // time each picture stays on screen
+    var MAX_SLIDES = 8;       // pictures cycled per category
+    var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+
+    function isVideoSrc(src) { return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(src || ""); }
+
+    function slidesFor(c) {
+      var items = c.videos || [], pics = [], vids = [];
+      items.forEach(function(v) { if (!v || !v.src) return; (isVideoSrc(v.src) ? vids : pics).push(v.src); });
+      var list = pics.length ? pics : vids;
+      return list.slice(0, MAX_SLIDES);
+    }
+
     function renderWorkGrid(collections) {
       var grid = document.getElementById("workGrid");
+      var shown = collections.filter(function(c) { return c.enabled !== false; });
+      if (!shown.length) { grid.innerHTML = '<div class="fb-empty">No projects to show yet.</div>'; return; }
       var html = "";
-      collections.forEach(function(c) {
-        var vids = c.videos || [];
-        html += '<a href="work-detail.html?slug=' + encodeURIComponent(c.slug) + '" class="work-card">' +
-          '<div class="work-card-inner">' +
-            '<div>' +
-              (c.index ? '<div class="work-card-idx">' + esc(c.index) + '</div>' : '') +
-              '<div class="work-card-title">' + esc(c.title) + '</div>' +
-              (c.subtitle ? '<div class="work-card-sub">' + esc(c.subtitle) + '</div>' : '') +
-            '</div>' +
-            '<div class="work-card-bottom">' +
-              '<span>' + vids.length + ' item' + (vids.length === 1 ? '' : 's') + '</span>' +
-              '<span class="work-card-arrow">View &rarr;</span>' +
-            '</div>' +
-          '</div></a>';
+      shown.forEach(function(c) {
+        var vids = c.videos || [], slides = slidesFor(c);
+        var media = slides.map(function(src, i) {
+          return isVideoSrc(src)
+            ? '<video src="' + esc(src) + '" muted playsinline loop preload="metadata"' + (i === 0 ? ' class="on"' : '') + '></video>'
+            : '<img src="' + esc(src) + '" alt="' + esc(c.title) + '"' + (i === 0 ? ' class="on"' : ' loading="lazy"') + ' decoding="async">';
+        }).join("");
+        var dots = slides.length > 1 ? '<span class="fb-cat-dots" aria-hidden="true">' + slides.map(function(_, i) { return '<i' + (i === 0 ? ' class="on"' : '') + '></i>'; }).join("") + '</span>' : "";
+        html += '<a href="work-detail.html?slug=' + encodeURIComponent(c.slug) + '" class="fb-cat" data-slides="' + slides.length + '">' +
+          '<span class="fb-cat-media">' + media + dots + '</span>' +
+          '<span class="fb-cat-cap">' +
+            '<span class="fb-cat-title">' + esc(c.title) + '</span>' +
+            (c.subtitle ? '<span class="fb-cat-sub">' + esc(c.subtitle) + '</span>' : '') +
+            '<span class="fb-cat-count">' + vids.length + ' item' + (vids.length === 1 ? '' : 's') + '</span>' +
+          '</span></a>';
       });
       grid.innerHTML = html;
+      startSlideshows();
+    }
+
+    /* Every category card cycles through its own pictures; cards start at staggered times so they never change in unison */
+    function startSlideshows() {
+      if (reduceMotion) return;
+      var cards = document.querySelectorAll(".fb-cat");
+      var visible = new WeakMap();
+      var io = ("IntersectionObserver" in window) ? new IntersectionObserver(function(es) {
+        es.forEach(function(e) { visible.set(e.target, e.isIntersecting); });
+      }, { threshold: 0.15 }) : null;
+
+      cards.forEach(function(card, n) {
+        var n_s = Number(card.getAttribute("data-slides"));
+        if (n_s < 2) return;
+        var layers = card.querySelectorAll(".fb-cat-media img, .fb-cat-media video");
+        var dots = card.querySelectorAll(".fb-cat-dots i");
+        var cur = 0, hover = false;
+        if (io) io.observe(card); else visible.set(card, true);
+        card.addEventListener("mouseenter", function() { hover = true; });
+        card.addEventListener("mouseleave", function() { hover = false; });
+        function step() {
+          if (document.hidden || hover || visible.get(card) === false) return;
+          var nxt = (cur + 1) % layers.length;
+          layers[cur].classList.remove("on"); layers[nxt].classList.add("on");
+          if (dots[cur]) dots[cur].classList.remove("on");
+          if (dots[nxt]) dots[nxt].classList.add("on");
+          if (layers[nxt].tagName === "VIDEO") { try { layers[nxt].play(); } catch (e) {} }
+          if (layers[cur].tagName === "VIDEO") { try { layers[cur].pause(); } catch (e) {} }
+          cur = nxt;
+        }
+        setTimeout(function() { step(); setInterval(step, SLIDE_MS); }, 600 + (n % 6) * 550);
+      });
     }
 
     (async function() {
