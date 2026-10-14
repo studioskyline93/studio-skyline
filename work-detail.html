@@ -49,7 +49,7 @@
     .fb-counter b{font-weight:500;color:var(--burgundy)}
     .fb-progress{flex:0 1 220px;height:1px;background:var(--line);position:relative}
     .fb-progress i{position:absolute;left:0;top:-.5px;height:2px;background:var(--burgundy);transition:width .6s ease}
-    .fb-leaf{position:absolute;left:-40px;bottom:-52px;width:112px;opacity:.3;pointer-events:none}
+    .fb-leaf{position:absolute;right:clamp(12px,2vw,30px);bottom:12px;width:74px;height:auto;opacity:.55;pointer-events:none;z-index:0}
 
     .fb-hero-media{position:relative;overflow:hidden;background:#e9e0dc}
     /* Hero shows the whole photograph (no crop) on a tinted backdrop */
@@ -110,8 +110,26 @@
     .fb-empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:60px 0;font-family:var(--serif);font-size:20px}
     .fb-grid-swap{animation:fbFade .5s ease}
     @keyframes fbFade{from{opacity:0}to{opacity:1}}
-    .fb-more-wrap{display:flex;justify-content:center;margin:clamp(28px,3vw,40px) 0 clamp(36px,4.5vw,64px)}
+    .fb-more-wrap{position:relative;display:flex;justify-content:center;align-items:center;min-height:clamp(190px,22vw,260px);margin:clamp(8px,1.5vw,18px) 0 clamp(36px,4.5vw,64px);overflow:hidden;isolation:isolate}
     .fb-more-wrap[hidden]{display:none}
+    /* Blurred preview of the next projects, fading out behind the button */
+    .fb-more-peek{position:absolute;inset:0;display:flex;gap:clamp(12px,1.4vw,20px);z-index:0;pointer-events:none;
+      -webkit-mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.7) 45%,transparent 100%);mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.7) 45%,transparent 100%)}
+    .fb-more-peek span{flex:1 1 0;min-width:0;overflow:hidden;background:#ece4df}
+    .fb-more-peek img{width:100%;height:100%;object-fit:cover;display:block;filter:blur(14px) saturate(1.1);transform:scale(1.15);opacity:.7}
+    .fb-more-wrap::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,rgba(250,246,241,.55) 0%,rgba(250,246,241,0) 65%)}
+    .fb-more-btn{position:relative;z-index:2;display:inline-flex;align-items:center;gap:16px;padding:10px 10px 10px 30px;border-radius:999px;border:1px solid rgba(255,255,255,.55);
+      background:linear-gradient(135deg,rgba(138,16,32,.96),rgba(106,10,22,.96));color:#fff;font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;font-weight:600;
+      box-shadow:0 18px 38px -14px rgba(106,10,22,.75),0 2px 0 rgba(255,255,255,.18) inset;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+      transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s,background .35s}
+    .fb-more-btn:hover{transform:translateY(-3px);box-shadow:0 24px 44px -14px rgba(106,10,22,.85),0 2px 0 rgba(255,255,255,.22) inset}
+    .fb-more-btn:active{transform:translateY(-1px)}
+    .fb-more-count{font-size:10.5px;letter-spacing:.1em;font-weight:500;opacity:.75;text-transform:none;white-space:nowrap}
+    .fb-more-count:empty{display:none}
+    .fb-more-ico{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.16);transition:background .3s}
+    .fb-more-ico svg{width:16px;height:16px;transition:transform .35s}
+    .fb-more-btn:hover .fb-more-ico{background:rgba(255,255,255,.28)}
+    .fb-more-btn:hover .fb-more-ico svg{transform:translateY(3px)}
 
     /* ---------- Capabilities ---------- */
     .fb-caps{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--white)}
@@ -136,7 +154,7 @@
     .fb-cta p{font-family:var(--serif);font-size:clamp(14px,1vw,16px);line-height:1.45;color:#4a4443;max-width:28em;margin:0 0 14px}
     .fb-banner .fb-btn,.fb-cta .fb-btn{padding:9px 18px;font-size:10px}
     .fb-banner-img img,.fb-cta-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
-    .fb-cta .fb-leaf{left:auto;right:-20px;bottom:-30px;transform:scaleX(-1);width:120px;opacity:.4}
+    .fb-cta .fb-leaf{right:clamp(16px,3vw,48px);bottom:10px;width:84px;opacity:.55}
 
     .fb-notfound{padding:120px var(--pad);font-family:var(--serif);font-size:40px;color:var(--burgundy)}
     .fb-hidden{display:none!important}
@@ -185,6 +203,7 @@
     @media (prefers-reduced-motion:reduce){
       .fb-slide,.fb-progress i,.fb-media img,.fb-media video,.fb-arrow,.fb-btn svg{transition:none}
       .fb-grid-swap{animation:none}
+      .fb-more-btn,.fb-more-ico svg{transition:none}
     }
   </style>
 </head>
@@ -209,8 +228,11 @@
       <nav class="fb-filters fb-hidden" id="fbFilters" aria-label="Project categories"><div class="fb-filter-track" id="fbFilterTrack"></div></nav>
       <div class="fb-folderbar" id="fbFolderBar"></div>
       <div class="fb-gallery" id="allGrid"></div>
-      <div class="fb-more-wrap" id="fbMoreWrap" hidden><button class="fb-btn ghost" id="fbMore" type="button">Load more projects
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button></div>
+      <div class="fb-more-wrap" id="fbMoreWrap" hidden>
+        <div class="fb-more-peek" id="fbPeek" aria-hidden="true"></div>
+        <button class="fb-more-btn" id="fbMore" type="button"><span class="fb-more-label">Load more projects</span><span class="fb-more-count" id="fbMoreCount"></span>
+          <span class="fb-more-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span></button>
+      </div>
     </section>
 
     <!-- Capabilities -->
@@ -252,7 +274,7 @@
         <p>Whether you have a ready design or just a concept, we can help you bring it to life with the right structure, materials and finishing.</p>
         <a class="fb-btn" id="fbEnquire" href="contact.html">Enquire now
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg></a>
-        <svg class="fb-leaf" viewBox="0 0 120 160" fill="none" stroke="#800D1B" stroke-width=".8" aria-hidden="true"><path d="M60 158C58 110 62 60 78 6"/><path d="M62 130c-22-6-34-22-36-40 20 4 34 16 36 40zM64 104c20-8 30-24 30-40-18 6-28 20-30 40zM66 78C46 70 38 54 40 38c18 6 26 20 26 40zM70 54c16-8 24-20 24-34-14 4-22 16-24 34z"/></svg>
+        <svg class="fb-leaf" viewBox="0 0 120 160" fill="#800D1B" fill-opacity=".1" stroke="#800D1B" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M60 156C58 118 62 70 71 10" fill="none"/><g transform="translate(59 138) scale(0.95) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(61 104) scale(0.9) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(65 70) scale(0.8) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(68 42) scale(0.65) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(59 122) scale(-0.95 0.95) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(62 88) scale(-0.85 0.85) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(66 56) scale(-0.72 0.72) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(69 30) scale(-0.55 0.55) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(71 12) rotate(-80) scale(.55)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g></svg>
       </div>
     </section>
   </main>
@@ -299,7 +321,7 @@
     var ARROW_R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg>';
     var CHEV_L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
     var CHEV_R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
-    var LEAF = '<svg class="fb-leaf" viewBox="0 0 120 160" fill="none" stroke="#800D1B" stroke-width=".8" aria-hidden="true"><path d="M60 158C58 110 62 60 78 6"/><path d="M62 130c-22-6-34-22-36-40 20 4 34 16 36 40zM64 104c20-8 30-24 30-40-18 6-28 20-30 40zM66 78C46 70 38 54 40 38c18 6 26 20 26 40zM70 54c16-8 24-20 24-34-14 4-22 16-24 34z"/></svg>';
+    var LEAF = '<svg class="fb-leaf" viewBox="0 0 120 160" fill="#800D1B" fill-opacity=".1" stroke="#800D1B" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M60 156C58 118 62 70 71 10" fill="none"/><g transform="translate(59 138) scale(0.95) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(61 104) scale(0.9) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(65 70) scale(0.8) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(68 42) scale(0.65) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(59 122) scale(-0.95 0.95) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(62 88) scale(-0.85 0.85) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(66 56) scale(-0.72 0.72) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(69 30) scale(-0.55 0.55) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(71 12) rotate(-80) scale(.55)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g></svg>';
 
     function isVideoSrc(src) { return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(src || ""); }
     function modalSources(item) {
@@ -445,6 +467,8 @@
       var mqWide = window.matchMedia("(min-width:1025px)");
 
       function clientKey(v) { return (v.client || "").trim().toLowerCase(); }
+      /* Folders switched off in the admin panel (collection.hiddenFolders) show their items individually */
+      function folderHidden(k) { return ((collection && collection.hiddenFolders) || []).indexOf(k) >= 0; }
 
       function buildEntries() {
         var out = [];
@@ -464,7 +488,7 @@
         });
         idxs.forEach(function(i) {
           var k = clientKey(videos[i]);
-          if (k && counts[k] >= 2) {
+          if (k && counts[k] >= 2 && !folderHidden(k)) {
             if (seen[k]) return; seen[k] = true; folderKeys.push(k);
             out.push({ kind: "folder", key: k, n: folderKeys.length - 1, idxs: members[k] });
           } else out.push({ kind: "item", i: i });
@@ -477,9 +501,9 @@
         var arrow = '<span class="fb-arrow">' + ARROW_R + '</span>';
         if (e.kind === "folder") {
           var cover = videos[e.idxs[0]];
-          /* Client folder with more than 2 pictures: the cover changes by itself every 3 seconds */
+          /* Client folder with 2+ pictures: the cover changes by itself every 3 seconds */
           var pics = e.idxs.map(function(i) { return videos[i].src; }).filter(function(src) { return !isVideoSrc(src); });
-          var cycle = pics.length > 2;
+          var cycle = pics.length >= 2;
           if (cycle) cyclePics[e.key] = pics;
           var coverSrc = cycle ? pics[(cycleIdx[e.key] || 0) % pics.length] : cover.src;
           return '<article class="fb-card"><button type="button" class="fb-card-btn" data-folder="' + e.n + '">' +
@@ -528,7 +552,21 @@
           grid.className = "fb-gallery single";
           grid.innerHTML = '<div class="fb-col">' + s + '</div>';
         }
-        document.getElementById("fbMoreWrap").hidden = entries.length <= limit;
+        var more = entries.length > limit;
+        document.getElementById("fbMoreWrap").hidden = !more;
+        if (more) {
+          var nPeek = mqWide.matches ? 4 : (mqDesktop.matches ? 2 : 1), peek = "";
+          var rest = entries.slice(limit);
+          for (var pi = 0; pi < rest.length && peek.split("<span>").length - 1 < nPeek; pi++) {
+            var pe = rest[pi], psrc = "";
+            if (pe.kind === "folder") {
+              for (var pj = 0; pj < pe.idxs.length; pj++) { if (!isVideoSrc(videos[pe.idxs[pj]].src)) { psrc = videos[pe.idxs[pj]].src; break; } }
+            } else if (!isVideoSrc(videos[pe.i].src)) psrc = videos[pe.i].src;
+            if (psrc) peek += '<span><img src="' + esc(psrc) + '" alt="" loading="lazy" decoding="async"></span>';
+          }
+          document.getElementById("fbPeek").innerHTML = peek;
+          document.getElementById("fbMoreCount").textContent = (entries.length - limit) + " more";
+        }
       }
       /* Size each card from the photo's real proportions so packaging is never cropped.
          Extreme shapes are clamped and shown with object-fit:contain (still uncropped). */
@@ -545,18 +583,18 @@
       }
       document.addEventListener("load", function(e) { if (e.target && e.target.tagName === "IMG") fitMedia(e.target); }, true);
       document.addEventListener("loadedmetadata", function(e) { if (e.target && e.target.tagName === "VIDEO") fitMedia(e.target); }, true);
-      /* Rotate the cover of every client folder that has more than 2 pictures */
+      /* Rotate the cover of every client folder that has 2+ pictures */
       setInterval(function() {
-        if (document.hidden || reduceMotion) return;
+        if (document.hidden) return;
         var boxes = document.querySelectorAll(".fb-media[data-cycle]");
         for (var b = 0; b < boxes.length; b++) {
           (function(box) {
             var key = box.getAttribute("data-cycle"), pics = cyclePics[key], img = box.querySelector("img");
-            if (!pics || pics.length <= 2 || !img) return;
+            if (!pics || pics.length < 2 || !img) return;
             cycleIdx[key] = ((cycleIdx[key] || 0) + 1) % pics.length;
             var next = pics[cycleIdx[key]], pre = new Image();
             pre.onload = function() {
-              img.style.transition = "opacity .45s, transform .9s cubic-bezier(.2,.7,.2,1)";
+              img.style.transition = reduceMotion ? "opacity .45s" : "opacity .45s, transform .9s cubic-bezier(.2,.7,.2,1)";
               img.style.opacity = 0;
               setTimeout(function() { img.src = next; img.style.opacity = 1; }, 450);
             };
