@@ -317,7 +317,7 @@
       var workData = await loadWorkContent();
       var allCollections = (workData && workData.collections) ? workData.collections : WORK_COLLECTIONS;
       var collection = null;
-      for (var ci = 0; ci < allCollections.length; ci++) { if (allCollections[ci].slug === slug) { collection = allCollections[ci]; break; } }
+      for (var ci = 0; ci < allCollections.length; ci++) { if (allCollections[ci].slug === slug && allCollections[ci].enabled !== false) { collection = allCollections[ci]; break; } }
 
       if (!collection) {
         document.getElementById("fbMain").innerHTML = '<h1 class="fb-notfound">Collection not found</h1>';
@@ -472,12 +472,18 @@
         return out;
       }
 
+      var cyclePics = {}, cycleIdx = {};
       function cardHtml(e, ratio) {
         var arrow = '<span class="fb-arrow">' + ARROW_R + '</span>';
         if (e.kind === "folder") {
           var cover = videos[e.idxs[0]];
+          /* Client folder with more than 2 pictures: the cover changes by itself every 3 seconds */
+          var pics = e.idxs.map(function(i) { return videos[i].src; }).filter(function(src) { return !isVideoSrc(src); });
+          var cycle = pics.length > 2;
+          if (cycle) cyclePics[e.key] = pics;
+          var coverSrc = cycle ? pics[(cycleIdx[e.key] || 0) % pics.length] : cover.src;
           return '<article class="fb-card"><button type="button" class="fb-card-btn" data-folder="' + e.n + '">' +
-            '<span class="fb-media" style="aspect-ratio:' + ratio + '">' + mediaTag(cover.src, 'metadata', folderNames[e.key]) + '</span>' +
+            '<span class="fb-media" style="aspect-ratio:' + ratio + '"' + (cycle ? ' data-cycle="' + esc(e.key) + '"' : '') + '>' + mediaTag(coverSrc, 'metadata', folderNames[e.key]) + '</span>' +
             '<span class="fb-cap"><span><span class="fb-cap-title">' + esc(folderNames[e.key]) + '</span>' +
             '<span class="fb-cap-sub">' + e.idxs.length + ' pieces</span></span>' + arrow + '</span></button></article>';
         }
@@ -532,12 +538,32 @@
         if (!box || !box.classList || !box.classList.contains("fb-media")) return;
         var w = el.naturalWidth || el.videoWidth, h = el.naturalHeight || el.videoHeight;
         if (!w || !h) return;
+        if (box.hasAttribute("data-cycle")) { if (box.getAttribute("data-fit")) return; box.setAttribute("data-fit", "1"); } // keep the card size steady while pictures rotate
         var r = w / h, c = Math.min(MAX_RATIO, Math.max(MIN_RATIO, r));
         box.style.aspectRatio = String(Math.round(c * 1000) / 1000);
         box.classList.toggle("is-contain", Math.abs(r - c) > 0.01);
       }
       document.addEventListener("load", function(e) { if (e.target && e.target.tagName === "IMG") fitMedia(e.target); }, true);
       document.addEventListener("loadedmetadata", function(e) { if (e.target && e.target.tagName === "VIDEO") fitMedia(e.target); }, true);
+      /* Rotate the cover of every client folder that has more than 2 pictures */
+      setInterval(function() {
+        if (document.hidden || reduceMotion) return;
+        var boxes = document.querySelectorAll(".fb-media[data-cycle]");
+        for (var b = 0; b < boxes.length; b++) {
+          (function(box) {
+            var key = box.getAttribute("data-cycle"), pics = cyclePics[key], img = box.querySelector("img");
+            if (!pics || pics.length <= 2 || !img) return;
+            cycleIdx[key] = ((cycleIdx[key] || 0) + 1) % pics.length;
+            var next = pics[cycleIdx[key]], pre = new Image();
+            pre.onload = function() {
+              img.style.transition = "opacity .45s, transform .9s cubic-bezier(.2,.7,.2,1)";
+              img.style.opacity = 0;
+              setTimeout(function() { img.src = next; img.style.opacity = 1; }, 450);
+            };
+            pre.src = next;
+          })(boxes[b]);
+        }
+      }, 3000);
       function swapGrid() {
         var grid = document.getElementById("allGrid");
         renderGrid();
