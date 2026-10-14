@@ -4,51 +4,246 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Work Detail — Studio Skyline</title>
+  <meta name="description" id="metaDesc" content="Premium rigid boxes and custom packaging by Studio Skyline Graphics.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <style>.media-img{width:100%;height:100%;object-fit:cover;display:block}
-  #modalImg{max-width:100%;max-height:62vh;margin:0 auto;display:none;object-fit:contain}
+  <style>
+    /* ============ Studio Skyline — Premium collection page ============ */
+    :root{
+      --burgundy:#800D1B; --burgundy-deep:#6a0a16;
+      --ivory:#FAF7F3; --white:#fff; --ink:#262222; --muted:#77716F; --line:#E9E0DC;
+      --serif:"Cormorant Garamond","Cormorant",Georgia,"Times New Roman",serif;
+      --sans:"Inter","Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+      --pad:clamp(20px,4.6vw,72px);
+    }
+    body.fb-page{margin:0;background:var(--ivory);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+    body.fb-page *{box-sizing:border-box}
+    /* Header / footer are injected by shared.js: restyle by element so existing links and markup stay intact */
+    body.fb-page #site-header{background:var(--ivory);color:var(--ink);border-bottom:1px solid var(--line);font-family:var(--sans)}
+    body.fb-page #site-header a{color:inherit}
+    body.fb-page #site-footer{background:var(--ivory);color:var(--ink);border-top:1px solid var(--line);font-family:var(--sans)}
+    body.fb-page #site-footer a{color:inherit}
+
+    .fb a:focus-visible,.fb button:focus-visible{outline:2px solid var(--burgundy);outline-offset:3px}
+    .fb button{font-family:inherit;cursor:pointer}
+    .fb-media img,.fb-media video,.fb-slide img,.fb-slide video,.fb-cta-img img,.fb-banner-img img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+
+    /* ---------- Hero ---------- */
+    .fb-hero{display:grid;grid-template-columns:38fr 62fr;min-height:clamp(440px,46vh,580px);background:var(--ivory);border-bottom:1px solid var(--line)}
+    .fb-hero-text{position:relative;display:flex;flex-direction:column;justify-content:center;padding:48px clamp(24px,3vw,56px) 40px var(--pad);overflow:hidden}
+    .fb-eyebrow{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--burgundy);font-weight:500}
+    .fb-h1{font-family:var(--serif);font-weight:500;color:var(--burgundy);font-size:clamp(46px,5.6vw,88px);line-height:.98;letter-spacing:-.01em;margin:22px 0 22px}
+    .fb-h1 span{display:block}
+    .fb-lede{font-family:var(--serif);font-size:clamp(18px,1.5vw,22px);line-height:1.4;color:var(--ink);max-width:25em;margin:0 0 30px}
+    .fb-btn{display:inline-flex;align-items:center;gap:14px;align-self:flex-start;background:var(--burgundy);color:#fff;border:1px solid var(--burgundy);padding:15px 26px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;text-decoration:none;transition:background .25s,color .25s}
+    .fb-btn svg{width:14px;height:14px;transition:transform .25s}
+    .fb-btn:hover{background:var(--burgundy-deep)}
+    .fb-btn:hover svg{transform:translateX(4px)}
+    .fb-btn.ghost{background:transparent;color:var(--burgundy)}
+    .fb-btn.ghost:hover{background:var(--burgundy);color:#fff}
+    .fb-btn.light{background:transparent;color:#fff;border-color:rgba(255,255,255,.7)}
+    .fb-btn.light:hover{background:#fff;color:var(--burgundy)}
+    .fb-counter{display:flex;align-items:center;gap:18px;margin-top:38px;font-size:11px;letter-spacing:.14em;color:var(--muted)}
+    .fb-counter b{font-weight:500;color:var(--burgundy)}
+    .fb-progress{flex:0 1 220px;height:1px;background:var(--line);position:relative}
+    .fb-progress i{position:absolute;left:0;top:-.5px;height:2px;background:var(--burgundy);transition:width .6s ease}
+    .fb-leaf{position:absolute;left:-44px;bottom:-48px;width:150px;opacity:.38;pointer-events:none}
+
+    .fb-hero-media{position:relative;overflow:hidden;background:#e9e0dc}
+    .fb-slide{position:absolute;inset:0;opacity:0;transition:opacity .9s ease;pointer-events:none}
+    .fb-slide.on{opacity:1;pointer-events:auto}
+    .fb-slide-open{display:block;width:100%;height:100%;padding:0;border:0;background:none}
+    .fb-hero-nav{position:absolute;right:clamp(16px,2.4vw,40px);bottom:clamp(16px,2.4vw,36px);display:flex;gap:12px;z-index:3}
+    .fb-circle{width:46px;height:46px;border-radius:50%;border:0;display:grid;place-items:center;background:rgba(250,247,243,.92);color:var(--burgundy);transition:background .25s,color .25s}
+    .fb-circle.solid{background:var(--burgundy);color:#fff}
+    .fb-circle:hover{background:var(--burgundy-deep);color:#fff}
+    .fb-circle svg{width:16px;height:16px}
+
+    /* ---------- Intro ---------- */
+    .fb-wrap{padding-left:var(--pad);padding-right:var(--pad)}
+    .fb-intro{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(24px,6vw,110px);align-items:end;padding-top:clamp(48px,6vw,88px);padding-bottom:clamp(28px,3vw,44px);border-bottom:1px solid var(--line);margin-bottom:34px}
+    .fb-h2{font-family:var(--serif);font-weight:500;color:var(--burgundy);font-size:clamp(36px,4vw,58px);line-height:1.04;margin:14px 0 22px}
+    .fb-rule{display:block;width:62px;height:1px;background:var(--burgundy)}
+    .fb-intro p{font-family:var(--serif);font-size:clamp(17px,1.3vw,20px);line-height:1.55;color:#4a4443;margin:0;max-width:30em}
+
+    /* ---------- Filters ---------- */
+    .fb-filters{overflow-x:auto;scrollbar-width:none;margin-bottom:clamp(28px,3vw,44px)}
+    .fb-filters::-webkit-scrollbar{display:none}
+    .fb-filter-track{display:flex;justify-content:center;gap:6px;min-width:max-content;margin:0 auto}
+    .fb-filter{border:0;background:transparent;color:var(--ink);font-size:12px;letter-spacing:.02em;padding:10px 20px;border-radius:3px;white-space:nowrap;transition:background .2s,color .2s}
+    .fb-filter:hover{color:var(--burgundy)}
+    .fb-filter[aria-pressed="true"]{background:var(--burgundy);color:#fff}
+    .fb-folderbar{display:none;align-items:center;gap:22px;margin:0 0 30px}
+    .fb-folderbar.on{display:flex}
+    .fb-back{background:none;border:0;padding:0;font-size:12px;letter-spacing:.08em;color:var(--burgundy);text-decoration:underline;text-underline-offset:4px}
+    .fb-folder-title{font-family:var(--serif);font-size:30px;font-weight:600;color:var(--burgundy)}
+
+    /* ---------- Gallery ---------- */
+    .fb-gallery{display:grid;grid-template-columns:55fr 45fr;gap:0 clamp(18px,2vw,34px);align-items:start}
+    .fb-col{display:flex;flex-direction:column;gap:clamp(30px,3.2vw,52px);min-width:0}
+    .fb-gallery.single{grid-template-columns:1fr}
+    .fb-card{margin:0}
+    .fb-card-btn{display:block;width:100%;padding:0;border:0;background:none;text-align:left;color:inherit}
+    .fb-media{display:block;width:100%;overflow:hidden;background:#ece4df;border-radius:1px}
+    .fb-media img,.fb-media video{transition:transform .9s cubic-bezier(.2,.7,.2,1)}
+    .fb-card-btn:hover .fb-media img,.fb-card-btn:hover .fb-media video{transform:scale(1.025)}
+    .fb-cap{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding-top:14px}
+    .fb-cap-title{display:block;font-family:var(--serif);font-size:clamp(19px,1.6vw,23px);font-weight:600;line-height:1.15}
+    .fb-cap-sub{display:block;margin-top:5px;font-size:12.5px;color:var(--muted)}
+    .fb-arrow{flex:none;color:var(--burgundy);transition:transform .25s;padding-top:4px}
+    .fb-arrow svg{width:16px;height:16px;display:block}
+    .fb-card-btn:hover .fb-arrow{transform:translateX(5px)}
+    .fb-empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:60px 0;font-family:var(--serif);font-size:20px}
+    .fb-grid-swap{animation:fbFade .5s ease}
+    @keyframes fbFade{from{opacity:0}to{opacity:1}}
+    .fb-more-wrap{display:flex;justify-content:center;margin:clamp(40px,5vw,64px) 0 clamp(56px,7vw,100px)}
+    .fb-more-wrap[hidden]{display:none}
+
+    /* ---------- Capabilities ---------- */
+    .fb-caps{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--white)}
+    .fb-cap-item{padding:clamp(28px,3vw,44px) clamp(16px,2vw,32px);text-align:center;border-left:1px solid var(--line)}
+    .fb-cap-item:first-child{border-left:0}
+    .fb-cap-item svg{width:38px;height:38px;color:var(--burgundy);stroke:currentColor;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+    .fb-cap-item h3{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);font-weight:600;margin:18px 0 10px}
+    .fb-cap-item p{font-size:13px;line-height:1.55;color:var(--muted);margin:0 auto;max-width:17em}
+
+    /* ---------- Craft banner ---------- */
+    .fb-banner{display:grid;grid-template-columns:44fr 56fr;background:var(--burgundy);color:#fff;min-height:clamp(340px,34vw,520px)}
+    .fb-banner-text{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:56px clamp(24px,4vw,64px) 56px var(--pad)}
+    .fb-banner h2{font-family:var(--serif);font-weight:500;font-size:clamp(34px,3.8vw,58px);line-height:1.04;margin:0 0 18px}
+    .fb-banner p{font-family:var(--serif);font-size:clamp(17px,1.3vw,20px);line-height:1.55;color:rgba(255,255,255,.86);max-width:27em;margin:0 0 30px}
+    .fb-banner-img{position:relative;min-height:260px;background:#5a0912}
+
+    /* ---------- Enquiry ---------- */
+    .fb-cta{display:grid;grid-template-columns:44fr 56fr;background:var(--ivory)}
+    .fb-cta-img{min-height:clamp(300px,32vw,480px);background:#ece4df}
+    .fb-cta-text{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:64px var(--pad) 64px clamp(28px,6vw,110px);overflow:hidden}
+    .fb-cta h2{font-family:var(--serif);font-weight:500;color:var(--burgundy);font-size:clamp(36px,4.2vw,64px);line-height:1.02;margin:0 0 20px}
+    .fb-cta p{font-family:var(--serif);font-size:clamp(17px,1.35vw,21px);line-height:1.55;color:#4a4443;max-width:28em;margin:0 0 32px}
+    .fb-cta .fb-leaf{left:auto;right:-20px;bottom:-30px;transform:scaleX(-1);width:190px;opacity:.4}
+
+    .fb-notfound{padding:120px var(--pad);font-family:var(--serif);font-size:40px;color:var(--burgundy)}
+    .fb-hidden{display:none!important}
+    .modal-overlay.hidden{display:none}
+
+    /* ---------- Modal tweaks (existing markup/behaviour kept) ---------- */
+    .media-img{width:100%;height:100%;object-fit:cover;display:block}
+    #modalImg{max-width:100%;max-height:62vh;margin:0 auto;display:none;object-fit:contain}
     #modalVideo{max-height:62vh}
     #modalAngles{display:none;gap:10px;flex-wrap:wrap;padding:14px 20px;border-top:1px solid rgba(255,255,255,.12)}
-    .angle-sq{width:72px;height:72px;border-radius:10px;overflow:hidden;padding:0;cursor:pointer;background:#111;
-      border:2px solid rgba(255,255,255,.25);opacity:.7;transition:opacity .15s,border-color .15s}
+    .angle-sq{width:72px;height:72px;border-radius:2px;overflow:hidden;padding:0;cursor:pointer;background:#111;border:2px solid rgba(255,255,255,.25);opacity:.7;transition:opacity .15s,border-color .15s}
     .angle-sq:hover{opacity:1}
     .angle-sq.on{border-color:#fff;opacity:1}
     .angle-sq img,.angle-sq video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
-    .triple-center-inner,.triple-ghost-inner{aspect-ratio:16/9;overflow:hidden}
-    .triple-center-inner video,.triple-center-inner img,.triple-ghost-inner video,.triple-ghost-inner img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
-    @keyframes ssFade{from{opacity:0}to{opacity:1}}
-    .triple-center-inner,.triple-ghost-inner{animation:ssFade .7s ease}
-    @media (prefers-reduced-motion:reduce){.triple-center-inner,.triple-ghost-inner{animation:none}}
-    .folder-chip{position:absolute;top:10px;left:10px;z-index:2;display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;
-      background:rgba(255,255,255,.9);color:#18181b;font-size:12px;letter-spacing:.02em;backdrop-filter:blur(6px)}
-    .folder-mosaic{display:grid;width:100%;height:100%;gap:3px;grid-template-columns:1fr 1fr;grid-template-rows:1fr}
-    .folder-mosaic.three{grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr}
-    .folder-mosaic.three .fm-cell:first-child{grid-row:1 / span 2}
-    .fm-cell{min-height:0;min-width:0;overflow:hidden}
-    .fm-cell video,.fm-cell img{width:100%;height:100%;object-fit:cover;display:block}
-    #folderBar{display:none;align-items:center;gap:18px;margin:36px 0 4px}
-    #folderBar.on{display:flex}
-    .folder-back{background:none;border:none;cursor:pointer;font:inherit;font-size:14px;text-decoration:underline;padding:0;color:inherit}
-    .folder-title{font-size:20px;font-weight:600;letter-spacing:-.01em}
-    .swap{animation:ssFade .45s ease}
     .modal-box{max-height:94vh;overflow-y:auto}
     .modal-client{margin-top:4px;font-size:13px;opacity:.65;letter-spacing:.04em}
     .modal-details{margin-top:10px;font-size:14px;line-height:1.65;opacity:.85;max-width:70ch}
-    .vid-card-body .client,.triple-caption .client{font-size:12px;opacity:.6;margin-top:2px}
-    .vid-card-media{aspect-ratio:16/9;overflow:hidden;position:relative}
-    .vid-card-media img,.vid-card-media video{width:100%;height:100%;object-fit:cover;display:block}
+
+    /* ---------- Tablet ---------- */
+    @media (max-width:1024px){
+      .fb-hero{grid-template-columns:42fr 58fr}
+      .fb-intro{grid-template-columns:1fr 1fr}
+      .fb-caps{grid-template-columns:repeat(2,1fr)}
+      .fb-cap-item:nth-child(3){border-left:0}
+      .fb-cap-item:nth-child(n+3){border-top:1px solid var(--line)}
+    }
+    /* ---------- Mobile ---------- */
+    @media (max-width:720px){
+      .fb-hero{grid-template-columns:1fr;min-height:0}
+      .fb-hero-text{padding:36px var(--pad) 30px}
+      .fb-leaf{display:none}
+      .fb-hero-media{aspect-ratio:4/3.1;order:2}
+      .fb-h1{font-size:clamp(44px,13vw,60px)}
+      .fb-counter{margin-top:28px}
+      .fb-intro{grid-template-columns:1fr;gap:20px;align-items:start}
+      .fb-filter-track{justify-content:flex-start}
+      .fb-filters{margin-left:calc(var(--pad) * -1);margin-right:calc(var(--pad) * -1);padding:0 var(--pad)}
+      .fb-gallery{grid-template-columns:1fr}
+      .fb-caps{grid-template-columns:1fr 1fr}
+      .fb-banner,.fb-cta{grid-template-columns:1fr}
+      .fb-banner-img{order:2;min-height:240px}
+      .fb-cta-img{order:2;min-height:260px}
+      .fb-cta-text{padding:48px var(--pad)}
+      .fb-circle{width:42px;height:42px}
+    }
+    @media (prefers-reduced-motion:reduce){
+      .fb-slide,.fb-progress i,.fb-media img,.fb-media video,.fb-arrow,.fb-btn svg{transition:none}
+      .fb-grid-swap{animation:none}
+    }
   </style>
 </head>
-<body>
+<body class="fb-page">
   <div id="site-header"></div>
 
-  <div class="site-main">
-    <div class="detail-header" id="detailHeader"></div>
-    <div id="tripleView"></div>
-    <div id="detailDesc"></div>
-  </div>
+  <main class="fb" id="fbMain">
+    <!-- Hero (built from collection data) -->
+    <section class="fb-hero" id="fbHero" aria-roledescription="carousel" aria-label="Featured projects"></section>
 
-  <!-- Modal -->
+    <!-- Portfolio -->
+    <section id="portfolio" class="fb-wrap" aria-labelledby="fbWorkTitle">
+      <div class="fb-intro">
+        <div>
+          <div class="fb-eyebrow">Our work</div>
+          <h2 class="fb-h2" id="fbWorkTitle">Packaging that tells a story</h2>
+          <span class="fb-rule" aria-hidden="true"></span>
+        </div>
+        <p id="fbIntroText">From concept to creation, we design and manufacture premium rigid boxes and custom packaging for brands that value detail, craftsmanship and a memorable unboxing experience.</p>
+      </div>
+
+      <nav class="fb-filters fb-hidden" id="fbFilters" aria-label="Project categories"><div class="fb-filter-track" id="fbFilterTrack"></div></nav>
+      <div class="fb-folderbar" id="fbFolderBar"></div>
+      <div class="fb-gallery" id="allGrid"></div>
+      <div class="fb-more-wrap" id="fbMoreWrap" hidden><button class="fb-btn ghost" id="fbMore" type="button">Load more projects
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button></div>
+    </section>
+
+    <!-- Capabilities -->
+    <section class="fb-caps" aria-label="Craftsmanship">
+      <div class="fb-cap-item">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 6 5 13.5 20 21l15-7.500z"/><path d="m5 20 15 7.500L35 20"/><path d="m5 26.500 15 7.500 15-7.500"/></svg>
+        <h3>Premium materials</h3><p>A curated range of luxury papers and finishes</p>
+      </div>
+      <div class="fb-cap-item">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 32V8h8v24z"/><path d="M12 14v-0M8 14h4M8 20h4M8 26h4"/><path d="m24 31 2-9 9-13 3 2-9 13z"/><path d="m26 22 3 2"/></svg>
+        <h3>Custom structures</h3><p>Tailored to your product and brand</p>
+      </div>
+      <div class="fb-cap-item">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="5.500"/><path d="M20 5v5M20 30v5M5 20h5M30 20h5M9.400 9.400l3.500 3.500M27.100 27.100l3.500 3.500M30.600 9.400l-3.500 3.500M12.900 27.100l-3.500 3.500"/><circle cx="20" cy="20" r="11"/></svg>
+        <h3>Precision manufacturing</h3><p>Consistent quality at every stage</p>
+      </div>
+      <div class="fb-cap-item">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="6" y="16" width="28" height="18"/><path d="M4 11h32v5H4zM20 11v23"/><path d="M20 11c-3-7-10-6-8-2 1 2 5 2 8 2zM20 11c3-7 10-6 8-2-1 2-5 2-8 2z"/></svg>
+        <h3>Bespoke inserts</h3><p>Designed for a complete unboxing experience</p>
+      </div>
+    </section>
+
+    <!-- Craft banner (image from collection data) -->
+    <section class="fb-banner" aria-labelledby="fbBannerTitle">
+      <div class="fb-banner-text">
+        <h2 id="fbBannerTitle">Finishes that make a difference</h2>
+        <p>Foil stamping, embossing and precise edge work turn a box into the first impression of your brand.</p>
+        <a class="fb-btn light" href="#portfolio">See the finishes
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="fb-banner-img" id="fbBannerImg"></div>
+    </section>
+
+    <!-- Enquiry -->
+    <section class="fb-cta" aria-labelledby="fbCtaTitle">
+      <div class="fb-cta-img" id="fbCtaImg"></div>
+      <div class="fb-cta-text">
+        <h2 id="fbCtaTitle">Let&rsquo;s create something exceptional.</h2>
+        <p>Whether you have a ready design or just a concept, we can help you bring it to life with the right structure, materials and finishing.</p>
+        <a class="fb-btn" id="fbEnquire" href="contact.html">Enquire now
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg></a>
+        <svg class="fb-leaf" viewBox="0 0 120 160" fill="none" stroke="#800D1B" stroke-width=".8" aria-hidden="true"><path d="M60 158C58 110 62 60 78 6"/><path d="M62 130c-22-6-34-22-36-40 20 4 34 16 36 40zM64 104c20-8 30-24 30-40-18 6-28 20-30 40zM66 78C46 70 38 54 40 38c18 6 26 20 26 40zM70 54c16-8 24-20 24-34-14 4-22 16-24 34z"/></svg>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal (unchanged structure) -->
   <div class="modal-overlay hidden" id="videoModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -74,257 +269,276 @@
   <script src="shared.js"></script>
   <script src="data.js"></script>
   <script>
+    /* Editable page copy. Everything else (projects, photos, titles, clients) comes from the existing data source. */
+    var FB_COPY = {
+      eyebrow: "The art of presentation",
+      lede: "Rigid boxes with luxury finishing, custom designs and premium inserts.",
+      ctaLabel: "Explore our work",
+      heroMax: 6,        // slides in the hero carousel
+      pageSize: 8,       // projects shown first
+      pageStep: 6        // projects added per "Load more"
+    };
+
     var params = new URLSearchParams(window.location.search);
     var slug = params.get("slug");
 
-    function isVideoSrc(src) {
-      return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(src || "");
-    }
+    var ARROW_R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg>';
+    var CHEV_L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
+    var CHEV_R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
+    var LEAF = '<svg class="fb-leaf" viewBox="0 0 120 160" fill="none" stroke="#800D1B" stroke-width=".8" aria-hidden="true"><path d="M60 158C58 110 62 60 78 6"/><path d="M62 130c-22-6-34-22-36-40 20 4 34 16 36 40zM64 104c20-8 30-24 30-40-18 6-28 20-30 40zM66 78C46 70 38 54 40 38c18 6 26 20 26 40zM70 54c16-8 24-20 24-34-14 4-22 16-24 34z"/></svg>';
+
+    function isVideoSrc(src) { return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(src || ""); }
     function modalSources(item) {
       var list = [item.src];
       (item.angles || []).forEach(function(a) { list.push((typeof a === "string") ? a : a.src); });
       return list;
     }
-    function mediaTag(src, preload, noLoop) {
-      if (isVideoSrc(src)) {
-        return '<video src="' + src + '" autoplay ' + (noLoop ? '' : 'loop ') + 'muted playsinline preload="' + preload + '"></video>';
-      }
-      return '<img class="media-img" src="' + src + '" alt="" loading="lazy">';
+    function mediaTag(src, preload, alt, eager) {
+      if (isVideoSrc(src)) return '<video src="' + src + '" muted playsinline loop preload="' + preload + '"></video>';
+      return '<img src="' + src + '" alt="' + esc(alt || "") + '"' + (eager ? '' : ' loading="lazy"') + ' decoding="async">';
     }
-
-    function findCollection(collections) {
-      for (var i = 0; i < collections.length; i++) {
-        if (collections[i].slug === slug) return collections[i];
-      }
-      return null;
-    }
+    function pad(n) { return String(n).padStart(2, "0"); }
 
     (async function() {
-    var workData = await loadWorkContent();
-    var allCollections = (workData && workData.collections) ? workData.collections : WORK_COLLECTIONS;
-    var collection = findCollection(allCollections);
+      var workData = await loadWorkContent();
+      var allCollections = (workData && workData.collections) ? workData.collections : WORK_COLLECTIONS;
+      var collection = null;
+      for (var ci = 0; ci < allCollections.length; ci++) { if (allCollections[ci].slug === slug) { collection = allCollections[ci]; break; } }
 
-    if (!collection) {
-      document.getElementById("detailHeader").innerHTML = '<h1 class="detail-title">Collection not found</h1>';
-      return;
-    }
-    {
+      if (!collection) {
+        document.getElementById("fbMain").innerHTML = '<h1 class="fb-notfound">Collection not found</h1>';
+        return;
+      }
+
       document.title = collection.title + " — Studio Skyline";
-
-      // Header
-      var headerHtml = '';
-      headerHtml += '<h1 class="detail-title">' + esc(collection.title) + '</h1>';
-      if (collection.subtitle) headerHtml += '<p class="detail-sub">' + esc(collection.subtitle) + '</p>';
-      document.getElementById("detailHeader").innerHTML = headerHtml;
-
-      // Description
-      if (collection.description) {
-        document.getElementById("detailDesc").innerHTML = '<p class="detail-desc">' + esc(collection.description) + '</p>';
+      var desc = collection.description || collection.subtitle;
+      if (desc) {
+        document.getElementById("metaDesc").setAttribute("content", desc);
+        if (collection.description) document.getElementById("fbIntroText").textContent = collection.description;
       }
 
-      var videos = collection.videos;
-      var active = 0;
-      var modalIndex = -1;
-      var angleIdx = 0;
-
-      function pad(n) { return String(n).padStart(2, "0"); }
-
-      function clamp(i) {
-        if (videos.length === 0) return 0;
-        return ((i % videos.length) + videos.length) % videos.length;
-      }
-
-      // ---- Auto-advance ----
-      var hovering = false, autoTimer = null;
+      var videos = collection.videos || [];
+      var modalIndex = -1, angleIdx = 0;
       var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-      function autoPaused() { return hovering || modalIndex >= 0 || document.hidden; }
-      function clearAuto() { if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; } }
+      /* ---------------- Hero ---------------- */
+      var hero = document.getElementById("fbHero");
+      var featured = [];
+      for (var f = 0; f < videos.length && featured.length < FB_COPY.heroMax; f++) featured.push(f);
+      var heroActive = 0, hovering = false, autoTimer = null;
 
+      function splitTitle(t) {
+        t = (t || "").trim();
+        var sp = t.indexOf(" ");
+        if (sp < 0) return esc(t);
+        return '<span>' + esc(t.slice(0, sp)) + '</span><span>' + esc(t.slice(sp + 1)) + '</span>';
+      }
+
+      function buildHero() {
+        var n = featured.length;
+        var slides = "";
+        featured.forEach(function(vi, k) {
+          var v = videos[vi];
+          slides += '<div class="fb-slide' + (k === 0 ? ' on' : '') + '" role="group" aria-roledescription="slide" aria-label="' + (k + 1) + ' of ' + n + '">' +
+            '<button class="fb-slide-open" type="button" data-open="' + vi + '" aria-label="View ' + esc(v.title || 'project') + '">' +
+            mediaTag(v.src, k === 0 ? 'auto' : 'metadata', v.title, k === 0) + '</button></div>';
+        });
+        var nav = n > 1 ? '<div class="fb-hero-nav"><button class="fb-circle" type="button" data-hero="-1" aria-label="Previous slide">' + CHEV_L + '</button>' +
+          '<button class="fb-circle solid" type="button" data-hero="1" aria-label="Next slide">' + CHEV_R + '</button></div>' : '';
+        var counter = n > 0 ? '<div class="fb-counter"><span><b id="fbCur">01</b> &nbsp;/ ' + pad(n) + '</span><span class="fb-progress" aria-hidden="true"><i id="fbBar" style="width:' + (100 / n) + '%"></i></span></div>' : '';
+
+        hero.innerHTML =
+          '<div class="fb-hero-text">' +
+            '<div class="fb-eyebrow">' + esc(FB_COPY.eyebrow) + '</div>' +
+            '<h1 class="fb-h1">' + splitTitle(collection.title) + '</h1>' +
+            '<p class="fb-lede">' + esc(collection.subtitle || FB_COPY.lede) + '</p>' +
+            '<a class="fb-btn" href="#portfolio">' + esc(FB_COPY.ctaLabel) + ARROW_R + '</a>' +
+            counter + LEAF +
+          '</div>' +
+          '<div class="fb-hero-media" id="fbStage" aria-live="off">' + slides + nav + '</div>';
+
+        var st = document.getElementById("fbStage");
+        st.addEventListener("pointerenter", function(e) { if (e.pointerType === "mouse") hovering = true; });
+        st.addEventListener("pointerleave", function(e) { if (e.pointerType === "mouse") hovering = false; });
+        playActiveVideo();
+        bindAuto();
+      }
+
+      function heroPaused() { return hovering || modalIndex >= 0 || document.hidden; }
+      function clearAuto() { if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; } }
+      function activeSlideEl() { return hero.querySelectorAll(".fb-slide")[heroActive]; }
+      function playActiveVideo() {
+        var slides = hero.querySelectorAll(".fb-slide");
+        for (var i = 0; i < slides.length; i++) {
+          var vid = slides[i].querySelector("video");
+          if (!vid) continue;
+          if (i === heroActive) {
+            vid.currentTime = 0; vid.loop = featured.length < 2;
+            vid.onended = function() { if (heroPaused()) { this.currentTime = 0; this.play(); } else setHero(heroActive + 1); };
+            var p = vid.play(); if (p && p.catch) p.catch(function() {});
+          } else { vid.pause(); }
+        }
+      }
       function bindAuto() {
         clearAuto();
-        if (videos.length < 2 || reduceMotion) return;
-        var cv = document.querySelector("#tripleStage .triple-center-inner video");
-        if (cv) {
-          // Videos play through once, then move on
-          cv.onended = function() {
-            if (autoPaused()) { cv.currentTime = 0; cv.play(); } else { setActive(active + 1); }
-          };
-          autoTimer = setTimeout(function() {
-            if (autoPaused()) bindAuto(); else setActive(active + 1);
-          }, 20000);
-        } else {
-          // Photos stay for 5 seconds
-          autoTimer = setTimeout(function tick() {
-            if (autoPaused()) { autoTimer = setTimeout(tick, 1000); } else { setActive(active + 1); }
-          }, 5000);
-        }
+        if (featured.length < 2 || reduceMotion) return;
+        var hasVideo = activeSlideEl() && activeSlideEl().querySelector("video");
+        var wait = hasVideo ? 20000 : 5500;
+        autoTimer = setTimeout(function tick() {
+          if (heroPaused()) autoTimer = setTimeout(tick, 1000); else setHero(heroActive + 1);
+        }, wait);
       }
-
+      function setHero(k) {
+        var n = featured.length; if (!n) return;
+        heroActive = ((k % n) + n) % n;
+        var slides = hero.querySelectorAll(".fb-slide");
+        for (var i = 0; i < slides.length; i++) slides[i].classList.toggle("on", i === heroActive);
+        var cur = document.getElementById("fbCur"), bar = document.getElementById("fbBar");
+        if (cur) cur.textContent = pad(heroActive + 1);
+        if (bar) bar.style.width = ((heroActive + 1) / n * 100) + "%";
+        playActiveVideo();
+        bindAuto();
+      }
       document.addEventListener("visibilitychange", function() { if (!document.hidden) bindAuto(); });
+      buildHero();
 
-      // ---- Rendering ----
-      function renderStage() {
-        var len = videos.length;
-        var prevI = clamp(active - 1);
-        var nextI = clamp(active + 1);
-        var current = videos[active];
+      /* ---------------- Categories (only if the data provides them) ---------------- */
+      function cats(v) {
+        var raw = [].concat(v.categories || v.category || []);
+        return raw.map(function(c) { return String(c).trim(); }).filter(Boolean);
+      }
+      var catList = [];
+      videos.forEach(function(v) { cats(v).forEach(function(c) { if (catList.indexOf(c) < 0) catList.push(c); }); });
+      var activeCat = "All projects";
 
-        var html = '<div class="triple-view">';
-
-        if (len > 1) {
-          html += '<button class="triple-ghost left" onclick="setActive(' + prevI + ')" aria-label="Previous">' +
-            '<div class="triple-ghost-inner" style="position:relative">' +
-            mediaTag(videos[prevI].src, 'metadata') +
-            '<div class="fade-left"></div></div></button>';
-          html += '<button class="triple-ghost right" onclick="setActive(' + nextI + ')" aria-label="Next">' +
-            '<div class="triple-ghost-inner" style="position:relative">' +
-            mediaTag(videos[nextI].src, 'metadata') +
-            '<div class="fade-right"></div></div></button>';
-        }
-
-        html += '<div class="triple-center"><div class="triple-center-inner">' +
-          mediaTag(current.src, 'auto', len > 1) +
-          '</div></div>';
-
-        if (len > 1) {
-          html += '<div class="triple-nav">' +
-            '<button class="nav-circle" onclick="setActive(' + prevI + ')" aria-label="Previous">&#8249;</button>' +
-            '<button class="nav-circle" onclick="setActive(' + nextI + ')" aria-label="Next">&#8250;</button>' +
-            '</div>';
-        }
-        html += '</div>';
-
-        document.getElementById("tripleStage").innerHTML = html;
+      function renderFilters() {
+        var nav = document.getElementById("fbFilters");
+        if (catList.length < 2 || gridScope !== null) { nav.classList.add("fb-hidden"); return; }
+        nav.classList.remove("fb-hidden");
+        var h = "";
+        ["All projects"].concat(catList).forEach(function(c) {
+          h += '<button type="button" class="fb-filter" data-cat="' + esc(c) + '" aria-pressed="' + (c === activeCat) + '">' + esc(c) + '</button>';
+        });
+        document.getElementById("fbFilterTrack").innerHTML = h;
       }
 
-      // ---- Grid: single cards + client folders ----
-      var gridScope = null;      // null = top level, otherwise a client key (inside a folder)
-      var folderKeys = [];       // folder index -> client key (rebuilt on each top-level render)
-      var folderNames = {};      // client key -> display name
+      /* ---------------- Gallery ---------------- */
+      var gridScope = null, folderKeys = [], folderNames = {};
+      var limit = FB_COPY.pageSize;
+      var RATIOS_A = [1.55, 2.4, 1.75, 1.6, 2.1];   // wide column
+      var RATIOS_B = [1.6, 1.5, 2.65, 1.45, 1.8];   // narrow column
+      var mqDesktop = window.matchMedia("(min-width:721px)");
 
       function clientKey(v) { return (v.client || "").trim().toLowerCase(); }
 
-      function itemCard(v, i) {
-        return '<button class="vid-card" data-i="' + i + '" onclick="openModal(' + i + ')">' +
-          '<div class="vid-card-media">' + mediaTag(v.src, 'metadata') + '<div class="overlay"></div></div>' +
-          '<div class="vid-card-body">' +
-          '<div class="title">' + esc(v.title || '') + '</div>' +
-          (v.client ? '<div class="client">' + esc(v.client) + '</div>' : '') +
-          '<div class="bar"></div></div></button>';
+      function buildEntries() {
+        var out = [];
+        var idxs = [];
+        videos.forEach(function(v, i) {
+          if (gridScope !== null && clientKey(v) !== gridScope) return;
+          if (activeCat !== "All projects" && cats(v).indexOf(activeCat) < 0) return;
+          idxs.push(i);
+        });
+        if (gridScope !== null) { idxs.forEach(function(i) { out.push({ kind: "item", i: i }); }); return out; }
+        var counts = {}, members = {}, seen = {};
+        folderKeys = [];
+        idxs.forEach(function(i) {
+          var k = clientKey(videos[i]); if (!k) return;
+          counts[k] = (counts[k] || 0) + 1; (members[k] = members[k] || []).push(i);
+          if (!folderNames[k]) folderNames[k] = videos[i].client.trim();
+        });
+        idxs.forEach(function(i) {
+          var k = clientKey(videos[i]);
+          if (k && counts[k] >= 2) {
+            if (seen[k]) return; seen[k] = true; folderKeys.push(k);
+            out.push({ kind: "folder", key: k, n: folderKeys.length - 1, idxs: members[k] });
+          } else out.push({ kind: "item", i: i });
+        });
+        return out;
       }
 
-      function folderCard(key, idxs, n) {
-        var shown = idxs.slice(0, 3);
-        var cells = '';
-        shown.forEach(function(i) { cells += '<div class="fm-cell">' + mediaTag(videos[i].src, 'metadata') + '</div>'; });
-        var icon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
-        return '<button class="vid-card folder-card" onclick="openFolder(' + n + ')">' +
-          '<div class="vid-card-media"><div class="folder-chip">' + icon + '<span>Folder</span></div>' +
-          '<div class="folder-mosaic' + (shown.length >= 3 ? ' three' : '') + '">' + cells + '</div>' +
-          '<div class="overlay"></div></div>' +
-          '<div class="vid-card-body"><div class="title">' + esc(folderNames[key]) + '</div>' +
-          '<div class="bar"></div></div></button>';
+      function cardHtml(e, ratio) {
+        var arrow = '<span class="fb-arrow">' + ARROW_R + '</span>';
+        if (e.kind === "folder") {
+          var cover = videos[e.idxs[0]];
+          return '<article class="fb-card"><button type="button" class="fb-card-btn" data-folder="' + e.n + '">' +
+            '<span class="fb-media" style="aspect-ratio:' + ratio + '">' + mediaTag(cover.src, 'metadata', folderNames[e.key]) + '</span>' +
+            '<span class="fb-cap"><span><span class="fb-cap-title">' + esc(folderNames[e.key]) + '</span>' +
+            '<span class="fb-cap-sub">' + e.idxs.length + ' pieces</span></span>' + arrow + '</span></button></article>';
+        }
+        var v = videos[e.i];
+        var sub = v.client || cats(v)[0] || "";
+        return '<article class="fb-card"><button type="button" class="fb-card-btn" data-open="' + e.i + '">' +
+          '<span class="fb-media" style="aspect-ratio:' + ratio + '">' + mediaTag(v.src, 'metadata', v.title) + '</span>' +
+          '<span class="fb-cap"><span><span class="fb-cap-title">' + esc(v.title || '') + '</span>' +
+          (sub ? '<span class="fb-cap-sub">' + esc(sub) + '</span>' : '') + '</span>' + arrow + '</span></button></article>';
       }
 
+      function renderGrid() {
+        var grid = document.getElementById("allGrid");
+        var bar = document.getElementById("fbFolderBar");
+        var two = mqDesktop.matches;
+        var entries = buildEntries();
+        var shown = entries.slice(0, limit);
+
+        if (gridScope === null) { bar.className = "fb-folderbar"; bar.innerHTML = ""; }
+        else {
+          bar.className = "fb-folderbar on";
+          bar.innerHTML = '<button class="fb-back" type="button" data-back="1">&larr; All work</button><div class="fb-folder-title">' + esc(folderNames[gridScope] || "") + '</div>';
+        }
+        renderFilters();
+
+        if (!shown.length) {
+          grid.className = "fb-gallery"; grid.innerHTML = '<div class="fb-empty">No projects to show yet.</div>';
+        } else if (two) {
+          var a = "", b = "";
+          shown.forEach(function(e, n) {
+            var col = n % 2, row = Math.floor(n / 2);
+            if (col === 0) a += cardHtml(e, RATIOS_A[row % RATIOS_A.length]);
+            else b += cardHtml(e, RATIOS_B[row % RATIOS_B.length]);
+          });
+          grid.className = "fb-gallery";
+          grid.innerHTML = '<div class="fb-col">' + a + '</div><div class="fb-col">' + b + '</div>';
+        } else {
+          var s = "";
+          shown.forEach(function(e, n) { s += cardHtml(e, Math.min(1.9, Math.max(1.3, RATIOS_A[n % RATIOS_A.length]))); });
+          grid.className = "fb-gallery single";
+          grid.innerHTML = '<div class="fb-col">' + s + '</div>';
+        }
+        document.getElementById("fbMoreWrap").hidden = entries.length <= limit;
+      }
+      function swapGrid() {
+        var grid = document.getElementById("allGrid");
+        renderGrid();
+        grid.classList.remove("fb-grid-swap"); void grid.offsetWidth; grid.classList.add("fb-grid-swap");
+      }
+      if (mqDesktop.addEventListener) mqDesktop.addEventListener("change", renderGrid);
+      else if (mqDesktop.addListener) mqDesktop.addListener(renderGrid);
+
+      /* ---------------- Events ---------------- */
+      document.addEventListener("click", function(ev) {
+        var t = ev.target.closest ? ev.target.closest("[data-open],[data-folder],[data-cat],[data-back],[data-hero],#fbMore") : null;
+        if (!t) return;
+        if (t.hasAttribute("data-open")) { openModal(Number(t.getAttribute("data-open"))); }
+        else if (t.hasAttribute("data-folder")) { gridScope = folderKeys[Number(t.getAttribute("data-folder"))]; limit = FB_COPY.pageSize; swapGrid(); }
+        else if (t.hasAttribute("data-back")) { gridScope = null; limit = FB_COPY.pageSize; swapGrid(); }
+        else if (t.hasAttribute("data-cat")) { activeCat = t.getAttribute("data-cat"); limit = FB_COPY.pageSize; swapGrid(); }
+        else if (t.hasAttribute("data-hero")) { setHero(heroActive + Number(t.getAttribute("data-hero"))); }
+        else if (t.id === "fbMore") { limit += FB_COPY.pageStep; renderGrid(); }
+      });
+
+      /* ---------------- Modal (existing behaviour) ---------------- */
       function scopeList() {
         var out = [];
         videos.forEach(function(v, i) { if (gridScope === null || clientKey(v) === gridScope) out.push(i); });
         return out;
       }
-
-      function renderGrid() {
-        var grid = document.getElementById("allGrid");
-        var bar = document.getElementById("folderBar");
-        var html = '';
-
-        if (gridScope === null) {
-          bar.className = ''; bar.innerHTML = '';
-          // Clients with 2+ products become a folder; everything else stays a normal card
-          var counts = {}, members = {}, seen = {};
-          folderKeys = [];
-          videos.forEach(function(v, i) {
-            var k = clientKey(v);
-            if (!k) return;
-            counts[k] = (counts[k] || 0) + 1;
-            (members[k] = members[k] || []).push(i);
-            if (!folderNames[k]) folderNames[k] = v.client.trim();
-          });
-          videos.forEach(function(v, i) {
-            var k = clientKey(v);
-            if (k && counts[k] >= 2) {
-              if (seen[k]) return;
-              seen[k] = true;
-              folderKeys.push(k);
-              html += folderCard(k, members[k], folderKeys.length - 1);
-            } else {
-              html += itemCard(v, i);
-            }
-          });
-        } else {
-          bar.className = 'on';
-          bar.innerHTML = '<button class="folder-back" onclick="closeFolder()">&larr; All work</button>' +
-            '<div class="folder-title">' + esc(folderNames[gridScope] || '') + '</div>';
-          scopeList().forEach(function(i) { html += itemCard(videos[i], i); });
-        }
-
-        grid.innerHTML = html;
-        grid.classList.remove("swap"); void grid.offsetWidth; grid.classList.add("swap");
-        markActive();
-      }
-
-      function markActive() {
-        var cards = document.querySelectorAll("#allGrid .vid-card");
-        for (var k = 0; k < cards.length; k++) {
-          var di = cards[k].getAttribute("data-i");
-          cards[k].classList.toggle("active", di !== null && Number(di) === active);
-        }
-      }
-
-      window.openFolder = function(n) {
-        gridScope = folderKeys[n];
-        renderGrid();
-      };
-      window.closeFolder = function() {
-        gridScope = null;
-        renderGrid();
-      };
-
-      function renderTriple() {
-        if (videos.length === 0) return;
-        if (!document.getElementById("tripleStage")) {
-          document.getElementById("tripleView").innerHTML =
-            '<div id="tripleStage"></div><div id="folderBar"></div><div class="all-grid" id="allGrid"></div>';
-          var st = document.getElementById("tripleStage");
-          // Pause auto-advance while a mouse is over the stage (not on touch screens)
-          st.addEventListener("pointerenter", function(e) { if (e.pointerType === "mouse") hovering = true; });
-          st.addEventListener("pointerleave", function(e) { if (e.pointerType === "mouse") hovering = false; });
-          renderGrid();
-        }
-        renderStage();
-        markActive();
-        bindAuto();
-      }
-
-      window.setActive = function(i) {
-        active = clamp(i);
-        renderTriple();
-      };
-
-      window.openModal = function(i) {
-        active = clamp(i);
-        modalIndex = i;
-        angleIdx = 0;
-        renderTriple();
-        showModal();
-      };
+      window.openModal = function(i) { modalIndex = i; angleIdx = 0; showModal(); };
 
       function showModal() {
         var modal = document.getElementById("videoModal");
         var vid = document.getElementById("modalVideo");
         var cap = document.getElementById("modalCaption");
-        var cnt = document.getElementById("modalCounter");
-
         modal.classList.remove("hidden");
         var img = document.getElementById("modalImg");
         var sources = modalSources(videos[modalIndex]);
@@ -335,79 +549,63 @@
           vid.style.display = ""; vid.src = msrc;
         } else {
           vid.pause(); vid.removeAttribute("src"); vid.style.display = "none";
-          img.src = msrc; img.style.display = "block";
+          img.src = msrc; img.alt = videos[modalIndex].title || ""; img.style.display = "block";
         }
-        cnt.textContent = "";
-
-        var cur = videos[modalIndex];
-        var ch = '';
+        document.getElementById("modalCounter").textContent = "";
+        var cur = videos[modalIndex], ch = '';
         if (cur.title) ch += '<div class="title">' + esc(cur.title) + '</div>';
         if (cur.client) ch += '<div class="modal-client">Client &middot; ' + esc(cur.client) + '</div>';
         if (cur.details) ch += '<div class="modal-details">' + esc(cur.details).replace(/\n/g, '<br>') + '</div>';
-        cap.innerHTML = ch;
-        cap.style.display = ch ? '' : 'none';
+        cap.innerHTML = ch; cap.style.display = ch ? '' : 'none';
 
         var th = document.getElementById("modalAngles");
         if (sources.length > 1) {
           var h = '';
           sources.forEach(function(sr, k) {
             h += '<button class="angle-sq' + (k === angleIdx ? ' on' : '') + '" onclick="setAngle(' + k + ')" aria-label="' + (k === 0 ? 'Main view' : 'Angle ' + k) + '">' +
-              (isVideoSrc(sr) ? '<video src="' + sr + '" muted playsinline preload="metadata"></video>' : '<img src="' + sr + '" alt="" loading="lazy">') +
-              '</button>';
+              (isVideoSrc(sr) ? '<video src="' + sr + '" muted playsinline preload="metadata"></video>' : '<img src="' + sr + '" alt="" loading="lazy">') + '</button>';
           });
-          th.innerHTML = h;
-          th.style.display = 'flex';
-        } else {
-          th.innerHTML = '';
-          th.style.display = 'none';
-        }
+          th.innerHTML = h; th.style.display = 'flex';
+        } else { th.innerHTML = ''; th.style.display = 'none'; }
       }
-
-      window.setAngle = function(k) {
-        angleIdx = k;
-        showModal();
-      };
-
+      window.setAngle = function(k) { angleIdx = k; showModal(); };
       window.closeModal = function() {
-        var modal = document.getElementById("videoModal");
         var vid = document.getElementById("modalVideo");
-        modal.classList.add("hidden");
-        vid.pause();
-        vid.removeAttribute("src");
+        document.getElementById("videoModal").classList.add("hidden");
+        vid.pause(); vid.removeAttribute("src");
         document.getElementById("modalImg").removeAttribute("src");
-        modalIndex = -1;
-        angleIdx = 0;
+        modalIndex = -1; angleIdx = 0;
       };
-
       window.modalNav = function(dir) {
-        var list = scopeList();
-        var pos = list.indexOf(modalIndex);
+        var list = scopeList(), pos = list.indexOf(modalIndex);
         if (pos < 0) { list = videos.map(function(x, i) { return i; }); pos = list.indexOf(modalIndex); }
         modalIndex = list[((pos + dir) % list.length + list.length) % list.length];
-        angleIdx = 0;
-        active = modalIndex;
-        renderTriple();
-        showModal();
+        angleIdx = 0; showModal();
       };
-
       document.addEventListener("keydown", function(e) {
         if (e.key === "Escape") closeModal();
-        if (e.key === "ArrowLeft") {
-          if (modalIndex >= 0) { modalNav(-1); }
-          else { setActive(active - 1); }
-        }
-        if (e.key === "ArrowRight") {
-          if (modalIndex >= 0) { modalNav(1); }
-          else { setActive(active + 1); }
-        }
+        if (e.key === "ArrowLeft") { if (modalIndex >= 0) modalNav(-1); else setHero(heroActive - 1); }
+        if (e.key === "ArrowRight") { if (modalIndex >= 0) modalNav(1); else setHero(heroActive + 1); }
       });
+      document.getElementById("videoModal").addEventListener("click", function(e) { if (e.target === this) closeModal(); });
 
-      document.getElementById("videoModal").addEventListener("click", function(e) {
-        if (e.target === this) closeModal();
-      });
+      /* ---------------- Banner & enquiry imagery (from collection data) ---------------- */
+      function pickImage(re, skip) {
+        var fallback = -1;
+        for (var i = 0; i < videos.length; i++) {
+          if (isVideoSrc(videos[i].src) || i === skip) continue;
+          if (fallback < 0) fallback = i;
+          if (re && re.test((videos[i].title || "") + " " + (videos[i].details || ""))) return i;
+        }
+        return fallback;
+      }
+      var bi = pickImage(/foil|emboss|stamp/i, -1);
+      var ci2 = pickImage(null, bi);
+      if (ci2 < 0) ci2 = bi;
+      if (bi >= 0) document.getElementById("fbBannerImg").innerHTML = '<img src="' + videos[bi].src + '" alt="" loading="lazy">';
+      if (ci2 >= 0) document.getElementById("fbCtaImg").innerHTML = '<img src="' + videos[ci2].src + '" alt="" loading="lazy">';
 
-      renderTriple();
-    }
+      renderGrid();
     })();
   </script>
 </body>
