@@ -134,19 +134,22 @@
     body.ix-themed .reel-card-view{transition:background-color .3s ease,color .3s ease,letter-spacing .4s ease}
     body.ix-themed .reel-card:hover .reel-card-view{letter-spacing:.04em}
     body.ix-themed .testimonial-card{transition:opacity .9s ease,translate 1s cubic-bezier(.2,.7,.2,1),box-shadow .5s ease}
-    /* ============ Film + mosaic ============ */
-    body.ix-themed .ix-show{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(8px,.9vw,12px);align-items:stretch;margin-top:clamp(40px,5vw,72px)}
-    body.ix-themed .ix-film{position:relative;aspect-ratio:16/9;background:#1b1514;overflow:hidden;box-shadow:0 14px 30px -18px rgba(60,35,20,.45)}
+    /* ============ Film in the middle, framed by a mosaic ============
+       12 x 8 grid. The film sits in the centre (8 x 4 cells = 16:9);
+       the 2 cells around it on every side are tiles. */
+    body.ix-themed .ix-show{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:repeat(8,minmax(0,1fr));gap:clamp(3px,.45vw,6px);aspect-ratio:4/3;margin-top:clamp(40px,5vw,72px)}
+    body.ix-themed .ix-film{grid-area:3/3/span 4/span 8;position:relative;z-index:1;background:#1b1514;overflow:hidden;box-shadow:0 26px 60px -26px rgba(60,35,20,.6)}
     body.ix-themed .ix-film:not(.is-ld){background:linear-gradient(100deg,#ece4df 30%,#f5efeb 50%,#ece4df 70%);background-size:220% 100%;animation:ixShimmer 1.7s ease-in-out infinite}
     body.ix-themed .ix-film iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;opacity:0;transition:opacity .9s ease}
     body.ix-themed .ix-film iframe.ld{opacity:1}
+    /* no work to show: film alone */
+    body.ix-themed .ix-show.ix-nomos{display:block;aspect-ratio:auto}
+    body.ix-themed .ix-show.ix-nomos .ix-film{aspect-ratio:16/9}
 
-    /* grid contributes no height of its own: it stretches to the film's height */
-    body.ix-themed .ix-mosaic{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));gap:clamp(3px,.4vw,6px);min-height:0}
     body.ix-themed .ix-tile{position:relative;display:block;overflow:hidden;background:#ece4df;min-width:0;min-height:0;outline:0}
-    body.ix-themed .ix-tile img,body.ix-themed .ix-tile video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .9s ease,transform 1.2s cubic-bezier(.2,.7,.2,1),filter .5s ease;backface-visibility:hidden;transform:translateZ(0)}
+    body.ix-themed .ix-tile img,body.ix-themed .ix-tile video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .9s ease,transform 1.2s cubic-bezier(.2,.7,.2,1);backface-visibility:hidden;transform:translateZ(0)}
     body.ix-themed .ix-tile .ld{opacity:1}
-    body.ix-themed .ix-tile::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.0);background:linear-gradient(180deg,rgba(128,13,27,0),rgba(128,13,27,.28));opacity:0;transition:opacity .5s ease,box-shadow .5s ease}
+    body.ix-themed .ix-tile::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,0);background:linear-gradient(180deg,rgba(128,13,27,0),rgba(128,13,27,.28));opacity:0;transition:opacity .5s ease,box-shadow .5s ease}
     @media (hover:hover){
       body.ix-themed .ix-tile:hover img,body.ix-themed .ix-tile:hover video{transform:scale(1.08) translateZ(0)}
       body.ix-themed .ix-tile:hover::after{opacity:1;box-shadow:inset 0 0 0 1px rgba(255,255,255,.55)}
@@ -155,13 +158,12 @@
     body.ix-themed .ix-tile.ix-tile-in{animation:ixTileIn .9s cubic-bezier(.2,.7,.2,1) backwards;animation-delay:var(--td,0ms)}
     @keyframes ixTileIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
 
-    @media (max-width:900px){
-      body.ix-themed .ix-show{grid-template-columns:1fr}
-      body.ix-themed .ix-mosaic{grid-template-rows:none;aspect-ratio:7/3}
-    }
-    @media (max-width:560px){
-      body.ix-themed .ix-mosaic{grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));aspect-ratio:5/3}
-      body.ix-themed .ix-tile:nth-child(n+16){display:none}
+    /* phones: film on top, then a small grid of work underneath */
+    @media (max-width:700px){
+      body.ix-themed .ix-show{grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:none;aspect-ratio:auto}
+      body.ix-themed .ix-film{grid-area:auto;grid-column:1/-1;aspect-ratio:16/9;margin-bottom:clamp(3px,1vw,6px)}
+      body.ix-themed .ix-tile{aspect-ratio:1/1}
+      body.ix-themed .ix-tile:nth-child(n+26){display:none}
     }
 
     /* ============ Cleaner reel + premium footer ============ */
@@ -336,8 +338,8 @@
       </div>
     </div>
 
-    <!-- Film (left) + mosaic of work (right). Film height = mosaic height. -->
-    <section class="ix-show" aria-label="Studio film and selected work">
+    <!-- Big film in the middle, ringed by a 2-tile-deep frame of work from every category -->
+    <section class="ix-show" id="ixShow" aria-label="Studio film and selected work">
       <div class="ix-film">
         <iframe
           src="https://www.youtube.com/embed/sGJJgBfHy5E"
@@ -347,7 +349,6 @@
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowfullscreen></iframe>
       </div>
-      <div class="ix-mosaic" id="ixMosaic" aria-label="Selected work"></div>
     </section>
 
     <div class="testimonials">
@@ -652,7 +653,7 @@
        • picks evenly across collections, at most a few clips (keeps the page light)
        • each tile links to its collection
        • every few seconds one photo quietly swaps for another (pauses off-screen) */
-    var IX_MOS_COLS = 7, IX_MOS_ROWS = 3, IX_MOS_MAX_VID = 3, IX_MOS_SWAP_MS = 2800;
+    var IX_MOS_COLS = 12, IX_MOS_TOTAL = 64, IX_MOS_MAX_VID = 4, IX_MOS_SWAP_MS = 2200;
     var ixMosTimer = null, ixMosIO = null;
 
     function ixShuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
@@ -706,19 +707,20 @@
     }
 
     function ixRenderMosaic(collections) {
-      var box = document.getElementById('ixMosaic');
+      var box = document.getElementById('ixShow');
       if (!box) return;
       if (ixMosTimer) { clearInterval(ixMosTimer); ixMosTimer = null; }
       if (ixMosIO) { ixMosIO.disconnect(); ixMosIO = null; }
+      Array.prototype.slice.call(box.querySelectorAll('.ix-tile')).forEach(function(t) { t.parentNode.removeChild(t); });
       var groups = ixMosPool(collections);
-      var total = IX_MOS_COLS * IX_MOS_ROWS;
+      var total = IX_MOS_TOTAL;
       var picked = ixMosPick(groups, total);
-      if (!picked.length) { box.style.display = 'none'; return; }
-      box.style.display = '';
+      if (!picked.length) { box.classList.add('ix-nomos'); return; }
+      box.classList.remove('ix-nomos');
       /* fewer items than tiles: repeat rather than leave holes */
       for (var r = 0; picked.length < total; r++) picked.push(picked[r % picked.length]);
 
-      box.innerHTML = '';
+      ixShuffle(picked);
       picked.forEach(function(it, i) {
         var a = document.createElement('a');
         a.className = 'ix-tile' + (IX_RM ? '' : ' ix-tile-in');
@@ -730,7 +732,7 @@
         box.appendChild(a);
       });
 
-      var tiles = Array.prototype.slice.call(box.children);
+      var tiles = Array.prototype.slice.call(box.querySelectorAll('.ix-tile'));
       var onScreen = true;
 
       /* clips only play while the mosaic is visible */
@@ -805,7 +807,7 @@
     }
 
     /* Static sections ease in as they reach the screen */
-    ['.ix-reel .reel-footer', '.ix-film', '.ix-mosaic', '.testimonials h2', '#site-footer'].forEach(function(sel) {
+    ['.ix-reel .reel-footer', '.ix-film', '.testimonials h2', '#site-footer'].forEach(function(sel) {
       var els = document.querySelectorAll(sel);
       for (var i = 0; i < els.length; i++) ixReveal(els[i], 'ix-rv', 0);
     });
