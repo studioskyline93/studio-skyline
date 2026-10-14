@@ -85,6 +85,13 @@
     /* ---------- Gallery ---------- */
     .fb-gallery{display:grid;grid-template-columns:55fr 45fr;gap:0 clamp(18px,2vw,32px);align-items:start}
     .fb-gallery:not(.single) .fb-col:nth-child(2){padding-top:clamp(24px,4vw,64px)}
+    /* 4 across on large screens: same staggered, asymmetrical rhythm, just smaller */
+    .fb-gallery.cols4{grid-template-columns:27fr 23fr 27fr 23fr;gap:0 clamp(12px,1.4vw,22px)}
+    .fb-gallery.cols4 .fb-col{gap:clamp(18px,1.8vw,28px)}
+    .fb-gallery.cols4 .fb-col:nth-child(even){padding-top:clamp(16px,2.6vw,44px)}
+    .fb-gallery.cols4 .fb-cap{padding-top:9px;gap:10px}
+    .fb-gallery.cols4 .fb-cap-title{font-size:clamp(16px,1.25vw,19px)}
+    .fb-gallery.cols4 .fb-cap-sub{font-size:11.5px;margin-top:3px}
     .fb-col{display:flex;flex-direction:column;gap:clamp(26px,2.6vw,40px);min-width:0}
     .fb-gallery.single{grid-template-columns:1fr}
     .fb-card{margin:0}
@@ -433,6 +440,7 @@
       var RATIOS_A = [1.5, 1.333, 1.5, 1.333, 1.5];   // placeholder ratios until each photo reports its real size
       var RATIOS_B = [1.333, 1.5, 1.333, 1.5, 1.333];
       var mqDesktop = window.matchMedia("(min-width:721px)");
+      var mqWide = window.matchMedia("(min-width:1025px)");
 
       function clientKey(v) { return (v.client || "").trim().toLowerCase(); }
 
@@ -496,14 +504,16 @@
         if (!shown.length) {
           grid.className = "fb-gallery"; grid.innerHTML = '<div class="fb-empty">No projects to show yet.</div>';
         } else if (two) {
-          var a = "", b = "";
+          var wide = mqWide.matches, nc = wide ? 4 : 2, cols = [];
+          for (var q = 0; q < nc; q++) cols.push("");
           shown.forEach(function(e, n) {
-            var col = n % 2, row = Math.floor(n / 2);
-            if (col === 0) a += cardHtml(e, RATIOS_A[row % RATIOS_A.length]);
-            else b += cardHtml(e, RATIOS_B[row % RATIOS_B.length]);
+            var col = n % nc, row = Math.floor(n / nc);
+            var set = (col % 2 === 0) ? RATIOS_A : RATIOS_B;
+            var r = set[(row + (col >= 2 ? 1 : 0)) % set.length];
+            cols[col] += cardHtml(e, r);
           });
-          grid.className = "fb-gallery";
-          grid.innerHTML = '<div class="fb-col">' + a + '</div><div class="fb-col">' + b + '</div>';
+          grid.className = "fb-gallery" + (wide ? " cols4" : "");
+          grid.innerHTML = cols.map(function(c) { return '<div class="fb-col">' + c + '</div>'; }).join("");
         } else {
           var s = "";
           shown.forEach(function(e, n) { s += cardHtml(e, RATIOS_A[n % RATIOS_A.length]); });
@@ -531,8 +541,8 @@
         renderGrid();
         grid.classList.remove("fb-grid-swap"); void grid.offsetWidth; grid.classList.add("fb-grid-swap");
       }
-      if (mqDesktop.addEventListener) mqDesktop.addEventListener("change", renderGrid);
-      else if (mqDesktop.addListener) mqDesktop.addListener(renderGrid);
+      if (mqDesktop.addEventListener) { mqDesktop.addEventListener("change", renderGrid); mqWide.addEventListener("change", renderGrid); }
+      else if (mqDesktop.addListener) { mqDesktop.addListener(renderGrid); mqWide.addListener(renderGrid); }
 
       /* ---------------- Events ---------------- */
       document.addEventListener("click", function(ev) {
