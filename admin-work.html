@@ -94,6 +94,8 @@
     }
     .meta-row label { display: grid; gap: 3px; }
     .meta-row label.wide { grid-column: 1 / -1; }
+    .meta-row .item-folder { grid-column: 1 / -1; }
+    .meta-row .item-folder:empty { display: none; }
     .meta-row span { font-size: 12px; color: var(--zinc-500); }
     .meta-row input, .meta-row textarea {
       width: 100%; border-radius: 8px; border: 1px solid rgba(228,228,231,0.6);
@@ -230,11 +232,53 @@
       });
       return order.map(function(k) { return map[k]; }).filter(function(g) { return g.items.length >= 2; });
     }
+    function folderOn(c, key) { return (c.hiddenFolders || []).indexOf(key) < 0; }
+    function toggleFolder(idx, on) {
+      var c = getActive();
+      if (!c) return;
+      var g = clientGroups(c)[idx];
+      if (!g) return;
+      var list = (c.hiddenFolders || []).filter(function(k) { return k !== g.key; });
+      if (!on) list.push(g.key);
+      if (list.length) c.hiddenFolders = list; else delete c.hiddenFolders;
+      renderClientFolders();
+      setStatus('Folder "' + g.name + '" is now ' + (on ? 'shown as a folder' : 'turned off (items show individually)') + '. Click Save changes to persist.');
+    }
+    function toggleFolderByKey(key, on) {
+      var c = getActive();
+      if (!c) return;
+      var g = clientGroups(c).filter(function(x) { return x.key === key; })[0];
+      if (!g) return;
+      var list = (c.hiddenFolders || []).filter(function(k) { return k !== key; });
+      if (!on) list.push(key);
+      if (list.length) c.hiddenFolders = list; else delete c.hiddenFolders;
+      renderClientFolders();
+      setStatus('Folder "' + g.name + '" is now ' + (on ? 'shown as a folder' : 'turned off (items show individually)') + '. Click Save changes to persist.');
+    }
+    // Folder on/off switch shown under the Client field of each item
+    function renderItemFolderToggles() {
+      var c = getActive();
+      var slots = document.querySelectorAll(".item-folder");
+      if (!c) return;
+      var groups = clientGroups(c);
+      Array.prototype.forEach.call(slots, function(slot) {
+        var v = (c.videos || [])[+slot.getAttribute("data-idx")];
+        var key = v ? (v.client || "").trim().toLowerCase() : "";
+        var g = key ? groups.filter(function(x) { return x.key === key; })[0] : null;
+        if (!g) { slot.innerHTML = ""; return; }
+        var on = folderOn(c, key);
+        slot.innerHTML = '<div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 10px; border:1px solid rgba(228,228,231,0.6); border-radius:10px; background:#fafafa">' +
+          '<span style="font-size:12px; color:var(--zinc-500)">Show &ldquo;' + escA(g.name) + '&rdquo; as a folder <b style="color:' + (on ? '#16a34a' : '#a1a1aa') + '; font-weight:500">' + (on ? 'ON' : 'OFF') + '</b></span>' +
+          '<label class="switch" title="' + (on ? 'Folder on - click to turn off' : 'Folder off - click to turn on') + '"><input type="checkbox"' + (on ? ' checked' : '') +
+          ' data-key="' + escA(key) + '" onchange="toggleFolderByKey(this.getAttribute(\'data-key\'), this.checked)"><span class="slider"></span></label></div>';
+      });
+    }
     function groupPics(g) {
       return g.items.map(function(v) { return v.src; }).filter(function(src) { return src && !VIDEO_RE.test(src); });
     }
 
     function renderClientFolders() {
+      renderItemFolderToggles();
       var el = document.getElementById("clientFolders");
       var c = getActive();
       if (!el || !c) return;
@@ -244,17 +288,21 @@
         return;
       }
       var html = '<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; margin-top:8px">';
-      groups.forEach(function(g) {
+      groups.forEach(function(g, gi) {
+        var on = folderOn(c, g.key);
         var pics = groupPics(g);
-        var cycle = pics.length > 2;
+        var cycle = pics.length > 2 && on;
         var first = pics.length ? pics[(coverIdx[g.key] || 0) % pics.length] : "";
-        html += '<div style="border:1px solid rgba(228,228,231,0.6); border-radius:12px; overflow:hidden; background:#fff">' +
+        html += '<div style="border:1px solid rgba(228,228,231,0.6); border-radius:12px; overflow:hidden; background:#fff' + (on ? '' : '; opacity:.55') + '">' +
           '<div class="cf-cover" data-key="' + escA(g.key) + '" style="position:relative; aspect-ratio:4/3; background:#f4f4f5">' +
           (first ? '<img src="' + escA(first) + '" alt="" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:opacity .4s">' : '') +
           (cycle ? '<span style="position:absolute; bottom:4px; right:6px; font-size:10px; background:rgba(0,0,0,.6); color:#fff; border-radius:6px; padding:0 5px">auto &middot; ' + pics.length + '</span>' : '') +
           '</div>' +
-          '<div style="padding:8px 10px"><div style="font-size:13px; font-weight:500">' + escA(g.name) + '</div>' +
-          '<div style="font-size:12px; color:var(--zinc-500)">' + g.items.length + ' pieces' + (cycle ? '' : '') + '</div></div></div>';
+          '<div style="padding:8px 10px; display:flex; align-items:center; justify-content:space-between; gap:8px">' +
+          '<div style="min-width:0"><div style="font-size:13px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap' + (on ? '' : '; text-decoration:line-through') + '">' + escA(g.name) + '</div>' +
+          '<div style="font-size:12px; color:var(--zinc-500)">' + g.items.length + ' pieces' + (on ? '' : ' &middot; off') + '</div></div>' +
+          '<label class="switch" title="' + (on ? 'Folder on — click to turn off' : 'Folder off — click to turn on') + '"><input type="checkbox"' + (on ? ' checked' : '') +
+          ' onchange="toggleFolder(' + gi + ', this.checked)"><span class="slider"></span></label></div></div>';
       });
       el.innerHTML = html + '</div>';
     }
@@ -264,7 +312,7 @@
       if (!c) return;
       clientGroups(c).forEach(function(g) {
         var pics = groupPics(g);
-        if (pics.length <= 2) return;
+        if (pics.length <= 2 || !folderOn(c, g.key)) return;
         coverIdx[g.key] = ((coverIdx[g.key] || 0) + 1) % pics.length;
         var box = document.querySelector('.cf-cover[data-key="' + g.key.replace(/"/g, '\\"') + '"]');
         if (!box) return;
@@ -392,7 +440,7 @@
 
       // Client folders (same client name = one folder on the website)
       html += '<div style="margin-top:24px"><div style="font-size:14px; font-weight:500">Client folders</div>' +
-        '<div style="margin-top:2px; font-size:12px; color:var(--zinc-500)">Cover photos change every 3 seconds when a folder has more than 2 pictures.</div>' +
+        '<div style="margin-top:2px; font-size:12px; color:var(--zinc-500)">Cover photos change every 3 seconds when a folder has more than 2 pictures. Turn a folder off to show its items individually instead.</div>' +
         '<div id="clientFolders"></div></div>';
 
       // Current videos
@@ -422,6 +470,7 @@
           html += '<div class="meta-row">' +
             '<label><span>Product name</span><input value="' + escA(v.title) + '" placeholder="e.g. Magnetic gift box" oninput="setMeta(' + idx + ',\'title\',this.value)"></label>' +
             '<label><span>Client</span><input list="clientList" value="' + escA(v.client) + '" placeholder="e.g. Crowne Plaza" oninput="setMeta(' + idx + ',\'client\',this.value)"></label>' +
+            '<div class="item-folder" data-idx="' + idx + '"></div>' +
             '<label class="wide"><span>Details (shown when visitors open this item)</span>' +
             '<textarea placeholder="Size, material, finish, quantity, turnaround..." oninput="setMeta(' + idx + ',\'details\',this.value)">' + escA(v.details) + '</textarea></label>' +
             '</div>';
