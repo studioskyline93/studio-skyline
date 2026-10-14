@@ -5,8 +5,115 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Production House — Studio Skyline</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ============ Studio Skyline — shared premium theme (matches Work pages) ============ */
+    :root{
+      --burgundy:#800D1B; --burgundy-deep:#6a0a16;
+      --ivory:#FAF7F3; --white:#fff; --ink:#262222; --muted:#77716F; --line:#E9E0DC;
+      --serif:"Cormorant Garamond","Cormorant",Georgia,"Times New Roman",serif;
+      --sans:"Inter","Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+      --pad:clamp(20px,4.6vw,72px);
+      /* remap the old neutral greys so every existing rule picks up the warm palette */
+      --zinc-50:#FAF7F3; --zinc-100:#F3EDE8; --zinc-200:#E9E0DC; --zinc-300:#D9CFCA; --zinc-400:#A39B98;
+      --zinc-500:#77716F; --zinc-600:#5F5958; --zinc-700:#4A4443; --zinc-800:#343030; --zinc-900:#262222;
+    }
+    body.fb-page{margin:0;background:var(--ivory);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+    body.fb-page *{box-sizing:border-box}
+    body.fb-page #site-header{background:var(--ivory);color:var(--ink);border-bottom:1px solid var(--line);font-family:var(--sans)}
+    body.fb-page #site-header a{color:inherit}
+    body.fb-page #site-footer{background:var(--ivory);color:var(--ink);border-top:1px solid var(--line);font-family:var(--sans)}
+    body.fb-page #site-footer a{color:inherit}
+    body.fb-page a:focus-visible,body.fb-page button:focus-visible{outline:2px solid var(--burgundy);outline-offset:3px}
+    body.fb-page .site-main{max-width:none;margin:0;padding:clamp(32px,4vw,56px) var(--pad) clamp(48px,6vw,88px)}
+
+    /* Headings */
+    body.fb-page .section-kicker{font-family:var(--sans);font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--burgundy);font-weight:500}
+    body.fb-page .section-title{font-family:var(--serif);font-weight:500;color:var(--burgundy);font-size:clamp(30px,3.1vw,44px);line-height:1.05;letter-spacing:0;margin:10px 0 16px}
+    body.fb-page .section-title::after{content:"";display:block;width:62px;height:1px;background:var(--burgundy);margin-top:16px}
+    body.fb-page .section-desc{font-family:var(--serif);font-size:clamp(16px,1.2vw,19px);line-height:1.5;color:#4a4443;max-width:30em;margin:0}
+    body.fb-page .detail-desc{font-family:var(--serif);font-size:clamp(16px,1.2vw,19px);line-height:1.5;color:#4a4443}
+
+    /* Cards */
+    body.fb-page .about-card,body.fb-page .contact-info,body.fb-page .contact-form-card,body.fb-page .video-card,body.fb-page .client-cell{
+      background:var(--white);border:1px solid var(--line);border-radius:2px;box-shadow:none;color:var(--ink)}
+    body.fb-page .about-card:hover,body.fb-page .video-card:hover,body.fb-page .client-cell:hover{border-color:rgba(128,13,27,.35);box-shadow:0 18px 40px -26px rgba(128,13,27,.35)}
+    body.fb-page .card-title{font-family:var(--serif);font-size:clamp(22px,1.9vw,28px);font-weight:600;line-height:1.15;color:var(--burgundy)}
+    body.fb-page .card-note{font-size:13px;color:var(--muted)}
+    body.fb-page .about-card p{font-family:var(--serif);font-size:clamp(16px,1.2vw,19px);line-height:1.5;color:#4a4443}
+    body.fb-page .about-card li{font-size:14px;color:var(--ink)}
+    body.fb-page .about-card li::marker{color:var(--burgundy)}
+    body.fb-page .about-card a,body.fb-page .contact-info a{color:var(--burgundy);text-decoration:none;transition:color .25s}
+    body.fb-page .about-card a:hover,body.fb-page .contact-info a:hover{color:var(--burgundy-deep);text-decoration:underline;text-underline-offset:4px}
+
+    /* Contact */
+    body.fb-page .contact-info .kicker{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--burgundy);font-weight:500}
+    body.fb-page .contact-info h2{font-family:var(--serif);font-weight:500;color:var(--burgundy);font-size:clamp(26px,2.4vw,34px);line-height:1.05}
+    body.fb-page .contact-info .details{font-size:14px;color:var(--ink);line-height:1.8}
+    body.fb-page .label-text{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--muted)}
+    body.fb-page .contact-form input,body.fb-page .contact-form textarea{font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--ivory);border:1px solid var(--line);border-radius:2px;
+      transition:border-color .25s ease,box-shadow .25s ease,background .25s ease}
+    body.fb-page .contact-form input::placeholder,body.fb-page .contact-form textarea::placeholder{color:#a39b98}
+    body.fb-page .contact-form input:focus,body.fb-page .contact-form textarea:focus{outline:none;background:#fff;border-color:var(--burgundy);box-shadow:0 0 0 3px rgba(128,13,27,.08)}
+    body.fb-page .btn-primary{font-family:var(--sans);background:var(--burgundy);color:#fff;border:1px solid var(--burgundy);border-radius:0;padding:13px 26px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;cursor:pointer;transition:background .25s,color .25s}
+    body.fb-page .btn-primary:hover{background:var(--burgundy-deep)}
+
+    /* Clients + videos */
+    body.fb-page .client-cell{text-decoration:none;overflow:hidden}
+    body.fb-page .client-cell .name{font-family:var(--serif);font-size:clamp(18px,1.5vw,22px);font-weight:600;color:var(--ink);transition:color .25s}
+    body.fb-page .client-cell:hover .name{color:var(--burgundy)}
+    body.fb-page .client-cell img{transition:opacity .85s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
+    body.fb-page .client-cell:hover img{transform:scale(1.04)}
+    body.fb-page .video-card{overflow:hidden}
+    body.fb-page .video-card .info h3{font-family:var(--serif);font-size:clamp(19px,1.6vw,23px);font-weight:600;line-height:1.15;color:var(--ink)}
+    body.fb-page .video-card .info p{font-size:12.5px;line-height:1.5;color:var(--muted)}
+
+    /* Production house */
+    body.fb-page .ph-tile{overflow:hidden;border-radius:2px;background:#ece4df}
+    body.fb-page .ph-tile .media img,body.fb-page .ph-tile .media video{transition:opacity .85s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
+    body.fb-page .ph-tile:hover .media img,body.fb-page .ph-tile:hover .media video{transform:scale(1.03)}
+    body.fb-page .play-circle{background:rgba(250,247,243,.92);color:var(--burgundy)}
+    body.fb-page .ph-walkthrough{font-family:var(--sans);font-size:12px;letter-spacing:.06em;color:var(--muted)}
+    body.fb-page .ph-step{font-family:var(--sans);background:transparent;color:var(--burgundy);border:1px solid var(--burgundy)}
+    body.fb-page .ph-line{background:var(--line)}
+    body.fb-page .ph-modal-close{font-family:var(--sans);background:var(--burgundy);color:#fff;border:0;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;transition:background .25s}
+    body.fb-page .ph-modal-close:hover{background:var(--burgundy-deep)}
+    body.fb-page .ph-modal-prev,body.fb-page .ph-modal-next{background:rgba(250,247,243,.92);color:var(--burgundy);border:0;transition:background .25s,color .25s}
+    body.fb-page .ph-modal-prev:hover,body.fb-page .ph-modal-next:hover{background:var(--burgundy-deep);color:#fff}
+    body.fb-page .ph-modal-alt{font-family:var(--serif);font-size:18px}
+    body.fb-page .ph-modal.open{animation:fbOverlayIn .35s ease backwards}
+    body.fb-page .ph-modal.open .ph-modal-content{animation:fbOverlayIn .55s ease backwards}
+    body.fb-page .ph-modal-media>*{animation:fbSwapIn .5s ease backwards}
+
+    /* ---------- Smooth, premium motion (same as work-detail) ---------- */
+    html{scroll-behavior:smooth;scrollbar-gutter:stable}
+    body.fb-page{animation:fbPageIn .6s ease backwards}
+    html.fb-leave body.fb-page{opacity:0;transition:opacity .25s ease}
+    @keyframes fbPageIn{from{opacity:0}to{opacity:1}}
+    @keyframes fbOverlayIn{from{opacity:0}to{opacity:1}}
+    @keyframes fbSwapIn{from{opacity:0}to{opacity:1}}
+    /* Blocks rise gently into view as you scroll */
+    body.fb-page .fb-rv{opacity:0;transform:translateY(22px);
+      transition:opacity .9s ease,transform 1s cubic-bezier(.2,.7,.2,1),border-color .35s ease,box-shadow .5s ease;
+      transition-delay:var(--rvd,0s),var(--rvd,0s),0s,0s}
+    body.fb-page .fb-rv.in{opacity:1;transform:none}
+    @media (prefers-reduced-motion:reduce){
+      html{scroll-behavior:auto}
+      body.fb-page{animation:none}
+      body.fb-page .fb-rv{opacity:1;transform:none;transition:none}
+    }
+
+    /* Media fades in once loaded, over a soft shimmer (no pop-in) */
+    .fb-pm{opacity:0;transition:opacity .85s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
+    .fb-pm.ld{opacity:1}
+    .media:not(.is-ld){background:linear-gradient(100deg,#ece4df 30%,#f5efeb 50%,#ece4df 70%);background-size:220% 100%;animation:fbShimmer 1.7s ease-in-out infinite}
+    @keyframes fbShimmer{from{background-position:120% 0}to{background-position:-120% 0}}
+    @media (prefers-reduced-motion:reduce){.fb-pm{opacity:1;transition:none}.media:not(.is-ld){animation:none}}
+  </style>
 </head>
-<body>
+<body class="fb-page">
   <div id="site-header"></div>
 
   <div class="site-main">
@@ -130,6 +237,75 @@
       media = (site && Array.isArray(site.productionHouseMedia)) ? site.productionHouseMedia : PRODUCTION_HOUSE_MEDIA;
       renderPHGrid();
     })();
+  </script>
+
+  <script>
+  /* Smooth, premium motion: scroll reveals, media fade-in, page fade between pages */
+  (function() {
+    var HERO = ".site-main > div:first-child > *", ITEMS = ".ph-tile, .ph-walkthrough, .detail-desc", MEDIA = ".ph-tile img, .ph-tile video";
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var main = document.querySelector("main, .site-main");
+
+    var io = ("IntersectionObserver" in window && !reduce) ? new IntersectionObserver(function(entries) {
+      var n = 0;
+      entries.forEach(function(en) {
+        if (!en.isIntersecting) return;
+        var el = en.target;
+        if (!el.hasAttribute("data-rvd")) el.style.setProperty("--rvd", (Math.min(n, 6) * 70) + "ms");
+        n++; el.classList.add("in"); io.unobserve(el);
+      });
+    }, { rootMargin: "0px 0px -6% 0px", threshold: 0.02 }) : null;
+
+    function reveal(el, delay) {
+      if (el.__rv) return; el.__rv = 1;
+      if (!io) { el.classList.add("fb-rv", "in"); return; }
+      if (delay != null) { el.setAttribute("data-rvd", "1"); el.style.setProperty("--rvd", delay + "ms"); }
+      el.classList.add("fb-rv"); io.observe(el);
+    }
+    function markLd(el) {
+      el.classList.add("ld");
+      var p = el.parentNode;
+      if (p && p.classList && p.classList.contains("media")) p.classList.add("is-ld");
+    }
+    function tag() {
+      if (!main) return;
+      if (HERO) main.querySelectorAll(HERO).forEach(function(el, i) { reveal(el, i * 80); });
+      if (ITEMS) main.querySelectorAll(ITEMS).forEach(function(el) { reveal(el); });
+      if (MEDIA) main.querySelectorAll(MEDIA).forEach(function(el) {
+        if (el.__pm) return; el.__pm = 1; el.classList.add("fb-pm");
+        if (el.tagName === "IMG" ? (el.complete && el.naturalWidth > 0) : el.readyState >= 2) markLd(el);
+        setTimeout(function() { markLd(el); }, 4000); /* safety net: nothing stays hidden */
+      });
+    }
+    document.addEventListener("load", function(e) { var t = e.target; if (t && t.tagName === "IMG" && t.classList.contains("fb-pm")) markLd(t); }, true);
+    document.addEventListener("loadeddata", function(e) { var t = e.target; if (t && t.tagName === "VIDEO" && t.classList.contains("fb-pm")) markLd(t); }, true);
+    document.addEventListener("error", function(e) { var t = e.target; if (t && t.classList && t.classList.contains("fb-pm")) markLd(t); }, true);
+
+    tag();
+    if (main && "MutationObserver" in window) {
+      var queued = false;
+      new MutationObserver(function() {
+        if (queued) return; queued = true;
+        requestAnimationFrame(function() { queued = false; tag(); });
+      }).observe(main, { childList: true, subtree: true });
+    }
+
+    /* Soft fade between pages */
+    document.addEventListener("click", function(e) {
+      if (reduce || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var a = e.target.closest ? e.target.closest("a[href]") : null;
+      if (!a || (a.target && a.target !== "_self") || a.hasAttribute("download")) return;
+      var href = a.getAttribute("href");
+      if (!href || href.charAt(0) === "#" || /^(mailto:|tel:|javascript:)/i.test(href)) return;
+      var u; try { u = new URL(a.href, location.href); } catch (x) { return; }
+      if (u.origin !== location.origin) return;
+      if (u.pathname === location.pathname && u.search === location.search) return;
+      e.preventDefault();
+      document.documentElement.classList.add("fb-leave");
+      setTimeout(function() { location.href = u.href; }, 260);
+    });
+    window.addEventListener("pageshow", function(e) { if (e.persisted) document.documentElement.classList.remove("fb-leave"); });
+  })();
   </script>
 </body>
 </html>
