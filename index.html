@@ -7,6 +7,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    /* Hold the first paint until fonts are ready (no font-swap jump), then fade the page in */
+    (function(){var h=document.documentElement;h.classList.add('ix-wait');var done=false;
+      function go(){if(done)return;done=true;requestAnimationFrame(function(){h.classList.remove('ix-wait');});}
+      setTimeout(go,1400);
+      if(document.fonts&&document.fonts.ready){Promise.all([document.fonts.ready,new Promise(function(r){setTimeout(r,160)})]).then(go);}else{window.addEventListener('load',go);}
+    })();
+  </script>
   <link rel="stylesheet" href="style.css">
   <style>
     body {
@@ -71,6 +79,78 @@
     body.ix-themed .testimonial-card blockquote{color:var(--ink);font-family:var(--serif)}
     body.ix-themed .testimonial-card figcaption{color:var(--muted);font-family:var(--sans)}
     body.ix-themed .testimonial-card .author{color:var(--burgundy);font-weight:600}
+
+    /* ============ Smooth, premium motion (motion only, no layout changes) ============ */
+    html{scroll-behavior:smooth}
+    body.ix-themed .btn-primary,body.ix-themed .btn-secondary,body.ix-themed .reel-btns button,body.ix-themed .reel-card-view{transition:background-color .28s ease,color .28s ease,border-color .28s ease,transform .28s ease,box-shadow .28s ease,opacity .28s ease}
+
+    /* Hero text and capabilities card rise in on load */
+    body.ix-themed .hero-card .hero-city,body.ix-themed .hero-card .hero-line,body.ix-themed .hero-card .hero-title,
+    body.ix-themed .hero-card .hero-intro,body.ix-themed .hero-card .hero-cta,body.ix-themed .hero-card .cap-card{animation:ixRise .95s cubic-bezier(.2,.7,.2,1) backwards}
+    body.ix-themed .hero-card .hero-line{animation-delay:.06s}
+    body.ix-themed .hero-card .hero-title{animation-delay:.12s}
+    body.ix-themed .hero-card .hero-intro{animation-delay:.2s}
+    body.ix-themed .hero-card .hero-cta{animation-delay:.28s}
+    body.ix-themed .hero-card .cap-card{animation-delay:.22s}
+    @keyframes ixRise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+    /* Sections and cards ease into view as you scroll */
+    body.ix-themed .ix-rv{opacity:0;translate:0 22px;transition:opacity .9s ease,translate 1s cubic-bezier(.2,.7,.2,1);transition-delay:var(--d,0ms)}
+    body.ix-themed .ix-rv.in{opacity:1;translate:0 0}
+    body.ix-themed .reel-card.ix-rvp .reel-card-media,body.ix-themed .reel-card.ix-rvp .reel-card-info{opacity:0;translate:0 22px;transition:opacity .9s ease,translate 1s cubic-bezier(.2,.7,.2,1);transition-delay:var(--d,0ms)}
+    body.ix-themed .reel-card.ix-rvp.in .reel-card-media,body.ix-themed .reel-card.ix-rvp.in .reel-card-info{opacity:1;translate:0 0}
+
+    /* Reel previews fade in over a soft shimmer, and zoom gently on hover */
+    body.ix-themed .reel-card-media{overflow:hidden}
+    body.ix-themed .reel-card-media:not(.is-ld){background:linear-gradient(100deg,#ece4df 30%,#f5efeb 50%,#ece4df 70%);background-size:220% 100%;animation:ixShimmer 1.7s ease-in-out infinite}
+    @keyframes ixShimmer{from{background-position:120% 0}to{background-position:-120% 0}}
+    body.ix-themed .reel-card-media img,body.ix-themed .reel-card-media video{transition:transform 1s cubic-bezier(.2,.7,.2,1)}
+    body.ix-themed .reel-card-media .fade{opacity:0;transition:opacity .85s ease,transform 1s cubic-bezier(.2,.7,.2,1)}
+    body.ix-themed .reel-card-media .fade.ld{opacity:1}
+    body.ix-themed .reel-card:hover .reel-card-media img,body.ix-themed .reel-card:hover .reel-card-media video{transform:scale(1.04)}
+
+    /* Reel scrolling: smooth, contained, and drag-able with a mouse */
+    body.ix-themed .reel-track{scroll-behavior:smooth;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;cursor:grab}
+    body.ix-themed .reel-track.ix-dragging{cursor:grabbing;user-select:none;-webkit-user-select:none}
+    body.ix-themed .reel-track.ix-dragging a{pointer-events:none}
+
+
+    /* ============ Premium smoothness layer ============ */
+    html{scrollbar-gutter:stable}
+    html.ix-smooth{scroll-behavior:auto}                    /* JS-driven inertia scrolling takes over */
+    body.ix-themed{transition:opacity .7s ease}
+    html.ix-wait body.ix-themed{opacity:0}
+    html.ix-wait body.ix-themed .hero-card .hero-city,html.ix-wait body.ix-themed .hero-card .hero-line,
+    html.ix-wait body.ix-themed .hero-card .hero-title,html.ix-wait body.ix-themed .hero-card .hero-intro,
+    html.ix-wait body.ix-themed .hero-card .hero-cta,html.ix-wait body.ix-themed .hero-card .cap-card{animation-play-state:paused}
+    /* GPU-friendly: only promote elements while they are waiting to animate */
+    body.ix-themed .ix-rv:not(.in),body.ix-themed .reel-card.ix-rvp:not(.in) .reel-card-media,body.ix-themed .reel-card.ix-rvp:not(.in) .reel-card-info{will-change:opacity,translate}
+    body.ix-themed .reel-card-media img,body.ix-themed .reel-card-media video{backface-visibility:hidden;transform:translateZ(0)}
+    body.ix-themed .reel-card:hover .reel-card-media img,body.ix-themed .reel-card:hover .reel-card-media video{transform:scale(1.04) translateZ(0)}
+    body.ix-themed .reel-card{transition:box-shadow .5s ease,translate .6s cubic-bezier(.2,.7,.2,1)}
+    body.ix-themed .reel-card:hover{translate:0 -4px;box-shadow:0 18px 40px -22px rgba(128,13,27,.35)}
+    body.ix-themed .reel-track{overscroll-behavior-y:auto;scroll-padding-inline:2px}
+    body.ix-themed .reel-card.ix-skel{pointer-events:none}
+    body.ix-themed .reel-card-view{transition:background-color .3s ease,color .3s ease,letter-spacing .4s ease}
+    body.ix-themed .reel-card:hover .reel-card-view{letter-spacing:.04em}
+    body.ix-themed .testimonial-card{transition:opacity .9s ease,translate 1s cubic-bezier(.2,.7,.2,1),box-shadow .5s ease}
+    body.ix-themed .video-embed iframe{opacity:0;transition:opacity .9s ease}
+    body.ix-themed .video-embed iframe.ld{opacity:1}
+    body.ix-themed .video-embed .aspect{background:linear-gradient(100deg,#ece4df 30%,#f5efeb 50%,#ece4df 70%);background-size:220% 100%;animation:ixShimmer 1.7s ease-in-out infinite}
+
+    @media (prefers-reduced-motion:reduce){
+      html.ix-wait body.ix-themed{opacity:1}
+      body.ix-themed .reel-card,body.ix-themed .video-embed iframe{transition:none}
+      body.ix-themed .reel-card:hover{translate:none}
+      body.ix-themed .video-embed .aspect{animation:none}
+      html,body.ix-themed .reel-track{scroll-behavior:auto}
+      body.ix-themed .hero-card .hero-city,body.ix-themed .hero-card .hero-line,body.ix-themed .hero-card .hero-title,
+      body.ix-themed .hero-card .hero-intro,body.ix-themed .hero-card .hero-cta,body.ix-themed .hero-card .cap-card{animation:none}
+      body.ix-themed .ix-rv,body.ix-themed .reel-card.ix-rvp .reel-card-media,body.ix-themed .reel-card.ix-rvp .reel-card-info{opacity:1;translate:0 0;transition:none}
+      body.ix-themed .reel-card-media:not(.is-ld){animation:none}
+      body.ix-themed .reel-card-media .fade{transition:none}
+      body.ix-themed .reel-card:hover .reel-card-media img,body.ix-themed .reel-card:hover .reel-card-media video{transform:none}
+    }
   </style>
 </head>
 <body class="ix-themed">
@@ -122,7 +202,7 @@
         <span class="label">Selected work</span>
         <span class="counter" id="reelCounter">01 / 00</span>
       </div>
-      <div class="reel-track" id="reelTrack"></div>
+      <div class="reel-track" id="reelTrack"><div class="reel-card ix-skel" aria-hidden="true"><div class="reel-card-media"></div><div class="reel-card-info"><div><div class="reel-card-title">&nbsp;</div><div class="reel-card-count">&nbsp;</div></div></div></div><div class="reel-card ix-skel" aria-hidden="true"><div class="reel-card-media"></div><div class="reel-card-info"><div><div class="reel-card-title">&nbsp;</div><div class="reel-card-count">&nbsp;</div></div></div></div><div class="reel-card ix-skel" aria-hidden="true"><div class="reel-card-media"></div><div class="reel-card-info"><div><div class="reel-card-title">&nbsp;</div><div class="reel-card-count">&nbsp;</div></div></div></div><div class="reel-card ix-skel" aria-hidden="true"><div class="reel-card-media"></div><div class="reel-card-info"><div><div class="reel-card-title">&nbsp;</div><div class="reel-card-count">&nbsp;</div></div></div></div></div>
       <div class="reel-footer">
         <span>Drag / scroll</span>
         <div class="reel-btns">
@@ -161,6 +241,108 @@
 
   <script>
     /* ── Site content ── */
+
+    /* ── Smoothness helpers ── */
+    var IX_RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var ixIO = ('IntersectionObserver' in window) ? new IntersectionObserver(function(entries) {
+      entries.forEach(function(en) {
+        if (!en.isIntersecting) return;
+        var el = en.target;
+        el.classList.add('in');
+        ixIO.unobserve(el);
+        setTimeout(function() { el.style.removeProperty('--d'); }, 1800);   // so later hover effects aren't delayed
+      });
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.02 }) : null;
+
+    function ixReveal(el, cls, delay) {
+      if (!el) return;
+      el.classList.add(cls);
+      el.style.setProperty('--d', (delay || 0) + 'ms');
+      if (!ixIO || IX_RM) { el.classList.add('in'); return; }
+      ixIO.observe(el);
+    }
+
+    function ixMarkLd(el) {
+      el.classList.add('ld');
+      var pn = el.parentNode;
+      if (pn && pn.classList && pn.classList.contains('reel-card-media')) pn.classList.add('is-ld');
+    }
+    function ixMarkLoaded(root) {
+      var boxes = root.querySelectorAll('.reel-card-media');
+      for (var i = 0; i < boxes.length; i++) {
+        var el = boxes[i].querySelector('img, video');
+        if (!el) { boxes[i].classList.add('is-ld'); continue; }
+        if (el.tagName === 'IMG' ? (el.complete && el.naturalWidth > 0) : el.readyState >= 2) ixMarkLd(el);
+      }
+    }
+    function ixForceLd(root) {   // safety net so nothing ever stays hidden
+      var boxes = root.querySelectorAll('.reel-card-media');
+      for (var i = 0; i < boxes.length; i++) boxes[i].classList.add('is-ld');
+      var fs = root.querySelectorAll('.fade');
+      for (var j = 0; j < fs.length; j++) fs[j].classList.add('ld');
+    }
+    document.addEventListener('load', function(e) { var t = e.target; if (t && t.tagName === 'IMG' && t.classList && t.classList.contains('fade')) ixMarkLd(t); }, true);
+    document.addEventListener('loadeddata', function(e) { var t = e.target; if (t && t.tagName === 'VIDEO' && t.classList && t.classList.contains('fade')) ixMarkLd(t); }, true);
+    document.addEventListener('error', function(e) { var t = e.target; if (t && (t.tagName === 'IMG' || t.tagName === 'VIDEO') && t.classList && t.classList.contains('fade')) ixMarkLd(t); }, true);
+
+    /* Live counter that follows the reel as it scrolls */
+    function updateReelCounter() {
+      var track = document.getElementById('reelTrack');
+      var counter = document.getElementById('reelCounter');
+      if (!track || !counter) return;
+      var cards = track.querySelectorAll('.reel-card'), total = cards.length;
+      if (!total) return;
+      var left = track.getBoundingClientRect().left, best = Infinity, cur = 0;
+      for (var i = 0; i < total; i++) {
+        var d = Math.abs(cards[i].getBoundingClientRect().left - left);
+        if (d < best) { best = d; cur = i; }
+      }
+      if (track.scrollLeft + track.clientWidth >= track.scrollWidth - 4) cur = total - 1;
+      counter.textContent = String(cur + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+    }
+
+    /* Mouse drag-to-scroll with a little momentum (touch keeps its native scrolling) */
+    function initReelDrag(track) {
+      if (track._ixDrag) return; track._ixDrag = true;
+      var down = false, moved = false, suppress = false, startX = 0, startL = 0, lastX = 0, lastT = 0, vel = 0, raf = null;
+      track.addEventListener('dragstart', function(e) { e.preventDefault(); });
+      track.addEventListener('click', function(e) { if (suppress) { e.preventDefault(); e.stopPropagation(); } }, true);
+      track.addEventListener('pointerdown', function(e) {
+        if (e.pointerType !== 'mouse' || e.button !== 0) return;
+        cancelAnimationFrame(raf);
+        down = true; moved = false; startX = e.clientX; startL = track.scrollLeft; lastX = e.clientX; lastT = performance.now(); vel = 0;
+      });
+      window.addEventListener('pointermove', function(e) {
+        if (!down) return;
+        var dx = e.clientX - startX;
+        if (!moved && Math.abs(dx) > 5) {
+          moved = true;
+          track.classList.add('ix-dragging');
+          track.style.scrollSnapType = 'none'; track.style.scrollBehavior = 'auto';
+        }
+        if (!moved) return;
+        track.scrollLeft = startL - dx;
+        var now = performance.now(), dt = now - lastT;
+        if (dt > 0) vel = (lastX - e.clientX) / dt;
+        lastX = e.clientX; lastT = now;
+      });
+      function end() {
+        if (!down) return;
+        down = false;
+        if (!moved) return;
+        track.classList.remove('ix-dragging');
+        suppress = true; setTimeout(function() { suppress = false; }, 60);
+        var v = (performance.now() - lastT < 90 && !IX_RM) ? vel * 16 : 0;      // px per frame
+        (function step() {
+          if (Math.abs(v) < 0.4) { track.style.scrollSnapType = ''; track.style.scrollBehavior = ''; return; }
+          track.scrollLeft += v; v *= 0.94;
+          raf = requestAnimationFrame(step);
+        })();
+      }
+      window.addEventListener('pointerup', end);
+      window.addEventListener('pointercancel', end);
+    }
     function renderReel(collections) {
       var track = document.getElementById('reelTrack');
       var counter = document.getElementById('reelCounter');
@@ -172,8 +354,8 @@
         var isVid = /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(preview);
         var mediaHtml = preview
           ? (isVid
-              ? '<video src="' + preview + '" autoplay loop muted playsinline preload="metadata"></video>'
-              : '<img src="' + preview + '" alt="' + esc(c.title) + '" loading="lazy" decoding="async">')
+              ? '<video class="fade" src="' + preview + '" autoplay' + (vids.length < 2 ? ' loop' : '') + ' muted playsinline preload="metadata"></video>'
+              : '<img class="fade" src="' + preview + '" alt="' + esc(c.title) + '" loading="lazy" decoding="async">')
           : '<div class="no-vid">No video yet</div>';
         html += '<a href="work-detail.html?slug=' + encodeURIComponent(c.slug) + '" class="reel-card">' +
           '<div class="reel-card-media">' + mediaHtml + '</div>' +
@@ -185,6 +367,159 @@
       });
       track.innerHTML = html;
       counter.textContent = '01 / ' + String(collections.length).padStart(2,'0');
+      var cardEls = track.querySelectorAll('.reel-card');
+      for (var ci = 0; ci < cardEls.length; ci++) ixReveal(cardEls[ci], 'ix-rvp', (ci % 5) * 70);
+      ixMarkLoaded(track);
+      setTimeout(function() { ixForceLd(track); }, 4000);
+      initReelDrag(track);
+      if (!track._ixCount) { track._ixCount = true; var tick = false; track.addEventListener('scroll', function() { if (tick) return; tick = true; requestAnimationFrame(function() { tick = false; updateReelCounter(); }); }, { passive: true }); }
+      updateReelCounter();
+      startReelCycling(collections);
+      ixPauseOffscreen(track);
+    }
+
+    /* Single (looping) videos only play while they are on screen */
+    function ixPauseOffscreen(track) {
+      if (!('IntersectionObserver' in window)) return;
+      var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(en) {
+          var v = en.target.querySelector('video'); if (!v || !v.loop) return;
+          if (en.isIntersecting) { var p = v.play(); if (p && p.catch) p.catch(function() {}); }
+          else { try { v.pause(); } catch (e) {} }
+        });
+      }, { threshold: 0.1 });
+      var boxes = track.querySelectorAll('.reel-card-media');
+      for (var i = 0; i < boxes.length; i++) io.observe(boxes[i]);
+    }
+
+    /* ── Auto-changing previews ──
+       Each reel card steps through its collection: a photo stays 4 seconds,
+       a video plays to the end, then the next one fades in. Cards that are
+       off-screen (or a hidden tab) pause. */
+    var REEL_MS = 4000;
+    var REEL_FADE = 800;
+    var REEL_REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function isVidSrc(src) { return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(src || ''); }
+
+    function makeSlide(src, alt) {
+      var el;
+      if (isVidSrc(src)) {
+        el = document.createElement('video');
+        el.muted = true; el.defaultMuted = true;
+        el.setAttribute('muted', ''); el.setAttribute('playsinline', '');
+        el.playsInline = true; el.preload = 'auto'; el.loop = false;
+      } else {
+        el = document.createElement('img');
+        el.alt = alt || ''; el.decoding = 'async';
+      }
+      el.src = src;
+      return el;
+    }
+
+    function startReelCycling(collections) {
+      var cards = document.querySelectorAll('#reelTrack .reel-card');
+      collections.forEach(function(c, i) {
+        var card = cards[i];
+        if (!card) return;
+        var srcs = (c.videos || []).map(function(v) { return v.src; }).filter(Boolean);
+        if (srcs.length < 2) return;
+        var box = card.querySelector('.reel-card-media');
+        if (box) initCardCycle(box, srcs, c.title, i);
+      });
+    }
+
+    function initCardCycle(box, srcs, title, n) {
+      var curEl = box.querySelector('video, img');
+      if (!curEl) return;
+      if (window.getComputedStyle(box).position === 'static') box.style.position = 'relative';
+
+      var idx = 0, timer = null, busy = false, visible = true, lastT = -1;
+
+      function clear() { if (timer) { clearTimeout(timer); timer = null; } }
+
+      /* decide how the current slide ends */
+      function arm(firstDelay) {
+        clear();
+        if (curEl.tagName === 'VIDEO') {
+          curEl.onended = function() { go(); };
+          timer = setTimeout(function watch() {
+            if (!visible || document.hidden) { timer = setTimeout(watch, 1500); return; }
+            if (curEl.currentTime > lastT + 0.3) { lastT = curEl.currentTime; timer = setTimeout(watch, 6000); }
+            else go();               // stalled or never started: move on
+          }, 6000);
+        } else {
+          timer = setTimeout(function tick() {
+            if (!visible || document.hidden) { timer = setTimeout(tick, 1000); return; }
+            go();
+          }, REEL_MS + (firstDelay || 0));
+        }
+      }
+
+      function go() {
+        if (busy) return;
+        busy = true; clear();
+        tryNext(0);
+      }
+
+      function tryNext(tries) {
+        if (tries >= srcs.length - 1) { busy = false; arm(); return; }
+        var ni = (idx + 1 + tries) % srcs.length;
+        var nel = makeSlide(srcs[ni], title);
+        var settled = false, guard;
+        nel.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:0;z-index:2;' +
+          (REEL_REDUCED ? '' : 'transition:opacity ' + REEL_FADE + 'ms ease;');
+
+        function drop() {
+          if (nel.tagName === 'VIDEO') { try { nel.pause(); } catch (e) {} }
+          if (nel.parentNode) nel.parentNode.removeChild(nel);
+        }
+        function ready() {
+          if (settled) return; settled = true; clearTimeout(guard);
+          show(nel, ni);
+        }
+        function fail() {
+          if (settled) return; settled = true; clearTimeout(guard);
+          drop(); tryNext(tries + 1);
+        }
+        if (nel.tagName === 'IMG') { nel.onload = ready; nel.onerror = fail; }
+        else { nel.addEventListener('loadeddata', ready); nel.addEventListener('error', fail); }
+        guard = setTimeout(fail, 8000);          // slow or broken file: skip it
+        box.appendChild(nel);
+      }
+
+      function show(nel, ni) {
+        if (nel.tagName === 'VIDEO') {
+          try { nel.currentTime = 0; } catch (e) {}
+          var p = nel.play(); if (p && p.catch) p.catch(function() {});
+        }
+        requestAnimationFrame(function() { requestAnimationFrame(function() { nel.style.opacity = '1'; }); });
+        var old = curEl;
+        setTimeout(function() {
+          nel.style.cssText = '';               // back to the card's normal styling
+          if (old.tagName === 'VIDEO') { old.onended = null; try { old.pause(); } catch (e) {} }
+          if (old.parentNode) old.parentNode.removeChild(old);
+          curEl = nel; idx = ni; busy = false; lastT = -1;
+          if (!visible && nel.tagName === 'VIDEO') { try { nel.pause(); } catch (e) {} }
+          arm();
+        }, REEL_REDUCED ? 0 : REEL_FADE + 100);
+      }
+
+      function setPlaying(on) {
+        if (curEl.tagName !== 'VIDEO') return;
+        if (on) { var p = curEl.play(); if (p && p.catch) p.catch(function() {}); }
+        else { try { curEl.pause(); } catch (e) {} }
+      }
+
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function(entries) {
+          visible = entries[0].isIntersecting;
+          setPlaying(visible && !document.hidden);
+        }, { threshold: 0.15 }).observe(box);
+      }
+      document.addEventListener('visibilitychange', function() { setPlaying(visible && !document.hidden); });
+
+      arm(n * 400);                              // stagger so cards don't all change at once
     }
 
     function scrollReel(dir) {
@@ -205,13 +540,92 @@
           (t.company ? ' &middot; ' + esc(t.company) : '') + '</figcaption></figure>';
       });
       el.innerHTML = html;
+      var figs = el.querySelectorAll('.testimonial-card');
+      for (var fi = 0; fi < figs.length; fi++) ixReveal(figs[fi], 'ix-rv', (fi % 4) * 80);
     }
+
+    /* Static sections ease in as they reach the screen */
+    ['.section', '.reel-header', '.reel-footer', '.video-embed', '.testimonials h2'].forEach(function(sel) {
+      var els = document.querySelectorAll(sel);
+      for (var i = 0; i < els.length; i++) ixReveal(els[i], 'ix-rv', 0);
+    });
 
     (async function() {
       var workData = await loadWorkContent();
       renderReel((workData && workData.collections) ? workData.collections : WORK_COLLECTIONS);
       var siteData = await loadSiteContent();
       renderTestimonials((siteData && Array.isArray(siteData.testimonials)) ? siteData.testimonials : TESTIMONIALS);
+    })();
+  </script>
+
+  <script>
+    /* ── Inertia ("buttery") scrolling for mouse wheel, keyboard and #links.
+          Touch devices and reduced-motion keep the browser's native scrolling. ── */
+    (function() {
+      var fine = window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+      var rm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var fr = document.querySelector('.video-embed iframe');
+      if (fr) { fr.addEventListener('load', function() { fr.classList.add('ld'); }); setTimeout(function() { fr.classList.add('ld'); }, 3500); }
+      if (!fine || rm) return;
+
+      var root = document.documentElement, cur = window.scrollY, target = cur, active = false, last = 0;
+      root.classList.add('ix-smooth');
+      function maxY() { return Math.max(0, root.scrollHeight - window.innerHeight); }
+      function clamp(v) { return Math.min(maxY(), Math.max(0, v)); }
+      function loop(now) {
+        var dt = Math.min(48, now - last); last = now;
+        var diff = target - cur;
+        if (Math.abs(diff) < 0.2) { cur = target; window.scrollTo(0, cur); active = false; return; }
+        cur += diff * (1 - Math.exp(-dt / 95));            /* frame-rate independent easing */
+        window.scrollTo(0, cur);
+        requestAnimationFrame(loop);
+      }
+      function push(y) {
+        if (!active) { cur = window.scrollY; }
+        target = clamp(y);
+        if (!active) { active = true; last = performance.now(); requestAnimationFrame(loop); }
+      }
+      window.addEventListener('scroll', function() { if (!active) { cur = target = window.scrollY; } }, { passive: true });
+
+      window.addEventListener('wheel', function(e) {
+        if (e.ctrlKey || e.defaultPrevented) return;
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;           /* horizontal gestures stay native (reel) */
+        for (var el = e.target; el && el.nodeType === 1 && el !== document.body; el = el.parentNode) {
+          var oy = getComputedStyle(el).overflowY;
+          if ((oy === 'auto' || oy === 'scroll') && el.scrollHeight > el.clientHeight + 1) return;   /* inner scrollers */
+        }
+        e.preventDefault();
+        var d = e.deltaY;
+        if (e.deltaMode === 1) d *= 34; else if (e.deltaMode === 2) d *= window.innerHeight;
+        push((active ? target : window.scrollY) + d);
+      }, { passive: false });
+
+      window.addEventListener('keydown', function(e) {
+        if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+        var t = e.target, tag = t && t.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON' || tag === 'A' || tag === 'IFRAME' || (t && t.isContentEditable)) return;
+        var base = active ? target : window.scrollY, h = window.innerHeight, y = null;
+        switch (e.key) {
+          case 'ArrowDown': y = base + 70; break;
+          case 'ArrowUp': y = base - 70; break;
+          case 'PageDown': y = base + h * 0.85; break;
+          case 'PageUp': y = base - h * 0.85; break;
+          case ' ': y = base + (e.shiftKey ? -1 : 1) * h * 0.85; break;
+          case 'Home': y = 0; break;
+          case 'End': y = maxY(); break;
+        }
+        if (y === null) return;
+        e.preventDefault(); push(y);
+      });
+
+      document.addEventListener('click', function(e) {
+        var a = e.target.closest && e.target.closest('a[href^="#"]');
+        if (!a || a.getAttribute('href').length < 2) return;
+        var dest = document.querySelector(a.getAttribute('href'));
+        if (!dest) return;
+        e.preventDefault();
+        push(dest.getBoundingClientRect().top + window.scrollY - 12);
+      });
     })();
   </script>
 
