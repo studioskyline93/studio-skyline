@@ -173,6 +173,46 @@
     .modal-client{margin-top:4px;font-size:13px;opacity:.65;letter-spacing:.04em}
     .modal-details{margin-top:10px;font-size:14px;line-height:1.65;opacity:.85;max-width:70ch}
 
+    /* ---------- Smooth, premium motion ---------- */
+    html{scroll-behavior:smooth;scrollbar-gutter:stable}
+    html.fb-lock{overflow:hidden}
+    #portfolio{scroll-margin-top:12px}
+    /* Media fades in once it has loaded, over a soft shimmer (no pop-in) */
+    .fb-media img,.fb-media video,.fb-slide img,.fb-slide video,.fb-cta-img img,.fb-banner-img img{opacity:0;transition:opacity .85s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
+    .fb-media .ld,.fb-slide .ld,.fb-cta-img .ld,.fb-banner-img .ld{opacity:1}
+    .fb-media:not(.is-ld){background:linear-gradient(100deg,#ece4df 30%,#f5efeb 50%,#ece4df 70%);background-size:220% 100%;animation:fbShimmer 1.7s ease-in-out infinite}
+    @keyframes fbShimmer{from{background-position:120% 0}to{background-position:-120% 0}}
+    /* Cards and sections rise gently into view as you scroll */
+    .fb-rv{opacity:0;transform:translateY(22px);transition:opacity .9s ease,transform 1s cubic-bezier(.2,.7,.2,1);transition-delay:var(--rvd,0s)}
+    .fb-rv.in{opacity:1;transform:none}
+    /* Layout changes (images loading, filters, load more) glide instead of jumping */
+    .fb-gallery .fb-card{transition:transform .7s cubic-bezier(.22,.8,.2,1)}
+    .fb-gallery.fb-resizing .fb-card{transition:none}
+    /* Hero text entrance */
+    .fb-hero-text>*:not(.fb-leaf){animation:fbRise .95s cubic-bezier(.2,.7,.2,1) backwards}
+    .fb-hero-text>*:nth-child(2){animation-delay:.08s}
+    .fb-hero-text>*:nth-child(3){animation-delay:.16s}
+    .fb-hero-text>*:nth-child(4){animation-delay:.24s}
+    .fb-hero-text>*:nth-child(5){animation-delay:.32s}
+    @keyframes fbRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+    /* Pop-up: soft fade and lift (backwards fill so existing positioning is never overridden) */
+    .modal-overlay:not(.hidden){animation:fbOverlayIn .35s ease backwards}
+    .modal-overlay:not(.hidden) .modal-box{animation:fbBoxIn .55s cubic-bezier(.2,.8,.2,1) backwards}
+    .fb-swap{animation:fbSwapIn .5s ease backwards}
+    .modal-box{overscroll-behavior:contain}
+    @keyframes fbOverlayIn{from{opacity:0}to{opacity:1}}
+    @keyframes fbBoxIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1}}
+    @keyframes fbSwapIn{from{opacity:0}to{opacity:1}}
+    @media (prefers-reduced-motion:reduce){
+      html{scroll-behavior:auto}
+      .fb-rv{opacity:1;transform:none;transition:none}
+      .fb-hero-text>*:not(.fb-leaf){animation:none}
+      .fb-media:not(.is-ld){animation:none}
+      .fb-gallery .fb-card{transition:none}
+      .fb-media img,.fb-media video,.fb-slide img,.fb-slide video,.fb-cta-img img,.fb-banner-img img{transition:none}
+      .modal-overlay:not(.hidden),.modal-overlay:not(.hidden) .modal-box,.fb-swap{animation:none}
+    }
+
     /* ---------- Tablet ---------- */
     @media (max-width:1024px){
       .fb-hero{grid-template-columns:42fr 58fr}
@@ -393,6 +433,46 @@
       var modalIndex = -1, angleIdx = 0;
       var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+      /* ---------------- Smoothness helpers ---------------- */
+      function markLd(el) {
+        el.classList.add("ld");
+        var pn = el.parentNode;
+        if (pn && pn.classList && pn.classList.contains("fb-media")) pn.classList.add("is-ld");
+      }
+      function markLoaded(root) {
+        if (!root) return;
+        var els = root.querySelectorAll("img,video");
+        for (var i = 0; i < els.length; i++) {
+          var el = els[i];
+          if (el.tagName === "IMG" ? (el.complete && el.naturalWidth > 0) : el.readyState >= 2) markLd(el);
+        }
+      }
+      function forceLd(root) { // safety net so nothing ever stays hidden
+        if (!root) return;
+        var els = root.querySelectorAll("img,video");
+        for (var i = 0; i < els.length; i++) markLd(els[i]);
+      }
+      var rvIO = ("IntersectionObserver" in window) ? new IntersectionObserver(function(entries) {
+        var n = 0;
+        entries.forEach(function(en) {
+          if (!en.isIntersecting) return;
+          var el = en.target;
+          if (!el.hasAttribute("data-rvd")) el.style.setProperty("--rvd", (Math.min(n, 6) * 70) + "ms");
+          n++; el.classList.add("in"); rvIO.unobserve(el);
+        });
+      }, { rootMargin: "0px 0px -6% 0px", threshold: 0.02 }) : null;
+      function reveal(el) {
+        if (!el) return;
+        if (!rvIO || reduceMotion) { el.classList.add("in"); return; }
+        rvIO.observe(el);
+      }
+      ["#portfolio .fb-intro", ".fb-banner-text", ".fb-cta-text"].forEach(function(sel) {
+        var e = document.querySelector(sel); if (e) { e.classList.add("fb-rv"); reveal(e); }
+      });
+      document.querySelectorAll(".fb-cap-item").forEach(function(e, i) {
+        e.classList.add("fb-rv"); e.setAttribute("data-rvd", "1"); e.style.setProperty("--rvd", (i * 90) + "ms"); reveal(e);
+      });
+
       /* ---------------- Hero ---------------- */
       var hero = document.getElementById("fbHero");
       var featured = [];
@@ -432,6 +512,7 @@
         var st = document.getElementById("fbStage");
         st.addEventListener("pointerenter", function(e) { if (e.pointerType === "mouse") hovering = true; });
         st.addEventListener("pointerleave", function(e) { if (e.pointerType === "mouse") hovering = false; });
+        markLoaded(hero); setTimeout(function() { forceLd(hero); }, 4000);
         playActiveVideo();
         bindAuto();
       }
@@ -497,6 +578,7 @@
       /* ---------------- Gallery ---------------- */
       var gridScope = null, folderKeys = [], folderNames = {};
       var limit = FB_COPY.pageSize;
+      var lastSig = "", lastShown = 0;
       var RATIOS_A = [1.5, 1.333, 1.5, 1.333, 1.5];   // placeholder ratios until each photo reports its real size
       var RATIOS_B = [1.333, 1.5, 1.333, 1.5, 1.333];
       var mqDesktop = window.matchMedia("(min-width:721px)");
@@ -533,6 +615,12 @@
       }
 
       var cyclePics = {}, cycleIdx = {};
+      /* Remember each photo's real shape so cards are right first time when the grid re-renders (no jumping) */
+      var ratioCache = {};
+      function mediaOpen(src, ratio) {
+        var k = ratioCache[src];
+        return '<span class="fb-media' + (k && k.contain ? ' is-contain' : '') + '" style="aspect-ratio:' + (k ? k.r : ratio) + '"';
+      }
       function cardHtml(e, ratio) {
                 if (e.kind === "folder") {
           var cover = videos[e.idxs[0]];
@@ -542,14 +630,14 @@
           if (cycle) cyclePics[e.key] = pics;
           var coverSrc = cycle ? pics[(cycleIdx[e.key] || 0) % pics.length] : cover.src;
           return '<article class="fb-card"><button type="button" class="fb-card-btn" data-folder="' + e.n + '">' +
-            '<span class="fb-media" style="aspect-ratio:' + ratio + '"' + (cycle ? ' data-cycle="' + esc(e.key) + '"' : '') + '>' + mediaTag(coverSrc, 'metadata', folderNames[e.key]) + '</span>' +
+            mediaOpen(coverSrc, ratio) + (cycle ? ' data-cycle="' + esc(e.key) + '"' : '') + '>' + mediaTag(coverSrc, 'metadata', folderNames[e.key]) + '</span>' +
             '<span class="fb-cap"><span><span class="fb-cap-title">' + esc(folderNames[e.key]) + '</span>' +
             '<span class="fb-cap-sub">' + e.idxs.length + ' pieces</span></span>' + '</span></button></article>';
         }
         var v = videos[e.i];
         var sub = v.client || cats(v)[0] || "";
         return '<article class="fb-card"><button type="button" class="fb-card-btn" data-open="' + e.i + '">' +
-          '<span class="fb-media" style="aspect-ratio:' + ratio + '">' + mediaTag(v.src, 'metadata', v.title) + '</span>' +
+          mediaOpen(v.src, ratio) + '>' + mediaTag(v.src, 'metadata', v.title) + '</span>' +
           '<span class="fb-cap"><span><span class="fb-cap-title">' + esc(v.title || '') + '</span>' +
           (sub ? '<span class="fb-cap-sub">' + esc(sub) + '</span>' : '') + '</span>' + '</span></button></article>';
       }
@@ -574,9 +662,25 @@
           var wide = mqWide.matches;
           var h = "";
           shown.forEach(function(e, n) { h += cardHtml(e, (n % 2 ? RATIOS_B : RATIOS_A)[n % 5]); });
-          grid.className = "fb-gallery" + (wide ? " cols4" : "");
+          grid.className = "fb-gallery fb-resizing" + (wide ? " cols4" : "");
           grid.innerHTML = h;
+          /* Cards already on screen before (e.g. after "Load more") stay put; only new ones rise in */
+          var sig = gridScope + "|" + activeCat;
+          var keep = (sig === lastSig) ? Math.min(lastShown, shown.length) : 0;
+          var btns = grid.querySelectorAll(".fb-card-btn");
+          for (var bi = 0; bi < btns.length; bi++) {
+            btns[bi].classList.add("fb-rv");
+            if (bi < keep) {
+              btns[bi].classList.add("in");
+              var ms = btns[bi].querySelectorAll("img,video");
+              for (var mi = 0; mi < ms.length; mi++) markLd(ms[mi]);
+            } else reveal(btns[bi]);
+          }
+          lastSig = sig; lastShown = shown.length;
           layoutMasonry();
+          markLoaded(grid);
+          setTimeout(function() { forceLd(grid); }, 4000);
+          requestAnimationFrame(function() { requestAnimationFrame(function() { grid.classList.remove("fb-resizing"); }); });
         }
         var total = entries.length;
         var more = total > limit;
@@ -635,7 +739,14 @@
         if (layoutQueued) return; layoutQueued = true;
         requestAnimationFrame(function() { layoutQueued = false; layoutMasonry(); });
       }
-      window.addEventListener("resize", queueLayout);
+      var resizeTimer = null;
+      window.addEventListener("resize", function() {
+        var g = document.getElementById("allGrid");
+        if (g) g.classList.add("fb-resizing");
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() { if (g) g.classList.remove("fb-resizing"); }, 220);
+        queueLayout();
+      });
       if (window.ResizeObserver) {
         var roGrid = new ResizeObserver(queueLayout);
         roGrid.observe(document.getElementById("allGrid"));
@@ -652,10 +763,13 @@
         var r = w / h, c = Math.min(MAX_RATIO, Math.max(MIN_RATIO, r));
         box.style.aspectRatio = String(Math.round(c * 1000) / 1000);
         box.classList.toggle("is-contain", Math.abs(r - c) > 0.01);
+        if (!box.hasAttribute("data-cycle")) ratioCache[el.getAttribute("src")] = { r: box.style.aspectRatio, contain: Math.abs(r - c) > 0.01 };
         queueLayout();
       }
-      document.addEventListener("load", function(e) { if (e.target && e.target.tagName === "IMG") fitMedia(e.target); }, true);
+      document.addEventListener("load", function(e) { if (e.target && e.target.tagName === "IMG") { markLd(e.target); fitMedia(e.target); } }, true);
       document.addEventListener("loadedmetadata", function(e) { if (e.target && e.target.tagName === "VIDEO") fitMedia(e.target); }, true);
+      document.addEventListener("loadeddata", function(e) { if (e.target && e.target.tagName === "VIDEO") markLd(e.target); }, true);
+      document.addEventListener("error", function(e) { if (e.target && (e.target.tagName === "IMG" || e.target.tagName === "VIDEO")) markLd(e.target); }, true);
       /* Rotate the cover of every client folder that has 2+ pictures */
       setInterval(function() {
         if (document.hidden) return;
@@ -714,6 +828,7 @@
         var vid = document.getElementById("modalVideo");
         var cap = document.getElementById("modalCaption");
         modal.classList.remove("hidden");
+        document.documentElement.classList.add("fb-lock");
         var img = document.getElementById("modalImg");
         var sources = modalSources(videos[modalIndex]);
         if (angleIdx >= sources.length) angleIdx = 0;
@@ -725,6 +840,8 @@
           vid.pause(); vid.removeAttribute("src"); vid.style.display = "none";
           img.src = msrc; img.alt = videos[modalIndex].title || ""; img.style.display = "block";
         }
+        var swapEl = isVideoSrc(msrc) ? vid : img;
+        swapEl.classList.remove("fb-swap"); void swapEl.offsetWidth; swapEl.classList.add("fb-swap");
         document.getElementById("modalCounter").textContent = "";
         var cur = videos[modalIndex], ch = '';
         if (cur.title) ch += '<div class="title">' + esc(cur.title) + '</div>';
@@ -746,6 +863,7 @@
       window.closeModal = function() {
         var vid = document.getElementById("modalVideo");
         document.getElementById("videoModal").classList.add("hidden");
+        document.documentElement.classList.remove("fb-lock");
         vid.pause(); vid.removeAttribute("src");
         document.getElementById("modalImg").removeAttribute("src");
         modalIndex = -1; angleIdx = 0;
@@ -778,6 +896,7 @@
       if (ci2 < 0) ci2 = bi;
       if (bi >= 0) document.getElementById("fbBannerImg").innerHTML = '<img src="' + videos[bi].src + '" alt="" loading="lazy">';
       if (ci2 >= 0) document.getElementById("fbCtaImg").innerHTML = '<img src="' + videos[ci2].src + '" alt="" loading="lazy">';
+      ["fbBannerImg", "fbCtaImg"].forEach(function(id) { var el = document.getElementById(id); markLoaded(el); setTimeout(function() { forceLd(el); }, 4000); });
 
       renderGrid();
     })();
