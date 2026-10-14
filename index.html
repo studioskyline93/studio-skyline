@@ -138,7 +138,37 @@
     body.ix-themed .video-embed iframe.ld{opacity:1}
     body.ix-themed .video-embed .aspect{background:linear-gradient(100deg,#ece4df 30%,#f5efeb 50%,#ece4df 70%);background-size:220% 100%;animation:ixShimmer 1.7s ease-in-out infinite}
 
+    /* ============ Cleaner reel + premium footer ============ */
+    body.ix-themed .ix-reel{padding-top:clamp(40px,5vw,72px)}
+    body.ix-themed .reel-track{scrollbar-width:none;-ms-overflow-style:none}
+    body.ix-themed .reel-track::-webkit-scrollbar{display:none}
+    body.ix-themed .reel-card-title{font-size:clamp(20px,1.7vw,26px);letter-spacing:.005em}
+    body.ix-themed .reel-card-view{border:0;border-bottom:1px solid currentColor;padding:0 0 3px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;background:none}
+    body.ix-themed .reel-card-view span{display:inline-block;transition:transform .4s cubic-bezier(.2,.7,.2,1)}
+    body.ix-themed .reel-card:hover .reel-card-view{letter-spacing:.2em}
+    body.ix-themed .reel-card:hover .reel-card-view span{transform:translateX(5px)}
+    body.ix-themed .reel-footer{display:flex;align-items:center;justify-content:space-between;gap:28px;margin-top:clamp(18px,2vw,28px)}
+    body.ix-themed .reel-prog{flex:1;height:1px;background:var(--line);position:relative;overflow:hidden}
+    body.ix-themed .reel-prog i{position:absolute;left:0;top:0;height:100%;width:30%;background:var(--burgundy);transition:transform .35s ease,width .35s ease}
+    body.ix-themed .reel-btns{display:flex;gap:10px}
+    body.ix-themed .reel-btns button{width:46px;height:46px;padding:0;border-radius:50%;display:grid;place-items:center;border:1px solid var(--burgundy);background:transparent;color:var(--burgundy);cursor:pointer}
+    body.ix-themed .reel-btns button:hover{background:var(--burgundy);color:#fff;transform:translateY(-2px)}
+    body.ix-themed .reel-btns button:active{transform:scale(.94)}
+
+    /* Footer: deep burgundy, ivory type, refined spacing */
+    body.ix-themed #site-footer{margin-top:clamp(72px,9vw,140px);padding:clamp(48px,6vw,88px) clamp(22px,5vw,64px) clamp(28px,3vw,40px);background:var(--burgundy);color:rgba(255,255,255,.86);border-top:0;font-family:var(--sans);font-size:13px;line-height:1.8;letter-spacing:.02em}
+    body.ix-themed #site-footer>*{max-width:1280px;margin-left:auto;margin-right:auto}
+    body.ix-themed #site-footer h1,body.ix-themed #site-footer h2,body.ix-themed #site-footer h3,body.ix-themed #site-footer h4,body.ix-themed #site-footer strong{color:#fff;font-family:var(--serif);font-weight:500;letter-spacing:.01em}
+    body.ix-themed #site-footer p,body.ix-themed #site-footer span,body.ix-themed #site-footer li,body.ix-themed #site-footer div{color:inherit}
+    body.ix-themed #site-footer a{color:rgba(255,255,255,.86);text-decoration:none;background-image:linear-gradient(currentColor,currentColor);background-size:0 1px;background-repeat:no-repeat;background-position:0 100%;transition:color .3s ease,background-size .45s cubic-bezier(.2,.7,.2,1)}
+    body.ix-themed #site-footer a:hover{color:#fff;background-size:100% 1px}
+    body.ix-themed #site-footer ul{list-style:none;margin:0;padding:0}
+    body.ix-themed #site-footer hr,body.ix-themed #site-footer [class*="bottom"],body.ix-themed #site-footer [class*="copy"]{border-color:rgba(255,255,255,.18)}
+    body.ix-themed #site-footer [class*="copy"],body.ix-themed #site-footer small{color:rgba(255,255,255,.6);font-size:12px}
+
     @media (prefers-reduced-motion:reduce){
+      body.ix-themed .reel-btns button:hover,body.ix-themed .reel-btns button:active{transform:none}
+      body.ix-themed .reel-prog i{transition:none}
       html.ix-wait body.ix-themed{opacity:1}
       body.ix-themed .reel-card,body.ix-themed .video-embed iframe{transition:none}
       body.ix-themed .reel-card:hover{translate:none}
@@ -192,22 +222,13 @@
       </div>
     </div>
 
-    <div class="section">
-      <div class="section-kicker">Work</div>
-      <div class="section-title">Work</div>
-    </div>
-
-    <div>
-      <div class="reel-header">
-        <span class="label">Selected work</span>
-        <span class="counter" id="reelCounter">01 / 00</span>
-      </div>
-      <div class="reel-track" id="reelTrack"><div class="reel-card ix-skel" aria-hidden="true"><div class="reel-card-media"></div><div class="reel-card-info"><div><div class="reel-card-title">&nbsp;</div><div class="reel-card-count">&nbsp;</div></div></div></div><div class="reel-card ix-skel" aria-hidden="true"><div class="reel-card-media"></div><div class="reel-card-info"><div><div class="reel-card-title">&nbsp;</div><div class="reel-card-count">&nbsp;</div></div></div></div><div class="reel-card ix-skel" aria-hidden="true"><div class="reel-card-media"></div><div class="reel-card-info"><div><div class="reel-card-title">&nbsp;</div><div class="reel-card-count">&nbsp;</div></div></div></div><div class="reel-card ix-skel" aria-hidden="true"><div class="reel-card-media"></div><div class="reel-card-info"><div><div class="reel-card-title">&nbsp;</div><div class="reel-card-count">&nbsp;</div></div></div></div></div>
+    <div class="ix-reel">
+      <div class="reel-track" id="reelTrack"><div class="reel-card ix-skel" aria-hidden="true"><div class="reel-card-media"></div><div class="reel-card-info"><div><div class="reel-card-title">&nbsp;</div></div></div></div><div class="reel-card ix-skel" aria-hidden="true"><div class="reel-card-media"></div><div class="reel-card-info"><div><div class="reel-card-title">&nbsp;</div></div></div></div><div class="reel-card ix-skel" aria-hidden="true"><div class="reel-card-media"></div><div class="reel-card-info"><div><div class="reel-card-title">&nbsp;</div></div></div></div><div class="reel-card ix-skel" aria-hidden="true"><div class="reel-card-media"></div><div class="reel-card-info"><div><div class="reel-card-title">&nbsp;</div></div></div></div></div>
       <div class="reel-footer">
-        <span>Drag / scroll</span>
+        <div class="reel-prog" aria-hidden="true"><i id="reelProg"></i></div>
         <div class="reel-btns">
-          <button onclick="scrollReel(-1)">Prev</button>
-          <button onclick="scrollReel(1)">Next</button>
+          <button type="button" onclick="scrollReel(-1)" aria-label="Previous"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+          <button type="button" onclick="scrollReel(1)" aria-label="Next"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
         </div>
       </div>
     </div>
@@ -288,18 +309,13 @@
 
     /* Live counter that follows the reel as it scrolls */
     function updateReelCounter() {
-      var track = document.getElementById('reelTrack');
-      var counter = document.getElementById('reelCounter');
-      if (!track || !counter) return;
-      var cards = track.querySelectorAll('.reel-card'), total = cards.length;
-      if (!total) return;
-      var left = track.getBoundingClientRect().left, best = Infinity, cur = 0;
-      for (var i = 0; i < total; i++) {
-        var d = Math.abs(cards[i].getBoundingClientRect().left - left);
-        if (d < best) { best = d; cur = i; }
-      }
-      if (track.scrollLeft + track.clientWidth >= track.scrollWidth - 4) cur = total - 1;
-      counter.textContent = String(cur + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+      var track = document.getElementById('reelTrack'), bar = document.getElementById('reelProg');
+      if (!track || !bar) return;
+      var max = track.scrollWidth - track.clientWidth;
+      var vis = track.scrollWidth ? Math.min(1, track.clientWidth / track.scrollWidth) : 1;
+      var pos = max > 0 ? track.scrollLeft / max : 0;
+      bar.style.width = (vis * 100) + '%';
+      bar.style.transform = 'translateX(' + (pos * (1 / vis - 1) * 100) + '%)';
     }
 
     /* Mouse drag-to-scroll with a little momentum (touch keeps its native scrolling) */
@@ -345,8 +361,11 @@
     }
     function renderReel(collections) {
       var track = document.getElementById('reelTrack');
-      var counter = document.getElementById('reelCounter');
       if (!track) return;
+      if (!collections.length) {
+        track.innerHTML = '<div class="no-vid" style="padding:48px 8px">New work coming soon.</div>';
+          return;
+      }
       var html = '';
       collections.forEach(function(c) {
         var vids = c.videos || [];
@@ -361,12 +380,11 @@
           '<div class="reel-card-media">' + mediaHtml + '</div>' +
           '<div class="reel-card-info">' +
             '<div><div class="reel-card-title">' + esc(c.title) + '</div>' +
-            '<div class="reel-card-count">' + vids.length + ' video' + (vids.length===1?'':'s') + '</div></div>' +
-            '<div class="reel-card-view">View</div>' +
+            '</div>' +
+            '<div class="reel-card-view">View <span aria-hidden="true">&rarr;</span></div>' +
           '</div></a>';
       });
       track.innerHTML = html;
-      counter.textContent = '01 / ' + String(collections.length).padStart(2,'0');
       var cardEls = track.querySelectorAll('.reel-card');
       for (var ci = 0; ci < cardEls.length; ci++) ixReveal(cardEls[ci], 'ix-rvp', (ci % 5) * 70);
       ixMarkLoaded(track);
@@ -457,6 +475,7 @@
       }
 
       function go() {
+        if (!box.isConnected) { clear(); return; }     /* card was removed by a refresh */
         if (busy) return;
         busy = true; clear();
         tryNext(0);
@@ -545,16 +564,64 @@
     }
 
     /* Static sections ease in as they reach the screen */
-    ['.section', '.reel-header', '.reel-footer', '.video-embed', '.testimonials h2'].forEach(function(sel) {
+    ['.ix-reel .reel-footer', '.video-embed', '.testimonials h2', '#site-footer'].forEach(function(sel) {
       var els = document.querySelectorAll(sel);
       for (var i = 0; i < els.length; i++) ixReveal(els[i], 'ix-rv', 0);
     });
 
+    /* ── Work categories: always mirror what the admin saved ──
+       • hidden categories (enabled === false) are not shown
+       • deleted categories disappear (the built-in list is used only if Supabase isn't configured)
+       • the reel refreshes itself when the admin saves, without reopening the page */
+    var IX_CACHE_KEY = 'ix-work-cache';
+    var ixWorkSig = null;
+
+    function ixVisible(list) {
+      return (list || []).filter(function(c) { return c && c.enabled !== false; });
+    }
+    function ixCacheGet() { try { return JSON.parse(localStorage.getItem(IX_CACHE_KEY)); } catch (e) { return null; } }
+    function ixCacheSet(v) { try { localStorage.setItem(IX_CACHE_KEY, JSON.stringify(v)); } catch (e) {} }
+
+    async function ixFetchWork() {
+      var data = await loadWorkContent();
+      if (data && Array.isArray(data.collections)) {
+        ixCacheSet(data.collections);
+        return data.collections;
+      }
+      if (typeof getSupabase === 'function' && getSupabase()) {
+        return ixCacheGet() || [];            /* live data unreachable: last known list, never the stale built-in one */
+      }
+      return WORK_COLLECTIONS;                /* Supabase not configured (local use) */
+    }
+
+    function ixSig(list) {
+      return JSON.stringify(list.map(function(c) {
+        return [c.slug, c.title, (c.videos || []).map(function(v) { return v.src; })];
+      }));
+    }
+
+    async function ixSyncWork(force) {
+      var list = ixVisible(await ixFetchWork());
+      var sig = ixSig(list);
+      if (!force && sig === ixWorkSig) return;
+      ixWorkSig = sig;
+      renderReel(list);
+    }
+
     (async function() {
-      var workData = await loadWorkContent();
-      renderReel((workData && workData.collections) ? workData.collections : WORK_COLLECTIONS);
+      await ixSyncWork(true);
       var siteData = await loadSiteContent();
       renderTestimonials((siteData && Array.isArray(siteData.testimonials)) ? siteData.testimonials : TESTIMONIALS);
+
+      var busy = false;
+      function refresh() {
+        if (busy || document.hidden) return;
+        busy = true;
+        ixSyncWork(false).catch(function() {}).then(function() { busy = false; });
+      }
+      document.addEventListener('visibilitychange', refresh);
+      window.addEventListener('focus', refresh);
+      setInterval(refresh, 45000);
     })();
   </script>
 
