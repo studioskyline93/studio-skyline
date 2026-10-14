@@ -51,10 +51,10 @@
     body.ix-themed .reel-card-media img{width:100%;height:100%;object-fit:cover;display:block}
 
     /* Capabilities card */
-    body.ix-themed .cap-card{background:var(--ivory);color:var(--ink);border-color:var(--line)}
+    body.ix-themed .cap-card{background:var(--paper);color:var(--ink);border-color:var(--line)}
     body.ix-themed .cap-title{color:var(--burgundy);font-family:var(--sans)}
     body.ix-themed .cap-list,body.ix-themed .cap-list li{color:var(--ink);font-family:var(--serif)}
-    body.ix-themed .cap-highlight{background:var(--white);color:var(--burgundy);border-color:var(--line);font-family:var(--serif)}
+    body.ix-themed .cap-highlight{background:transparent;color:var(--burgundy);border-color:var(--line);font-family:var(--serif)}
 
     /* Section headings */
     body.ix-themed .section-kicker{color:var(--burgundy);font-family:var(--sans)}
@@ -186,7 +186,7 @@
       content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
       background-image:var(--fibre),var(--grain);
       background-size:600px 600px,220px 220px;
-      opacity:.16;mix-blend-mode:multiply;
+      opacity:.09;mix-blend-mode:multiply;
     }
     /* Faint halftone dots + CMYK registration mark, very low contrast */
     body.ix-themed::after{
@@ -195,28 +195,29 @@
         radial-gradient(circle at 50% 50%,rgba(128,13,27,.5) 0 .7px,transparent 1.1px) 0 0/9px 9px,
         radial-gradient(circle at 100% 100%,transparent 0 6px,rgba(128,13,27,.55) 6.5px 7px,transparent 7.5px) right 28px bottom 28px/30px 30px no-repeat;
       -webkit-mask-image:linear-gradient(135deg,transparent 55%,#000 100%);mask-image:linear-gradient(135deg,transparent 55%,#000 100%);
-      opacity:.045;
+      opacity:.03;
     }
-    body.ix-themed #site-header,body.ix-themed .cap-card{background-color:rgba(250,246,239,.82)}
+    body.ix-themed #site-header{background-color:rgba(250,246,239,.82)}
     @supports (backdrop-filter:blur(1px)){body.ix-themed #site-header{-webkit-backdrop-filter:saturate(1.1) blur(6px);backdrop-filter:saturate(1.1) blur(6px)}}
 
-    /* Image behind the hero: soft, washed, fades into the paper below */
+    /* Image behind the hero ONLY: anchored to the hero card, fades fully before the content below */
     body.ix-themed .site-main{position:relative;isolation:isolate}
-    body.ix-themed .site-main::before{
-      content:"";position:absolute;z-index:-1;pointer-events:none;top:0;left:50%;transform:translateX(-50%);
-      width:100vw;height:min(100vh,820px);
+    body.ix-themed .hero-card{position:relative}
+    body.ix-themed .hero-card::before{
+      content:"";position:absolute;z-index:-1;pointer-events:none;
+      top:-48px;bottom:-72px;left:50%;width:100vw;transform:translateX(-50%);
       background:
-        linear-gradient(180deg,rgba(250,246,239,.30) 0%,rgba(250,246,239,.12) 45%,var(--paper) 100%),
-        url("images/hero-backdrop.jpg") center 30%/cover no-repeat;
-      -webkit-mask-image:linear-gradient(180deg,#000 35%,transparent 100%);mask-image:linear-gradient(180deg,#000 35%,transparent 100%);
+        linear-gradient(180deg,rgba(250,246,239,.18) 0%,rgba(250,246,239,.10) 55%,rgba(250,246,239,.9) 100%),
+        url("images/hero-backdrop.jpg") center 35%/cover no-repeat;
+      -webkit-mask-image:linear-gradient(180deg,#000 62%,transparent 100%);mask-image:linear-gradient(180deg,#000 62%,transparent 100%);
     }
 
     /* Footer: same burgundy, faint paper grain + fine diagonal weave */
     body.ix-themed #site-footer{position:relative;isolation:isolate;
       background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.018) 0 1px,transparent 1px 5px),linear-gradient(180deg,rgba(255,255,255,.025),rgba(0,0,0,.05))}
     body.ix-themed #site-footer::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:var(--grain);background-size:220px 220px;opacity:.12;mix-blend-mode:soft-light}
-    @media (max-width:700px){body.ix-themed::after{display:none}body.ix-themed .site-main::before{height:min(80vh,640px)}}
-    @media print{body.ix-themed::before,body.ix-themed::after,body.ix-themed .site-main::before{display:none}}
+    @media (max-width:700px){body.ix-themed::after{display:none}body.ix-themed .hero-card::before{top:-24px;bottom:-48px}}
+    @media print{body.ix-themed::before,body.ix-themed::after,body.ix-themed .hero-card::before{display:none}}
 
     @media (prefers-reduced-motion:reduce){
       body.ix-themed .reel-btns button:hover,body.ix-themed .reel-btns button:active{transform:none}
