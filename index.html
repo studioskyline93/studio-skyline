@@ -135,14 +135,14 @@
     body.ix-themed .reel-card:hover .reel-card-view{letter-spacing:.04em}
     body.ix-themed .testimonial-card{transition:opacity .9s ease,translate 1s cubic-bezier(.2,.7,.2,1),box-shadow .5s ease}
     /* ============ Film in the middle, framed by a mosaic ============
-       12 x 7 grid. The film sits in the centre (10 x 5 cells = 16:9);
-       a single row of tiles runs round all four sides. */
-    body.ix-themed .ix-show{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:repeat(7,minmax(0,1fr));gap:clamp(3px,.45vw,6px);aspect-ratio:12/7.875;margin-top:clamp(40px,5vw,72px)}
+       12 x 8 grid. The film sits in the centre (8 x 4 cells = 16:9);
+       two rows of tiles run round all four sides. */
+    body.ix-themed .ix-show{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:repeat(8,minmax(0,1fr));gap:clamp(3px,.45vw,6px);aspect-ratio:4/3;margin-top:clamp(40px,5vw,72px)}
     /* Film "comes up out of the screen": it rises as it scrolls into view, overlaps the tiles,
        casts a deep layered shadow onto them, and leans gently toward the pointer. */
     body.ix-themed .ix-film{
       --s:.94;--sx:0;--sy:0;
-      grid-area:2/2/span 5/span 10;position:relative;z-index:1;background:#1b1514;
+      grid-area:3/3/span 4/span 8;position:relative;z-index:1;background:#1b1514;
       transform:perspective(1600px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(var(--s));
       transform-origin:50% 50%;will-change:transform;
       box-shadow:0 0 0 1px rgba(255,255,255,.35),0 2px 4px rgba(35,20,14,.22),0 8px 16px -6px rgba(35,20,14,.28);
@@ -677,7 +677,7 @@
        • picks evenly across collections, at most a few clips (keeps the page light)
        • each tile links to its collection
        • every few seconds one photo quietly swaps for another (pauses off-screen) */
-    var IX_MOS_COLS = 12, IX_MOS_TOTAL = 34, IX_MOS_MAX_VID = 4, IX_MOS_SWAP_MS = 2200;
+    var IX_MOS_COLS = 12, IX_MOS_TOTAL = 64, IX_MOS_MAX_VID = 4, IX_MOS_SWAP_MS = 2200;
     var ixMosTimer = null, ixMosIO = null;
 
     function ixShuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
