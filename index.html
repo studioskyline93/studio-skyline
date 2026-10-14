@@ -11,7 +11,7 @@
     /* Hold the first paint until fonts are ready (no font-swap jump), then fade the page in */
     (function(){var h=document.documentElement;h.classList.add('ix-wait');var done=false;
       function go(){if(done)return;done=true;requestAnimationFrame(function(){h.classList.remove('ix-wait');});}
-      setTimeout(go,1400);
+      setTimeout(go,800);
       if(document.fonts&&document.fonts.ready){Promise.all([document.fonts.ready,new Promise(function(r){setTimeout(r,160)})]).then(go);}else{window.addEventListener('load',go);}
     })();
   </script>
@@ -138,9 +138,25 @@
        12 x 8 grid. The film sits in the centre (8 x 4 cells = 16:9);
        the 2 cells around it on every side are tiles. */
     body.ix-themed .ix-show{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:repeat(8,minmax(0,1fr));gap:clamp(3px,.45vw,6px);aspect-ratio:4/3;margin-top:clamp(40px,5vw,72px)}
-    body.ix-themed .ix-film{grid-area:3/3/span 4/span 8;position:relative;z-index:1;background:#1b1514;overflow:hidden;box-shadow:0 26px 60px -26px rgba(60,35,20,.6)}
+    @property --ix-ang{syntax:'<angle>';inherits:false;initial-value:0deg}
+    @keyframes ixSpin{to{--ix-ang:360deg}}
+    body.ix-themed .ix-film{--ix-bw:clamp(3px,.38vw,5px);grid-area:3/3/span 4/span 8;position:relative;z-index:1;background:#1b1514;box-shadow:0 26px 60px -26px rgba(60,35,20,.6)}
+    /* animated frame: a burgundy ring with a champagne-gold light that slowly travels round it */
+    body.ix-themed .ix-film::before,body.ix-themed .ix-film::after{
+      content:"";position:absolute;pointer-events:none;
+      background:conic-gradient(from var(--ix-ang),#800D1B 0deg,#5d0912 70deg,#800D1B 140deg,#b5543f 215deg,#EADBC2 262deg,#FFF6DF 285deg,#EADBC2 308deg,#b5543f 335deg,#800D1B 360deg);
+      animation:ixSpin 7s linear infinite;
+      -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+      mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);mask-composite:exclude}
+    body.ix-themed .ix-film::before{inset:0;padding:var(--ix-bw)}
+    /* soft glow that follows the same light, bleeding onto the neighbouring tiles */
+    body.ix-themed .ix-film::after{inset:-8px;padding:calc(var(--ix-bw) + 8px);filter:blur(11px);opacity:.5;z-index:-1;transition:opacity .6s ease}
+    @media (hover:hover){
+      body.ix-themed .ix-film:hover::after{opacity:.85}
+      body.ix-themed .ix-film:hover::before,body.ix-themed .ix-film:hover::after{animation-duration:3.6s}
+    }
     body.ix-themed .ix-film:not(.is-ld){background:linear-gradient(100deg,#ece4df 30%,#f5efeb 50%,#ece4df 70%);background-size:220% 100%;animation:ixShimmer 1.7s ease-in-out infinite}
-    body.ix-themed .ix-film iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;opacity:0;transition:opacity .9s ease}
+    body.ix-themed .ix-film iframe{position:absolute;inset:var(--ix-bw);width:calc(100% - 2 * var(--ix-bw));height:calc(100% - 2 * var(--ix-bw));border:0;display:block;opacity:0;transition:opacity .9s ease}
     body.ix-themed .ix-film iframe.ld{opacity:1}
     /* no work to show: film alone */
     body.ix-themed .ix-show.ix-nomos{display:block;aspect-ratio:auto}
@@ -277,6 +293,7 @@
       body.ix-themed .reel-card,body.ix-themed .ix-film iframe{transition:none}
       body.ix-themed .reel-card:hover{translate:none}
       body.ix-themed .ix-film{animation:none}
+      body.ix-themed .ix-film::before,body.ix-themed .ix-film::after{animation:none}
       body.ix-themed .ix-tile.ix-tile-in{animation:none}
       html,body.ix-themed .reel-track{scroll-behavior:auto}
       body.ix-themed .hero-card .hero-city,body.ix-themed .hero-card .hero-line,body.ix-themed .hero-card .hero-title,
@@ -500,7 +517,7 @@
       updateReelCounter();
       startReelCycling(collections);
       ixPauseOffscreen(track);
-      ixRenderMosaic(collections);
+      ixQueueMosaic(collections);
     }
 
     /* Single (looping) videos only play while they are on screen */
@@ -688,6 +705,18 @@
       return out;
     }
 
+    /* Tiles are ~100px, so ask Supabase for a small version instead of the full-size photo.
+       A one-image probe checks the project supports it; otherwise full-size files are used. */
+    var IX_SB = '/storage/v1/object/public/';
+    var IX_THUMB = { ok: null };
+    function ixThumb(src) {
+      if (IX_THUMB.ok === false || !src || isVidSrc(src)) return src;
+      var m = src.indexOf(IX_SB);
+      if (m < 0) return src;
+      return src.slice(0, m) + '/storage/v1/render/image/public/' + src.slice(m + IX_SB.length) +
+        (src.indexOf('?') < 0 ? '?' : '&') + 'width=320&height=320&resize=cover&quality=60';
+    }
+
     function ixTileMedia(it) {
       var el;
       if (it.vid) {
@@ -700,13 +729,45 @@
         el = document.createElement('img');
         el.alt = ''; el.decoding = 'async'; el.loading = 'lazy';
         el.addEventListener('load', function() { el.classList.add('ld'); });
-        el.src = it.src;
+        var th = ixThumb(it.src);
+        if (th !== it.src) {
+          el.addEventListener('error', function() { if (!el._fb) { el._fb = true; el.src = it.src; } });   /* thumbnail failed: use the original */
+        }
+        el.src = th;
       }
-      el.addEventListener('error', function() { el.classList.add('ld'); });
+      el.addEventListener('error', function() { if (el.tagName === 'VIDEO' || el._fb || ixThumb(it.src) === it.src) el.classList.add('ld'); });
       return el;
     }
 
-    function ixRenderMosaic(collections) {
+    /* Don't compete with the hero and reel on first load: build the mosaic when it's near the screen */
+    var ixMosPending = null, ixMosWatch = null;
+    function ixQueueMosaic(collections) {
+      var box = document.getElementById('ixShow');
+      if (!box) return;
+      ixMosPending = collections;
+      if (ixMosWatch) { ixMosWatch.disconnect(); ixMosWatch = null; }
+      if (box.querySelector('.ix-tile') || !('IntersectionObserver' in window)) { ixRenderMosaic(collections); return; }
+      ixMosWatch = new IntersectionObserver(function(en) {
+        if (!en[0].isIntersecting) return;
+        ixMosWatch.disconnect(); ixMosWatch = null;
+        ixRenderMosaic(ixMosPending);
+      }, { rootMargin: '700px 0px' });
+      ixMosWatch.observe(box);
+    }
+
+    function ixRenderMosaic(collections, probed) {
+      if (!probed && IX_THUMB.ok === null) {
+        var smp = null;
+        (collections || []).some(function(c) { return (c.videos || []).some(function(v) { if (v && v.src && !isVidSrc(v.src) && v.src.indexOf(IX_SB) > -1) { smp = v.src; return true; } return false; }); });
+        if (smp) {
+          var pr = new Image();
+          pr.onload = function() { IX_THUMB.ok = true; ixRenderMosaic(collections, true); };
+          pr.onerror = function() { IX_THUMB.ok = false; ixRenderMosaic(collections, true); };
+          pr.src = ixThumb(smp);
+          return;
+        }
+        IX_THUMB.ok = false;
+      }
       var box = document.getElementById('ixShow');
       if (!box) return;
       if (ixMosTimer) { clearInterval(ixMosTimer); ixMosTimer = null; }
@@ -779,8 +840,8 @@
             busy = false;
           }, 1000);
         };
-        img.onerror = function() { busy = false; };
-        img.src = next.src;
+        img.onerror = function() { if (!img._fb && ixThumb(next.src) !== next.src) { img._fb = true; img.src = next.src; } else busy = false; };
+        img.src = ixThumb(next.src);
       }, IX_MOS_SWAP_MS);
     }
 
@@ -852,8 +913,15 @@
     }
 
     (async function() {
-      await ixSyncWork(true);
-      var siteData = await loadSiteContent();
+      var sitePromise = loadSiteContent().catch(function() { return null; });
+      var cached = ixCacheGet();
+      if (cached && cached.length) {            /* repeat visit: paint instantly from the last known list, then sync */
+        var cl = ixVisible(cached); ixWorkSig = ixSig(cl); renderReel(cl);
+        await ixSyncWork(false);
+      } else {
+        await ixSyncWork(true);
+      }
+      var siteData = await sitePromise;
       renderTestimonials((siteData && Array.isArray(siteData.testimonials)) ? siteData.testimonials : TESTIMONIALS);
 
       var busy = false;
