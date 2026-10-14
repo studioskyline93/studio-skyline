@@ -111,6 +111,26 @@
     .fb-more-ico svg{width:15px;height:15px;transition:transform .3s}
     .fb-more-btn:hover .fb-more-ico svg{transform:translateY(3px)}
 
+    /* ---------- Expand / collapse controls ---------- */
+    .fb-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:0 0 clamp(16px,1.8vw,24px);scroll-margin-top:16px}
+    .fb-toolbar[hidden]{display:none}
+    .fb-showing{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+    .fb-showing b{font-weight:600;color:var(--burgundy)}
+    .fb-toolbar-btns{display:flex;gap:18px;align-items:center}
+    .fb-textbtn{background:none;border:0;padding:0 0 3px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:var(--burgundy);border-bottom:1px solid var(--burgundy);transition:color .2s,border-color .2s}
+    .fb-textbtn:hover{color:var(--burgundy-deep);border-color:var(--burgundy-deep)}
+    .fb-textbtn[hidden]{display:none}
+    .fb-more-wrap{gap:14px;flex-wrap:wrap}
+    .fb-more-btn[hidden]{display:none}
+    .fb-more-btn.solid{background:var(--burgundy);color:#fff}
+    .fb-more-btn.solid:hover{background:var(--burgundy-deep)}
+    .fb-more-btn.up:hover .fb-more-ico svg{transform:translateY(-3px)}
+    .fb-float{position:fixed;left:50%;bottom:clamp(16px,3vw,28px);transform:translate(-50%,16px);z-index:30;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s}
+    .fb-float.on{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+    .fb-float button{display:inline-flex;align-items:center;gap:10px;background:var(--burgundy);color:#fff;border:0;border-radius:999px;padding:13px 22px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;box-shadow:0 12px 30px -10px rgba(0,0,0,.45)}
+    .fb-float button:hover{background:var(--burgundy-deep)}
+    .fb-float svg{width:14px;height:14px}
+
     /* ---------- Capabilities ---------- */
     .fb-caps{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--white)}
     .fb-cap-item{padding:clamp(20px,2vw,30px) clamp(16px,2vw,28px);text-align:center;border-left:1px solid var(--line)}
@@ -178,11 +198,12 @@
       .fb-cta-img{order:2;height:200px}
       .fb-cta-text{padding:24px var(--pad)}
       .fb-circle{width:42px;height:42px}
+      .fb-toolbar{flex-direction:column;align-items:flex-start;gap:10px}
     }
     @media (prefers-reduced-motion:reduce){
       .fb-slide,.fb-progress i,.fb-media img,.fb-media video,.fb-arrow,.fb-btn svg{transition:none}
       .fb-grid-swap{animation:none}
-      .fb-more-btn,.fb-more-ico svg{transition:none}
+      .fb-more-btn,.fb-more-ico svg,.fb-float{transition:none}
     }
   </style>
 </head>
@@ -206,11 +227,22 @@
 
       <nav class="fb-filters fb-hidden" id="fbFilters" aria-label="Project categories"><div class="fb-filter-track" id="fbFilterTrack"></div></nav>
       <div class="fb-folderbar" id="fbFolderBar"></div>
+      <div class="fb-toolbar" id="fbToolbar" hidden>
+        <div class="fb-showing" id="fbShowing" aria-live="polite"></div>
+        <div class="fb-toolbar-btns">
+          <button class="fb-textbtn" type="button" data-loadall="1" id="fbAllTop">Load all</button>
+          <button class="fb-textbtn" type="button" data-less="1" id="fbLessTop" hidden>Show less</button>
+        </div>
+      </div>
       <div class="fb-gallery" id="allGrid"></div>
       <div class="fb-more-wrap" id="fbMoreWrap" hidden>
         <button class="fb-more-btn" id="fbMore" type="button"><span class="fb-more-label">Load more projects</span><span class="fb-more-count" id="fbMoreCount"></span>
           <span class="fb-more-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span></button>
+        <button class="fb-more-btn solid" id="fbAll" type="button" data-loadall="1"><span class="fb-more-label">Load all</span></button>
+        <button class="fb-more-btn up" id="fbLess" type="button" data-less="1" hidden><span class="fb-more-label">Show less</span>
+          <span class="fb-more-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg></span></button>
       </div>
+      <div class="fb-float" id="fbFloat"><button type="button" data-less="1" aria-label="Show fewer projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>Show less</button></div>
     </section>
 
     <!-- Capabilities -->
@@ -331,7 +363,33 @@
         if (collection.description) document.getElementById("fbIntroText").textContent = collection.description;
       }
 
-      var videos = collection.videos || [];
+      /* Newest first: sort by an upload/created date when the data has one (or a timestamp in the file name);
+         otherwise assume the list is oldest-to-newest and reverse it. Done once, so hero, grid, folders and modal all agree. */
+      function itemTime(v) {
+        var keys = ["created_at", "createdAt", "added_at", "addedAt", "uploaded_at", "uploadedAt", "date", "updated_at", "updatedAt", "timestamp"];
+        for (var k = 0; k < keys.length; k++) {
+          var raw = v[keys[k]];
+          if (raw == null || raw === "") continue;
+          var t = (typeof raw === "number") ? (raw < 1e12 ? raw * 1000 : raw) : Date.parse(raw);
+          if (t && !isNaN(t)) return t;
+        }
+        var m = /(?:^|[\/_\-])(1[5-9]\d{8}|1[5-9]\d{11})(?=[_\-.\/?#]|$)/.exec(String(v.src || ""));
+        if (m) return m[1].length === 10 ? Number(m[1]) * 1000 : Number(m[1]);
+        return null;
+      }
+      function newestFirst(list) {
+        var rows = list.map(function(v, i) { return { v: v, i: i, t: itemTime(v) }; });
+        var dated = rows.some(function(r) { return r.t !== null; });
+        if (!dated) return list.slice().reverse();
+        rows.sort(function(a, b) {
+          if (a.t === null && b.t === null) return a.i - b.i;
+          if (a.t === null) return 1;
+          if (b.t === null) return -1;
+          return (b.t - a.t) || (a.i - b.i);
+        });
+        return rows.map(function(r) { return r.v; });
+      }
+      var videos = newestFirst(collection.videos || []);
       var modalIndex = -1, angleIdx = 0;
       var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -520,12 +578,37 @@
           grid.innerHTML = h;
           layoutMasonry();
         }
-        var more = entries.length > limit;
-        document.getElementById("fbMoreWrap").hidden = !more;
+        var total = entries.length;
+        var more = total > limit;
+        var canCollapse = total > FB_COPY.pageSize && limit > FB_COPY.pageSize;
+        var nShown = Math.min(limit, total);
+        document.getElementById("fbMoreWrap").hidden = !(more || canCollapse);
+        document.getElementById("fbMore").hidden = !more;
+        document.getElementById("fbAll").hidden = !more;
+        document.getElementById("fbLess").hidden = !canCollapse;
+        document.getElementById("fbAllTop").hidden = !more;
+        document.getElementById("fbLessTop").hidden = !canCollapse;
         if (more) {
-          document.getElementById("fbMoreCount").textContent = (entries.length - limit) + " more";
+          document.getElementById("fbMoreCount").textContent = Math.min(FB_COPY.pageStep, total - limit) + " more";
         }
+        var tb = document.getElementById("fbToolbar");
+        tb.hidden = total <= FB_COPY.pageSize;
+        document.getElementById("fbShowing").innerHTML = 'Showing <b>' + nShown + '</b> of ' + total;
+        updateFloat();
       }
+      /* Floating "Show less" pill: appears while the list is expanded and the bottom buttons are still off-screen */
+      function updateFloat() {
+        var fl = document.getElementById("fbFloat");
+        var grid = document.getElementById("allGrid"), wrap = document.getElementById("fbMoreWrap");
+        if (!fl || !grid || !wrap) return;
+        var lessBtn = document.getElementById("fbLess");
+        var expanded = lessBtn && !lessBtn.hidden && !wrap.hidden;
+        var g = grid.getBoundingClientRect(), w = wrap.getBoundingClientRect();
+        var show = expanded && modalIndex < 0 && g.top < window.innerHeight * 0.4 && g.bottom > 0 && w.top > window.innerHeight;
+        fl.classList.toggle("on", !!show);
+      }
+      window.addEventListener("scroll", updateFloat, { passive: true });
+      window.addEventListener("resize", updateFloat);
       /* Masonry: every card goes into the currently shortest column, so columns always end level and no gaps appear */
       var layoutQueued = false;
       function layoutMasonry() {
@@ -602,7 +685,7 @@
 
       /* ---------------- Events ---------------- */
       document.addEventListener("click", function(ev) {
-        var t = ev.target.closest ? ev.target.closest("[data-open],[data-folder],[data-cat],[data-back],[data-hero],#fbMore") : null;
+        var t = ev.target.closest ? ev.target.closest("[data-open],[data-folder],[data-cat],[data-back],[data-hero],[data-loadall],[data-less],#fbMore") : null;
         if (!t) return;
         if (t.hasAttribute("data-open")) { openModal(Number(t.getAttribute("data-open"))); }
         else if (t.hasAttribute("data-folder")) { gridScope = folderKeys[Number(t.getAttribute("data-folder"))]; limit = FB_COPY.pageSize; swapGrid(); }
@@ -610,6 +693,12 @@
         else if (t.hasAttribute("data-cat")) { activeCat = t.getAttribute("data-cat"); limit = FB_COPY.pageSize; swapGrid(); }
         else if (t.hasAttribute("data-hero")) { setHero(heroActive + Number(t.getAttribute("data-hero"))); }
         else if (t.id === "fbMore") { limit += FB_COPY.pageStep; renderGrid(); }
+        else if (t.hasAttribute("data-loadall")) { limit = 1e9; renderGrid(); }
+        else if (t.hasAttribute("data-less")) {
+          limit = FB_COPY.pageSize; renderGrid();
+          var tbEl = document.getElementById("fbToolbar");
+          if (tbEl && !tbEl.hidden) tbEl.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+        }
       });
 
       /* ---------------- Modal (existing behaviour) ---------------- */
