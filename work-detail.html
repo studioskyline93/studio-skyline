@@ -83,18 +83,11 @@
     .fb-folder-title{font-family:var(--serif);font-size:30px;font-weight:600;color:var(--burgundy)}
 
     /* ---------- Gallery ---------- */
-    .fb-gallery{display:grid;grid-template-columns:55fr 45fr;gap:0 clamp(18px,2vw,32px);align-items:start}
-    .fb-gallery:not(.single) .fb-col:nth-child(2){padding-top:clamp(24px,4vw,64px)}
-    /* 4 across on large screens: same staggered, asymmetrical rhythm, just smaller */
-    .fb-gallery.cols4{grid-template-columns:27fr 23fr 27fr 23fr;gap:0 clamp(12px,1.4vw,22px)}
-    .fb-gallery.cols4 .fb-col{gap:clamp(18px,1.8vw,28px)}
-    .fb-gallery.cols4 .fb-col:nth-child(even){padding-top:clamp(16px,2.6vw,44px)}
-    .fb-gallery.cols4 .fb-cap{padding-top:9px;gap:10px}
+    .fb-gallery{position:relative;display:block;width:100%}
+    .fb-gallery .fb-card{position:absolute;top:0;left:0;margin:0;min-width:0}
+    .fb-gallery .fb-cap{padding-top:10px;gap:10px}
     .fb-gallery.cols4 .fb-cap-title{font-size:clamp(16px,1.25vw,19px)}
     .fb-gallery.cols4 .fb-cap-sub{font-size:11.5px;margin-top:3px}
-    .fb-col{display:flex;flex-direction:column;gap:clamp(26px,2.6vw,40px);min-width:0}
-    .fb-gallery.single{grid-template-columns:1fr}
-    .fb-card{margin:0}
     .fb-card-btn{display:block;width:100%;padding:0;border:0;background:none;text-align:left;color:inherit}
     .fb-media{display:block;width:100%;overflow:hidden;background:#ece4df;border-radius:1px}
     /* Container ratio is set from each photo's real proportions (see fitMedia); contain is used only when a photo is clamped, so nothing is cropped */
@@ -104,31 +97,18 @@
     .fb-cap{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding-top:12px}
     .fb-cap-title{display:block;font-family:var(--serif);font-size:clamp(19px,1.6vw,23px);font-weight:600;line-height:1.15}
     .fb-cap-sub{display:block;margin-top:5px;font-size:12.5px;color:var(--muted)}
-    .fb-arrow{flex:none;color:var(--burgundy);transition:transform .25s;padding-top:4px}
-    .fb-arrow svg{width:16px;height:16px;display:block}
-    .fb-card-btn:hover .fb-arrow{transform:translateX(5px)}
-    .fb-empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:60px 0;font-family:var(--serif);font-size:20px}
+    .fb-empty{text-align:center;color:var(--muted);padding:60px 0;font-family:var(--serif);font-size:20px}
     .fb-grid-swap{animation:fbFade .5s ease}
     @keyframes fbFade{from{opacity:0}to{opacity:1}}
-    .fb-more-wrap{position:relative;display:flex;justify-content:center;align-items:center;min-height:clamp(190px,22vw,260px);margin:clamp(8px,1.5vw,18px) 0 clamp(36px,4.5vw,64px);overflow:hidden;isolation:isolate}
+    .fb-more-wrap{display:flex;justify-content:center;margin:clamp(22px,2.4vw,34px) 0 clamp(36px,4.5vw,64px)}
     .fb-more-wrap[hidden]{display:none}
-    /* Blurred preview of the next projects, fading out behind the button */
-    .fb-more-peek{position:absolute;inset:0;display:flex;gap:clamp(12px,1.4vw,20px);z-index:0;pointer-events:none;
-      -webkit-mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.7) 45%,transparent 100%);mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.7) 45%,transparent 100%)}
-    .fb-more-peek span{flex:1 1 0;min-width:0;overflow:hidden;background:#ece4df}
-    .fb-more-peek img{width:100%;height:100%;object-fit:cover;display:block;filter:blur(14px) saturate(1.1);transform:scale(1.15);opacity:.7}
-    .fb-more-wrap::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,rgba(250,246,241,.55) 0%,rgba(250,246,241,0) 65%)}
-    .fb-more-btn{position:relative;z-index:2;display:inline-flex;align-items:center;gap:16px;padding:10px 10px 10px 30px;border-radius:999px;border:1px solid rgba(255,255,255,.55);
-      background:linear-gradient(135deg,rgba(138,16,32,.96),rgba(106,10,22,.96));color:#fff;font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;font-weight:600;
-      box-shadow:0 18px 38px -14px rgba(106,10,22,.75),0 2px 0 rgba(255,255,255,.18) inset;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
-      transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s,background .35s}
-    .fb-more-btn:hover{transform:translateY(-3px);box-shadow:0 24px 44px -14px rgba(106,10,22,.85),0 2px 0 rgba(255,255,255,.22) inset}
-    .fb-more-btn:active{transform:translateY(-1px)}
-    .fb-more-count{font-size:10.5px;letter-spacing:.1em;font-weight:500;opacity:.75;text-transform:none;white-space:nowrap}
+    .fb-more-btn{display:inline-flex;align-items:center;gap:12px;padding:13px 26px;border:1px solid var(--burgundy);border-radius:0;background:transparent;color:var(--burgundy);
+      font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;transition:background .3s,color .3s}
+    .fb-more-btn:hover{background:var(--burgundy);color:#fff}
+    .fb-more-count{font-size:11px;letter-spacing:.06em;font-weight:500;opacity:.7;text-transform:none;white-space:nowrap}
     .fb-more-count:empty{display:none}
-    .fb-more-ico{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.16);transition:background .3s}
-    .fb-more-ico svg{width:16px;height:16px;transition:transform .35s}
-    .fb-more-btn:hover .fb-more-ico{background:rgba(255,255,255,.28)}
+    .fb-more-ico{display:grid;place-items:center}
+    .fb-more-ico svg{width:15px;height:15px;transition:transform .3s}
     .fb-more-btn:hover .fb-more-ico svg{transform:translateY(3px)}
 
     /* ---------- Capabilities ---------- */
@@ -192,7 +172,6 @@
       .fb-intro{grid-template-columns:1fr;gap:20px;align-items:start}
       .fb-filter-track{justify-content:flex-start}
       .fb-filters{margin-left:calc(var(--pad) * -1);margin-right:calc(var(--pad) * -1);padding:0 var(--pad)}
-      .fb-gallery{grid-template-columns:1fr}
       .fb-caps{grid-template-columns:1fr 1fr}
       .fb-banner,.fb-cta{grid-template-columns:1fr}
       .fb-banner-img{order:2;height:200px}
@@ -229,7 +208,6 @@
       <div class="fb-folderbar" id="fbFolderBar"></div>
       <div class="fb-gallery" id="allGrid"></div>
       <div class="fb-more-wrap" id="fbMoreWrap" hidden>
-        <div class="fb-more-peek" id="fbPeek" aria-hidden="true"></div>
         <button class="fb-more-btn" id="fbMore" type="button"><span class="fb-more-label">Load more projects</span><span class="fb-more-count" id="fbMoreCount"></span>
           <span class="fb-more-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span></button>
       </div>
@@ -498,8 +476,7 @@
 
       var cyclePics = {}, cycleIdx = {};
       function cardHtml(e, ratio) {
-        var arrow = '<span class="fb-arrow">' + ARROW_R + '</span>';
-        if (e.kind === "folder") {
+                if (e.kind === "folder") {
           var cover = videos[e.idxs[0]];
           /* Client folder with 2+ pictures: the cover changes by itself every 3 seconds */
           var pics = e.idxs.map(function(i) { return videos[i].src; }).filter(function(src) { return !isVideoSrc(src); });
@@ -509,14 +486,14 @@
           return '<article class="fb-card"><button type="button" class="fb-card-btn" data-folder="' + e.n + '">' +
             '<span class="fb-media" style="aspect-ratio:' + ratio + '"' + (cycle ? ' data-cycle="' + esc(e.key) + '"' : '') + '>' + mediaTag(coverSrc, 'metadata', folderNames[e.key]) + '</span>' +
             '<span class="fb-cap"><span><span class="fb-cap-title">' + esc(folderNames[e.key]) + '</span>' +
-            '<span class="fb-cap-sub">' + e.idxs.length + ' pieces</span></span>' + arrow + '</span></button></article>';
+            '<span class="fb-cap-sub">' + e.idxs.length + ' pieces</span></span>' + '</span></button></article>';
         }
         var v = videos[e.i];
         var sub = v.client || cats(v)[0] || "";
         return '<article class="fb-card"><button type="button" class="fb-card-btn" data-open="' + e.i + '">' +
           '<span class="fb-media" style="aspect-ratio:' + ratio + '">' + mediaTag(v.src, 'metadata', v.title) + '</span>' +
           '<span class="fb-cap"><span><span class="fb-cap-title">' + esc(v.title || '') + '</span>' +
-          (sub ? '<span class="fb-cap-sub">' + esc(sub) + '</span>' : '') + '</span>' + arrow + '</span></button></article>';
+          (sub ? '<span class="fb-cap-sub">' + esc(sub) + '</span>' : '') + '</span>' + '</span></button></article>';
       }
 
       function renderGrid() {
@@ -535,38 +512,50 @@
 
         if (!shown.length) {
           grid.className = "fb-gallery"; grid.innerHTML = '<div class="fb-empty">No projects to show yet.</div>';
-        } else if (two) {
-          var wide = mqWide.matches, nc = wide ? 4 : 2, cols = [];
-          for (var q = 0; q < nc; q++) cols.push("");
-          shown.forEach(function(e, n) {
-            var col = n % nc, row = Math.floor(n / nc);
-            var set = (col % 2 === 0) ? RATIOS_A : RATIOS_B;
-            var r = set[(row + (col >= 2 ? 1 : 0)) % set.length];
-            cols[col] += cardHtml(e, r);
-          });
-          grid.className = "fb-gallery" + (wide ? " cols4" : "");
-          grid.innerHTML = cols.map(function(c) { return '<div class="fb-col">' + c + '</div>'; }).join("");
         } else {
-          var s = "";
-          shown.forEach(function(e, n) { s += cardHtml(e, RATIOS_A[n % RATIOS_A.length]); });
-          grid.className = "fb-gallery single";
-          grid.innerHTML = '<div class="fb-col">' + s + '</div>';
+          var wide = mqWide.matches;
+          var h = "";
+          shown.forEach(function(e, n) { h += cardHtml(e, (n % 2 ? RATIOS_B : RATIOS_A)[n % 5]); });
+          grid.className = "fb-gallery" + (wide ? " cols4" : "");
+          grid.innerHTML = h;
+          layoutMasonry();
         }
         var more = entries.length > limit;
         document.getElementById("fbMoreWrap").hidden = !more;
         if (more) {
-          var nPeek = mqWide.matches ? 4 : (mqDesktop.matches ? 2 : 1), peek = "";
-          var rest = entries.slice(limit);
-          for (var pi = 0; pi < rest.length && peek.split("<span>").length - 1 < nPeek; pi++) {
-            var pe = rest[pi], psrc = "";
-            if (pe.kind === "folder") {
-              for (var pj = 0; pj < pe.idxs.length; pj++) { if (!isVideoSrc(videos[pe.idxs[pj]].src)) { psrc = videos[pe.idxs[pj]].src; break; } }
-            } else if (!isVideoSrc(videos[pe.i].src)) psrc = videos[pe.i].src;
-            if (psrc) peek += '<span><img src="' + esc(psrc) + '" alt="" loading="lazy" decoding="async"></span>';
-          }
-          document.getElementById("fbPeek").innerHTML = peek;
           document.getElementById("fbMoreCount").textContent = (entries.length - limit) + " more";
         }
+      }
+      /* Masonry: every card goes into the currently shortest column, so columns always end level and no gaps appear */
+      var layoutQueued = false;
+      function layoutMasonry() {
+        var grid = document.getElementById("allGrid");
+        if (!grid) return;
+        var cards = grid.querySelectorAll(".fb-card");
+        if (!cards.length) { grid.style.height = ""; return; }
+        var W = grid.clientWidth;
+        var nc = mqWide.matches ? 4 : (mqDesktop.matches ? 2 : 1);
+        var gx = nc === 1 ? 0 : (nc === 4 ? Math.min(22, Math.max(12, window.innerWidth * .014)) : Math.min(32, Math.max(18, window.innerWidth * .02)));
+        var gy = nc === 4 ? Math.min(28, Math.max(18, window.innerWidth * .018)) : Math.min(40, Math.max(26, window.innerWidth * .026));
+        var cw = (W - gx * (nc - 1)) / nc, hs = [], i;
+        for (i = 0; i < nc; i++) hs.push(0);
+        for (i = 0; i < cards.length; i++) {
+          var c = cards[i], k = 0;
+          for (var j = 1; j < nc; j++) if (hs[j] < hs[k] - 0.5) k = j;
+          c.style.width = cw + "px";
+          c.style.transform = "translate(" + (k * (cw + gx)) + "px," + hs[k] + "px)";
+          hs[k] += c.offsetHeight + gy;
+        }
+        grid.style.height = Math.max.apply(null, hs.map(function(v) { return v - gy; })) + "px";
+      }
+      function queueLayout() {
+        if (layoutQueued) return; layoutQueued = true;
+        requestAnimationFrame(function() { layoutQueued = false; layoutMasonry(); });
+      }
+      window.addEventListener("resize", queueLayout);
+      if (window.ResizeObserver) {
+        var roGrid = new ResizeObserver(queueLayout);
+        roGrid.observe(document.getElementById("allGrid"));
       }
       /* Size each card from the photo's real proportions so packaging is never cropped.
          Extreme shapes are clamped and shown with object-fit:contain (still uncropped). */
@@ -580,6 +569,7 @@
         var r = w / h, c = Math.min(MAX_RATIO, Math.max(MIN_RATIO, r));
         box.style.aspectRatio = String(Math.round(c * 1000) / 1000);
         box.classList.toggle("is-contain", Math.abs(r - c) > 0.01);
+        queueLayout();
       }
       document.addEventListener("load", function(e) { if (e.target && e.target.tagName === "IMG") fitMedia(e.target); }, true);
       document.addEventListener("loadedmetadata", function(e) { if (e.target && e.target.tagName === "VIDEO") fitMedia(e.target); }, true);
