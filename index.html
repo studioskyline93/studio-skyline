@@ -166,6 +166,58 @@
     body.ix-themed #site-footer hr,body.ix-themed #site-footer [class*="bottom"],body.ix-themed #site-footer [class*="copy"]{border-color:rgba(255,255,255,.18)}
     body.ix-themed #site-footer [class*="copy"],body.ix-themed #site-footer small{color:rgba(255,255,255,.6);font-size:12px}
 
+
+    /* ============ Premium paper background (background-only; no layout changes) ============ */
+    :root{
+      --paper:#FAF6EF; --paper-warm:#F4ECDF; --champagne:#EADBC2;
+      --grain:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .33  0 0 0 0 .22  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); --fibre:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='600'><filter id='f' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='.012 .09' numOctaves='2' seed='7' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .55  0 0 0 0 .4  0 0 0 0 .28  0 0 0 1.1 -.42'/></filter><rect width='100%' height='100%' filter='url(%23f)'/></svg>");
+    }
+    body.ix-themed{
+      background-color:var(--paper);
+      background-image:
+        radial-gradient(120% 70% at 12% -8%,rgba(255,252,246,.95) 0%,rgba(255,252,246,0) 60%),
+        radial-gradient(90% 60% at 100% 35%,rgba(234,219,194,.38) 0%,rgba(234,219,194,0) 65%),
+        radial-gradient(100% 55% at 0% 78%,rgba(128,13,27,.035) 0%,rgba(128,13,27,0) 60%),
+        linear-gradient(180deg,var(--paper) 0%,var(--paper-warm) 100%);
+      background-attachment:scroll;
+    }
+    /* Paper grain + fibres, fixed so it never repaints on scroll; sits behind everything */
+    body.ix-themed::before{
+      content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+      background-image:var(--fibre),var(--grain);
+      background-size:600px 600px,220px 220px;
+      opacity:.16;mix-blend-mode:multiply;
+    }
+    /* Faint halftone dots + CMYK registration mark, very low contrast */
+    body.ix-themed::after{
+      content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+      background:
+        radial-gradient(circle at 50% 50%,rgba(128,13,27,.5) 0 .7px,transparent 1.1px) 0 0/9px 9px,
+        radial-gradient(circle at 100% 100%,transparent 0 6px,rgba(128,13,27,.55) 6.5px 7px,transparent 7.5px) right 28px bottom 28px/30px 30px no-repeat;
+      -webkit-mask-image:linear-gradient(135deg,transparent 55%,#000 100%);mask-image:linear-gradient(135deg,transparent 55%,#000 100%);
+      opacity:.045;
+    }
+    body.ix-themed #site-header,body.ix-themed .cap-card{background-color:rgba(250,246,239,.82)}
+    @supports (backdrop-filter:blur(1px)){body.ix-themed #site-header{-webkit-backdrop-filter:saturate(1.1) blur(6px);backdrop-filter:saturate(1.1) blur(6px)}}
+
+    /* Image behind the hero: soft, washed, fades into the paper below */
+    body.ix-themed .site-main{position:relative;isolation:isolate}
+    body.ix-themed .site-main::before{
+      content:"";position:absolute;z-index:-1;pointer-events:none;top:0;left:50%;transform:translateX(-50%);
+      width:100vw;height:min(100vh,820px);
+      background:
+        linear-gradient(180deg,rgba(250,246,239,.30) 0%,rgba(250,246,239,.12) 45%,var(--paper) 100%),
+        url("images/hero-backdrop.jpg") center 30%/cover no-repeat;
+      -webkit-mask-image:linear-gradient(180deg,#000 35%,transparent 100%);mask-image:linear-gradient(180deg,#000 35%,transparent 100%);
+    }
+
+    /* Footer: same burgundy, faint paper grain + fine diagonal weave */
+    body.ix-themed #site-footer{position:relative;isolation:isolate;
+      background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.018) 0 1px,transparent 1px 5px),linear-gradient(180deg,rgba(255,255,255,.025),rgba(0,0,0,.05))}
+    body.ix-themed #site-footer::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:var(--grain);background-size:220px 220px;opacity:.12;mix-blend-mode:soft-light}
+    @media (max-width:700px){body.ix-themed::after{display:none}body.ix-themed .site-main::before{height:min(80vh,640px)}}
+    @media print{body.ix-themed::before,body.ix-themed::after,body.ix-themed .site-main::before{display:none}}
+
     @media (prefers-reduced-motion:reduce){
       body.ix-themed .reel-btns button:hover,body.ix-themed .reel-btns button:active{transform:none}
       body.ix-themed .reel-prog i{transition:none}
