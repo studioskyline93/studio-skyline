@@ -23,8 +23,6 @@ const SITE = {
   pincode: "110020",
   mapsUrl: "https://maps.app.goo.gl/EenU3czcuWe8jpna8",
   mapsQuery: "Studio Skyline Graphics Pvt Ltd, 93 DSIDC Complex, Near Okhla Post Office, Okhla Phase I, Okhla Industrial Estate, New Delhi, Delhi 110020",
-  instagram: "https://instagram.com/",
-  youtube: "https://youtube.com/",
 };
 
 function renderHeader() {
@@ -79,6 +77,7 @@ function injectLocationStyles() {
     .site-footer .ix-loc h3{font-size:clamp(22px,2.4vw,30px);margin:0 0 14px;font-weight:500;line-height:1.25}
     .site-footer .ix-eyebrow{display:block;font-size:11px;letter-spacing:.22em;text-transform:uppercase;opacity:.6;margin-bottom:10px}
     .site-footer .ix-loc address{font-style:normal;margin:0 0 18px;line-height:1.8}
+    .site-footer .footer-copy{max-width:1280px;margin:0 auto;font-size:12px;opacity:.7}
     .site-footer .ix-contact{margin:0 0 22px}
     .site-footer .ix-contact .ix-eyebrow{margin:0 0 4px}
     .site-footer .ix-contact .ix-contact-links{display:flex;flex-wrap:wrap;gap:2px 18px;margin-bottom:14px}
@@ -115,16 +114,7 @@ function renderFooter() {
         <iframe title="${esc(SITE.name)} location" src="${mapSrc}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
       </div>
     </div>
-    <div class="footer-inner">
-      <div>
-        <div class="col-title">Social</div>
-        <div class="social-links">
-          <a href="${SITE.instagram}" target="_blank" rel="noopener">Instagram</a>
-          <a href="${SITE.youtube}" target="_blank" rel="noopener">YouTube</a>
-        </div>
-      </div>
-      <div class="footer-copy">&copy; ${year} ${SITE.name}. All rights reserved.</div>
-    </div>
+    <div class="footer-copy">&copy; ${year} ${SITE.name} All rights reserved.</div>
   </footer>`;
 }
 
