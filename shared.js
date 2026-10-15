@@ -70,22 +70,39 @@ function injectLocationStyles() {
   if (document.getElementById("footer-location-css")) return;
   const st = document.createElement("style");
   st.id = "footer-location-css";
-  // Neutral defaults for pages without their own theme; index.html's
-  // body.ix-themed rules are more specific and override these.
+  // Full footer theme (burgundy, same as index.html). Scoped to #site-footer and
+  // doubled-id for specificity so it wins over each page's own "body.fb-page #site-footer"
+  // rule and looks identical on every page, no matter what body class the page uses.
+  const F = "#site-footer#site-footer";
+  const GRAIN = "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .33  0 0 0 0 .22  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")";
   st.textContent = `
-    .site-footer .ix-loc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:clamp(24px,4vw,56px);align-items:stretch;max-width:1280px;margin:0 auto clamp(32px,4vw,56px);padding-bottom:clamp(32px,4vw,56px);border-bottom:1px solid rgba(128,128,128,.35)}
-    .site-footer .ix-loc h3{font-size:clamp(22px,2.4vw,30px);margin:0 0 14px;font-weight:500;line-height:1.25}
-    .site-footer .ix-eyebrow{display:block;font-size:11px;letter-spacing:.22em;text-transform:uppercase;opacity:.6;margin-bottom:10px}
-    .site-footer .ix-loc address{font-style:normal;margin:0 0 18px;line-height:1.8}
-    .site-footer .footer-copy{max-width:1280px;margin:0 auto;font-size:12px;opacity:.7}
-    .site-footer .ix-contact{margin:0 0 22px}
-    .site-footer .ix-contact .ix-eyebrow{margin:0 0 4px}
-    .site-footer .ix-contact .ix-contact-links{display:flex;flex-wrap:wrap;gap:2px 18px;margin-bottom:14px}
-    .site-footer .ix-contact a{color:inherit;text-decoration:none}
-    .site-footer .ix-dir{display:inline-block;padding:12px 22px;border:1px solid currentColor;border-radius:999px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:inherit}
-    .site-footer .ix-map{min-height:260px;border-radius:6px;overflow:hidden;border:1px solid rgba(128,128,128,.35)}
-    .site-footer .ix-map iframe{display:block;width:100%;height:100%;min-height:260px;border:0}
-    @media (max-width:760px){.site-footer .ix-loc{grid-template-columns:1fr}}
+    ${F}{--f-burgundy:#800D1B;--f-serif:"Cormorant Garamond","Cormorant",Georgia,"Times New Roman",serif;--f-sans:"Inter","Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+      position:relative;isolation:isolate;margin-top:clamp(72px,9vw,140px);padding:clamp(48px,6vw,88px) clamp(22px,5vw,64px) clamp(28px,3vw,40px);
+      background-color:var(--burgundy,var(--f-burgundy));
+      background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.018) 0 1px,transparent 1px 5px),linear-gradient(180deg,rgba(255,255,255,.025),rgba(0,0,0,.05));
+      color:rgba(255,255,255,.86);border-top:0;font-family:var(--f-sans);font-size:13px;line-height:1.8;letter-spacing:.02em;-webkit-font-smoothing:antialiased;box-sizing:border-box}
+    ${F}::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:${GRAIN};background-size:220px 220px;opacity:.12;mix-blend-mode:soft-light}
+    ${F} *{box-sizing:border-box}
+    ${F}>*{max-width:1280px;margin-left:auto;margin-right:auto}
+    ${F} .site-footer{background:none;padding:0;margin:0;border:0;color:inherit;font:inherit}
+    ${F} h3{color:#fff;font-family:var(--f-serif);font-weight:500;letter-spacing:.01em}
+    ${F} span,${F} div,${F} address{color:inherit}
+    ${F} a{color:rgba(255,255,255,.86);text-decoration:none;background-image:linear-gradient(currentColor,currentColor);background-size:0 1px;background-repeat:no-repeat;background-position:0 100%;transition:color .3s ease,background-size .45s cubic-bezier(.2,.7,.2,1)}
+    ${F} a:hover{color:#fff;background-size:100% 1px}
+
+    ${F} .ix-loc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:clamp(24px,4vw,56px);align-items:stretch;max-width:1280px;margin:0 auto clamp(32px,4vw,56px);padding-bottom:clamp(32px,4vw,56px);border-bottom:1px solid rgba(255,255,255,.18)}
+    ${F} .ix-loc h3{font-size:clamp(22px,2.4vw,30px);line-height:1.25;margin:0 0 14px}
+    ${F} .ix-eyebrow{display:block;font-family:var(--f-sans);font-size:11px;font-weight:400;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.6);opacity:1;margin-bottom:10px}
+    ${F} .ix-loc address{font-style:normal;font-family:var(--f-sans);font-size:13px;margin:0 0 22px;line-height:1.8;color:rgba(255,255,255,.86)}
+    ${F} .ix-contact{margin:0 0 22px}
+    ${F} .ix-contact .ix-eyebrow{margin:0 0 4px}
+    ${F} .ix-contact .ix-contact-links{display:flex;flex-wrap:wrap;gap:2px 18px;margin-bottom:14px}
+    ${F} .ix-loc .ix-dir{display:inline-block;padding:12px 22px;border:1px solid rgba(255,255,255,.55);border-radius:999px;color:#fff;font-size:12px;letter-spacing:.14em;text-transform:uppercase;background-image:none;transition:background .3s ease,color .3s ease}
+    ${F} .ix-loc .ix-dir:hover{background:#fff;color:var(--burgundy,var(--f-burgundy))}
+    ${F} .ix-map{min-height:260px;border-radius:6px;overflow:hidden;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.15)}
+    ${F} .ix-map iframe{display:block;width:100%;height:100%;min-height:260px;border:0;filter:grayscale(.25) contrast(1.02)}
+    ${F} .footer-copy{max-width:1280px;margin:0 auto;font-size:12px;color:rgba(255,255,255,.6);opacity:1}
+    @media (max-width:760px){${F} .ix-loc{grid-template-columns:1fr}}
   `;
   document.head.appendChild(st);
 }
