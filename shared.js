@@ -85,15 +85,16 @@ function injectHeaderStyles() {
     ${M}{position:fixed;inset:0;z-index:2147483000;display:none;width:100%;height:100vh;height:100dvh;margin:0;padding:0;background:#800D1B;color:#fff;overflow-y:auto;-webkit-overflow-scrolling:touch;opacity:0;visibility:hidden;transform:none;font-family:var(--sans,"Inter",system-ui,sans-serif)}
     ${M}.open{display:block;visibility:visible;opacity:1;pointer-events:auto;animation:mmFade .35s ease both}
     ${M}::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.018) 0 1px,transparent 1px 5px),linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,0,0,.08))}
-    ${M} .mobile-menu-inner{position:relative;display:flex;flex-direction:column;min-height:100%;max-width:640px;margin:0 auto;padding:max(20px,env(safe-area-inset-top)) clamp(22px,6vw,40px) max(24px,env(safe-area-inset-bottom));box-sizing:border-box;background:none}
-    ${M} .mobile-menu-top{display:flex;align-items:center;justify-content:space-between;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.18);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.6)}
-    ${M} .close-btn{display:inline-flex;align-items:center;gap:8px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.55);border-radius:999px;padding:9px 16px;font-family:inherit;font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;line-height:1;cursor:pointer;transition:background .3s ease,color .3s ease}
+    ${M} .mobile-menu-inner{position:relative;display:flex;flex-direction:column;min-height:100%;max-width:640px;margin:0 auto;padding:max(16px,env(safe-area-inset-top)) clamp(20px,5vw,32px) max(20px,env(safe-area-inset-bottom));box-sizing:border-box;background:none}
+    ${M} .mobile-menu-top{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.18);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.6)}
+    ${M} .mobile-menu-top span{color:rgba(255,255,255,.6);font-size:10px}
+    ${M} .close-btn{display:inline-flex;align-items:center;gap:8px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.55);border-radius:999px;padding:8px 14px;font-family:inherit;font-size:10px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;line-height:1;cursor:pointer;transition:background .3s ease,color .3s ease}
     ${M} .close-btn:hover{background:#fff;color:#800D1B}
     ${M} .close-btn svg{width:14px;height:14px;flex:none}
-    ${M} .mobile-menu-links{display:flex;flex-direction:column;flex:1;justify-content:center;padding:clamp(12px,3vh,28px) 0}
-    ${M} .mobile-menu-links a{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:clamp(14px,2.6vh,22px) 0;border-bottom:1px solid rgba(255,255,255,.14);color:#fff;text-decoration:none;background:none;transition:padding-left .35s cubic-bezier(.2,.7,.2,1),color .3s ease}
-    ${M} .mobile-menu-links a .label{font-family:var(--serif,"Cormorant Garamond",Georgia,serif);font-size:clamp(30px,9vw,42px);font-weight:500;line-height:1.1;letter-spacing:.005em;color:inherit}
-    ${M} .mobile-menu-links a .idx{font-size:11px;letter-spacing:.2em;color:rgba(255,255,255,.55)}
+    ${M} .mobile-menu-links{display:flex;flex-direction:column;flex:1;justify-content:flex-start;padding:8px 0 0}
+    ${M} .mobile-menu-links a{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.14);color:#fff;text-decoration:none;background:none;transition:padding-left .35s cubic-bezier(.2,.7,.2,1),color .3s ease}
+    ${M} .mobile-menu-links a .label{font-family:var(--serif,"Cormorant Garamond",Georgia,serif);font-size:clamp(22px,6.2vw,28px);font-weight:500;line-height:1.15;letter-spacing:.005em;color:inherit}
+    ${M} .mobile-menu-links a .idx{font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.55)}
     ${M} .mobile-menu-links a:hover,${M} .mobile-menu-links a:active{padding-left:8px}
     ${M} .mobile-menu-links a[aria-current="page"] .label{font-style:italic}
     ${M} .mobile-menu-links a[aria-current="page"] .idx{color:#fff}
@@ -104,7 +105,7 @@ function injectHeaderStyles() {
     ${M}.open .mobile-menu-links a:nth-child(4){animation-delay:.20s}
     ${M}.open .mobile-menu-links a:nth-child(5){animation-delay:.25s}
     ${M}.open .mobile-menu-links a:nth-child(6){animation-delay:.30s}
-    ${M} .mobile-menu-footer{padding-top:18px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.6)}
+    ${M} .mobile-menu-footer{padding-top:16px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.6)}
     @keyframes mmFade{from{opacity:0}to{opacity:1}}
     @keyframes mmRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
     @media (prefers-reduced-motion:reduce){${M}.open,${M}.open .mobile-menu-links a{animation:none}}
