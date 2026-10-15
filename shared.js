@@ -19,7 +19,10 @@ const SITE = {
   city: "New Delhi",
   email: "studioskyline93@gmail.com",
   phone: "+91-9810264240",
-  addressLine: "Okhla Industrial Area, New Delhi",
+  addressLine: "93 DSIDC Complex, Near Okhla Post Office, Okhla Phase I, Okhla Industrial Estate",
+  pincode: "110020",
+  mapsUrl: "https://maps.app.goo.gl/EenU3czcuWe8jpna8",
+  mapsQuery: "Studio Skyline Graphics Pvt Ltd, 93 DSIDC Complex, Near Okhla Post Office, Okhla Phase I, Okhla Industrial Estate, New Delhi, Delhi 110020",
   instagram: "https://instagram.com/",
   youtube: "https://youtube.com/",
 };
@@ -65,14 +68,44 @@ function renderHeader() {
   </header>`;
 }
 
+function injectLocationStyles() {
+  if (document.getElementById("footer-location-css")) return;
+  const st = document.createElement("style");
+  st.id = "footer-location-css";
+  st.textContent = `
+    .footer-location{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:clamp(24px,4vw,56px);align-items:stretch;max-width:1280px;margin:0 auto clamp(32px,4vw,56px);padding-bottom:clamp(32px,4vw,56px);border-bottom:1px solid currentColor;border-bottom-color:rgba(128,128,128,.35)}
+    .footer-location .fl-eyebrow{display:block;font-size:11px;letter-spacing:.22em;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+    .footer-location .fl-name{font-size:clamp(22px,2.4vw,30px);margin:0 0 14px;font-weight:500;line-height:1.25}
+    .footer-location address{font-style:normal;margin:0 0 22px;line-height:1.8}
+    .footer-location .fl-btn{display:inline-block;padding:12px 22px;border:1px solid currentColor;border-radius:999px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:inherit;opacity:.9;transition:opacity .3s ease,transform .3s ease}
+    .footer-location .fl-btn:hover{opacity:1;transform:translateY(-1px)}
+    .footer-location .fl-map{min-height:260px;border-radius:6px;overflow:hidden;border:1px solid rgba(128,128,128,.35)}
+    .footer-location .fl-map iframe{display:block;width:100%;height:100%;min-height:260px;border:0}
+    @media (max-width:760px){.footer-location{grid-template-columns:1fr}}
+  `;
+  document.head.appendChild(st);
+}
+
 function renderFooter() {
   const year = new Date().getFullYear();
+  const mapSrc = "https://maps.google.com/maps?q=" + encodeURIComponent(SITE.mapsQuery) + "&z=16&output=embed";
   return `
   <footer class="site-footer">
+    <div class="footer-location">
+      <div>
+        <span class="fl-eyebrow">Visit us</span>
+        <div class="fl-name">${SITE.name}</div>
+        <address>${SITE.addressLine},<br>${SITE.city}, Delhi ${SITE.pincode}</address>
+        <a class="fl-btn" href="${SITE.mapsUrl}" target="_blank" rel="noopener">Open in Google Maps</a>
+      </div>
+      <div class="fl-map">
+        <iframe title="${esc(SITE.name)} location" src="${mapSrc}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      </div>
+    </div>
     <div class="footer-inner">
       <div>
         <div class="col-title">${SITE.name}</div>
-        <div class="col-body">${SITE.addressLine}<br>${SITE.city}</div>
+        <div class="col-body">${SITE.addressLine}<br>${SITE.city} ${SITE.pincode}</div>
       </div>
       <div>
         <div class="col-title">Enquiries</div>
@@ -108,7 +141,7 @@ function initPage() {
   const headerEl = document.getElementById("site-header");
   const footerEl = document.getElementById("site-footer");
   if (headerEl) headerEl.innerHTML = renderHeader();
-  if (footerEl) footerEl.innerHTML = renderFooter();
+  if (footerEl) { injectLocationStyles(); footerEl.innerHTML = renderFooter(); }
 }
 
 document.addEventListener("DOMContentLoaded", initPage);
