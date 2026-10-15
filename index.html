@@ -189,6 +189,18 @@
       body.ix-themed .ix-tile:nth-child(n+26){display:none}
     }
 
+
+    /* ============ Footer: location + map ============ */
+    body.ix-themed #site-footer .ix-loc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:clamp(24px,4vw,56px);align-items:stretch;margin-bottom:clamp(32px,4vw,56px);padding-bottom:clamp(32px,4vw,56px);border-bottom:1px solid rgba(255,255,255,.18)}
+    body.ix-themed #site-footer .ix-loc h3{font-size:clamp(22px,2.4vw,30px);margin:0 0 14px}
+    body.ix-themed #site-footer .ix-loc .ix-eyebrow{display:block;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:10px}
+    body.ix-themed #site-footer .ix-loc address{font-style:normal;margin:0 0 22px;color:rgba(255,255,255,.86)}
+    body.ix-themed #site-footer .ix-loc .ix-dir{display:inline-block;padding:12px 22px;border:1px solid rgba(255,255,255,.55);border-radius:999px;color:#fff;font-size:12px;letter-spacing:.14em;text-transform:uppercase;background-image:none;transition:background .3s ease,color .3s ease}
+    body.ix-themed #site-footer .ix-loc .ix-dir:hover{background:#fff;color:var(--burgundy)}
+    body.ix-themed #site-footer .ix-map{min-height:260px;border-radius:6px;overflow:hidden;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.15)}
+    body.ix-themed #site-footer .ix-map iframe{display:block;width:100%;height:100%;min-height:260px;border:0;filter:grayscale(.25) contrast(1.02)}
+    @media (max-width:760px){body.ix-themed #site-footer .ix-loc{grid-template-columns:1fr}}
+
     /* ============ Cleaner reel + premium footer ============ */
     body.ix-themed .ix-reel{padding-top:clamp(40px,5vw,72px)}
     body.ix-themed .reel-track{scrollbar-width:none;-ms-overflow-style:none}
@@ -389,6 +401,37 @@
   <script src="supabase-client.js"></script>
   <script src="shared.js"></script>
   <script src="data.js"></script>
+
+  <script>
+  /* Footer location block (survives shared.js re-rendering the footer) */
+  (function () {
+    var SHORT = 'https://maps.app.goo.gl/EenU3czcuWe8jpna8';
+    var ADDR = 'Studio Skyline Graphics Pvt Ltd, 93 DSIDC Complex, Near Okhla Post Office, Okhla Phase I, Okhla Industrial Estate, New Delhi, Delhi 110020';
+    var EMBED = 'https://maps.google.com/maps?q=' + encodeURIComponent(ADDR) + '&z=16&output=embed';
+    function build() {
+      var d = document.createElement('div');
+      d.className = 'ix-loc';
+      d.innerHTML =
+        '<div><span class="ix-eyebrow">Visit us</span><h3>Studio Skyline Graphics Pvt Ltd</h3>' +
+        '<address>93 DSIDC Complex, Near Okhla Post Office,<br>Okhla Phase I, Okhla Industrial Estate,<br>New Delhi, Delhi 110020</address>' +
+        '<a class="ix-dir" href="' + SHORT + '" target="_blank" rel="noopener">Open in Google Maps</a></div>' +
+        '<div class="ix-map"><iframe title="Studio Skyline Graphics location" src="' + EMBED + '" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>';
+      return d;
+    }
+    function ensure() {
+      var f = document.getElementById('site-footer');
+      if (!f || f.querySelector('.ix-loc')) return;
+      f.insertBefore(build(), f.firstChild);
+    }
+    function init() {
+      var f = document.getElementById('site-footer');
+      if (!f) return;
+      ensure();
+      new MutationObserver(ensure).observe(f, { childList: true });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  })();
+  </script>
 
   <script>
     /* ── Site content ── */
