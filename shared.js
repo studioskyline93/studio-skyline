@@ -17,8 +17,8 @@ const NAV = [
 const SITE = {
   name: "Studio Skyline Graphics Pvt. Ltd.",
   city: "New Delhi",
-  email: "studioskyline93@gmail.com",
-  phone: "+91-9810264240",
+  emails: ["contact@studioskylinegraphics.com", "studioskyline93@gmail.com"],
+  phones: ["011-40527042", "011-40527043", "011-40527044"],
   addressLine: "93 DSIDC Complex, Near Okhla Post Office, Okhla Phase I, Okhla Industrial Estate",
   pincode: "110020",
   mapsUrl: "https://maps.app.goo.gl/EenU3czcuWe8jpna8",
@@ -72,54 +72,55 @@ function injectLocationStyles() {
   if (document.getElementById("footer-location-css")) return;
   const st = document.createElement("style");
   st.id = "footer-location-css";
+  // Neutral defaults for pages without their own theme; index.html's
+  // body.ix-themed rules are more specific and override these.
   st.textContent = `
-    .footer-location{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:clamp(24px,4vw,56px);align-items:stretch;max-width:1280px;margin:0 auto clamp(32px,4vw,56px);padding-bottom:clamp(32px,4vw,56px);border-bottom:1px solid currentColor;border-bottom-color:rgba(128,128,128,.35)}
-    .footer-location .fl-eyebrow{display:block;font-size:11px;letter-spacing:.22em;text-transform:uppercase;opacity:.6;margin-bottom:10px}
-    .footer-location .fl-name{font-size:clamp(22px,2.4vw,30px);margin:0 0 14px;font-weight:500;line-height:1.25}
-    .footer-location address{font-style:normal;margin:0 0 22px;line-height:1.8}
-    .footer-location .fl-btn{display:inline-block;padding:12px 22px;border:1px solid currentColor;border-radius:999px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:inherit;opacity:.9;transition:opacity .3s ease,transform .3s ease}
-    .footer-location .fl-btn:hover{opacity:1;transform:translateY(-1px)}
-    .footer-location .fl-map{min-height:260px;border-radius:6px;overflow:hidden;border:1px solid rgba(128,128,128,.35)}
-    .footer-location .fl-map iframe{display:block;width:100%;height:100%;min-height:260px;border:0}
-    @media (max-width:760px){.footer-location{grid-template-columns:1fr}}
+    .site-footer .ix-loc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:clamp(24px,4vw,56px);align-items:stretch;max-width:1280px;margin:0 auto clamp(32px,4vw,56px);padding-bottom:clamp(32px,4vw,56px);border-bottom:1px solid rgba(128,128,128,.35)}
+    .site-footer .ix-loc h3{font-size:clamp(22px,2.4vw,30px);margin:0 0 14px;font-weight:500;line-height:1.25}
+    .site-footer .ix-eyebrow{display:block;font-size:11px;letter-spacing:.22em;text-transform:uppercase;opacity:.6;margin-bottom:10px}
+    .site-footer .ix-loc address{font-style:normal;margin:0 0 18px;line-height:1.8}
+    .site-footer .ix-contact{margin:0 0 22px}
+    .site-footer .ix-contact .ix-eyebrow{margin:0 0 4px}
+    .site-footer .ix-contact .ix-contact-links{display:flex;flex-wrap:wrap;gap:2px 18px;margin-bottom:14px}
+    .site-footer .ix-contact a{color:inherit;text-decoration:none}
+    .site-footer .ix-dir{display:inline-block;padding:12px 22px;border:1px solid currentColor;border-radius:999px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:inherit}
+    .site-footer .ix-map{min-height:260px;border-radius:6px;overflow:hidden;border:1px solid rgba(128,128,128,.35)}
+    .site-footer .ix-map iframe{display:block;width:100%;height:100%;min-height:260px;border:0}
+    @media (max-width:760px){.site-footer .ix-loc{grid-template-columns:1fr}}
   `;
   document.head.appendChild(st);
 }
 
 function renderFooter() {
   const year = new Date().getFullYear();
+  const phoneLinks = SITE.phones.map(p => `<a href="tel:+91${p.replace(/\D/g, "").replace(/^0/, "")}">${p}</a>`).join("");
+  const emailLinks = SITE.emails.map(e => `<a href="mailto:${e}">${e}</a>`).join("");
   const mapSrc = "https://maps.google.com/maps?q=" + encodeURIComponent(SITE.mapsQuery) + "&z=16&output=embed";
   return `
   <footer class="site-footer">
-    <div class="footer-location">
+    <div class="ix-loc">
       <div>
-        <span class="fl-eyebrow">Visit us</span>
-        <div class="fl-name">${SITE.name}</div>
+        <span class="ix-eyebrow">Visit us</span>
+        <h3>${SITE.name}</h3>
         <address>${SITE.addressLine},<br>${SITE.city}, Delhi ${SITE.pincode}</address>
-        <a class="fl-btn" href="${SITE.mapsUrl}" target="_blank" rel="noopener">Open in Google Maps</a>
+        <div class="ix-contact">
+          <span class="ix-eyebrow">Call</span>
+          <div class="ix-contact-links">${phoneLinks}</div>
+          <span class="ix-eyebrow">Email</span>
+          <div class="ix-contact-links">${emailLinks}</div>
+        </div>
+        <a class="ix-dir" href="${SITE.mapsUrl}" target="_blank" rel="noopener">Open in Google Maps</a>
       </div>
-      <div class="fl-map">
+      <div class="ix-map">
         <iframe title="${esc(SITE.name)} location" src="${mapSrc}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
       </div>
     </div>
     <div class="footer-inner">
       <div>
-        <div class="col-title">${SITE.name}</div>
-        <div class="col-body">${SITE.addressLine}<br>${SITE.city} ${SITE.pincode}</div>
-      </div>
-      <div>
-        <div class="col-title">Enquiries</div>
-        <div class="col-body">
-          <a href="mailto:${SITE.email}">${SITE.email}</a>
-          <div style="margin-top:4px">${SITE.phone}</div>
-        </div>
-      </div>
-      <div>
         <div class="col-title">Social</div>
         <div class="social-links">
-          <a href="${SITE.instagram}">Instagram</a>
-          <a href="${SITE.youtube}">YouTube</a>
-          <a href="contact.html">Contact</a>
+          <a href="${SITE.instagram}" target="_blank" rel="noopener">Instagram</a>
+          <a href="${SITE.youtube}" target="_blank" rel="noopener">YouTube</a>
         </div>
       </div>
       <div class="footer-copy">&copy; ${year} ${SITE.name}. All rights reserved.</div>
