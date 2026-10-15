@@ -27,8 +27,9 @@ const SITE = {
 
 function renderHeader() {
   const navLinks = NAV.map(n => `<a href="${n.href}">${n.label}</a>`).join("");
+  const here = (location.pathname.split("/").pop() || "index.html").toLowerCase();
   const mobileLinks = NAV.map((n, i) =>
-    `<a href="${n.href}" onclick="closeMobileMenu()">
+    `<a href="${n.href}" onclick="closeMobileMenu()"${n.href === here ? ' aria-current="page"' : ""}>
       <span class="label">${n.label}</span>
       <span class="idx">${String(i + 1).padStart(2, "0")}</span>
     </a>`
@@ -64,6 +65,52 @@ function renderHeader() {
       </div>
     </div>
   </header>`;
+}
+
+function injectHeaderStyles() {
+  if (document.getElementById("header-menu-css")) return;
+  const st = document.createElement("style");
+  st.id = "header-menu-css";
+  // Themed mobile menu (burgundy full-screen overlay, same look as the footer).
+  // Doubled id beats each page's own "#site-header" rules. Only the menu button's
+  // look and the overlay are styled here; desktop header layout is left to style.css.
+  const H = "#site-header#site-header";
+  st.textContent = `
+    ${H} .menu-btn{background:transparent;color:var(--burgundy,#800D1B);border:1px solid var(--burgundy,#800D1B);border-radius:999px;padding:9px 16px;font-family:var(--sans,"Inter",system-ui,sans-serif);font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;line-height:1;cursor:pointer;align-items:center;gap:8px;transition:background .3s ease,color .3s ease}
+    ${H} .menu-btn:hover{background:var(--burgundy,#800D1B);color:#fff}
+    ${H} .menu-btn svg{width:14px;height:14px;flex:none}
+
+    /* backdrop-filter on the header would trap the fixed overlay inside the header bar */
+    html.menu-open #site-header#site-header{-webkit-backdrop-filter:none;backdrop-filter:none}
+
+    ${H} .mobile-menu{position:fixed;inset:0;z-index:2147483000;display:none;width:100%;height:100vh;height:100dvh;margin:0;padding:0;background:#800D1B;color:#fff;overflow-y:auto;-webkit-overflow-scrolling:touch;opacity:0;visibility:hidden;transform:none;font-family:var(--sans,"Inter",system-ui,sans-serif)}
+    ${H} .mobile-menu.open{display:block;visibility:visible;opacity:1;animation:mmFade .35s ease both}
+    ${H} .mobile-menu::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.018) 0 1px,transparent 1px 5px),linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,0,0,.08))}
+    ${H} .mobile-menu-inner{position:relative;display:flex;flex-direction:column;min-height:100%;max-width:640px;margin:0 auto;padding:max(20px,env(safe-area-inset-top)) clamp(22px,6vw,40px) max(24px,env(safe-area-inset-bottom));box-sizing:border-box;background:none}
+    ${H} .mobile-menu-top{display:flex;align-items:center;justify-content:space-between;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.18);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.6)}
+    ${H} .close-btn{display:inline-flex;align-items:center;gap:8px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.55);border-radius:999px;padding:9px 16px;font-family:inherit;font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;line-height:1;cursor:pointer;transition:background .3s ease,color .3s ease}
+    ${H} .close-btn:hover{background:#fff;color:#800D1B}
+    ${H} .close-btn svg{width:14px;height:14px;flex:none}
+    ${H} .mobile-menu-links{display:flex;flex-direction:column;flex:1;justify-content:center;padding:clamp(12px,3vh,28px) 0}
+    ${H} .mobile-menu-links a{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:clamp(14px,2.6vh,22px) 0;border-bottom:1px solid rgba(255,255,255,.14);color:#fff;text-decoration:none;background:none;transition:padding-left .35s cubic-bezier(.2,.7,.2,1),color .3s ease}
+    ${H} .mobile-menu-links a .label{font-family:var(--serif,"Cormorant Garamond",Georgia,serif);font-size:clamp(30px,9vw,42px);font-weight:500;line-height:1.1;letter-spacing:.005em;color:inherit}
+    ${H} .mobile-menu-links a .idx{font-size:11px;letter-spacing:.2em;color:rgba(255,255,255,.55)}
+    ${H} .mobile-menu-links a:hover,${H} .mobile-menu-links a:active{padding-left:8px}
+    ${H} .mobile-menu-links a[aria-current="page"] .label{font-style:italic}
+    ${H} .mobile-menu-links a[aria-current="page"] .idx{color:#fff}
+    ${H} .mobile-menu.open .mobile-menu-links a{animation:mmRise .6s cubic-bezier(.2,.7,.2,1) backwards}
+    ${H} .mobile-menu.open .mobile-menu-links a:nth-child(1){animation-delay:.05s}
+    ${H} .mobile-menu.open .mobile-menu-links a:nth-child(2){animation-delay:.10s}
+    ${H} .mobile-menu.open .mobile-menu-links a:nth-child(3){animation-delay:.15s}
+    ${H} .mobile-menu.open .mobile-menu-links a:nth-child(4){animation-delay:.20s}
+    ${H} .mobile-menu.open .mobile-menu-links a:nth-child(5){animation-delay:.25s}
+    ${H} .mobile-menu.open .mobile-menu-links a:nth-child(6){animation-delay:.30s}
+    ${H} .mobile-menu-footer{padding-top:18px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.6)}
+    @keyframes mmFade{from{opacity:0}to{opacity:1}}
+    @keyframes mmRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+    @media (prefers-reduced-motion:reduce){${H} .mobile-menu.open,${H} .mobile-menu.open .mobile-menu-links a{animation:none}}
+  `;
+  document.head.appendChild(st);
 }
 
 function injectLocationStyles() {
@@ -137,19 +184,22 @@ function renderFooter() {
 
 function openMobileMenu() {
   document.getElementById("mobileMenu").classList.add("open");
+  document.documentElement.classList.add("menu-open");
   document.body.style.overflow = "hidden";
 }
 
 function closeMobileMenu() {
   document.getElementById("mobileMenu").classList.remove("open");
+  document.documentElement.classList.remove("menu-open");
   document.body.style.overflow = "";
 }
 
 function initPage() {
   const headerEl = document.getElementById("site-header");
   const footerEl = document.getElementById("site-footer");
-  if (headerEl) headerEl.innerHTML = renderHeader();
+  if (headerEl) { injectHeaderStyles(); headerEl.innerHTML = renderHeader(); }
   if (footerEl) { injectLocationStyles(); footerEl.innerHTML = renderFooter(); }
 }
 
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeMobileMenu(); });
 document.addEventListener("DOMContentLoaded", initPage);
