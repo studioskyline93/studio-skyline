@@ -337,7 +337,7 @@
       if (!el || !c) return;
       var groups = clientGroups(c);
       if (!groups.length) {
-        el.innerHTML = '<div style="margin-top:8px; font-size:13px; color:var(--zinc-500)">No client folders yet. Give 2 or more items the same client name and they appear as one folder on the website.</div>';
+        el.innerHTML = '<div style="margin-top:8px; font-size:13px; color:var(--zinc-500)">No brand folders yet. Give 2 or more items the same brand name and they appear as one folder on the website.</div>';
         return;
       }
       var html = '<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; margin-top:8px">';
@@ -508,7 +508,7 @@
         '</div>');
 
       // Client folders (dropdown)
-      html += sec('folders', 'secFolders', 'Client folders',
+      html += sec('folders', 'secFolders', 'Brand folders',
         '<div style="font-size:12px; color:var(--zinc-500)">Cover photos change every 3 seconds when a folder has more than 2 pictures. Turn a folder off to show its items individually instead.</div><div id="clientFolders"></div>');
 
       // Items: each one is its own dropdown
@@ -534,7 +534,7 @@
 
           items += '<div class="meta-row">' +
             '<label><span>Product name</span><input value="' + escA(v.title) + '" placeholder="e.g. Magnetic gift box" oninput="setMeta(' + idx + ',\'title\',this.value)"></label>' +
-            '<label><span>Client</span><input list="clientList" value="' + escA(v.client) + '" placeholder="e.g. Crowne Plaza" oninput="setMeta(' + idx + ',\'client\',this.value)"></label>' +
+            '<label><span>Brand</span><input list="clientList" value="' + escA(v.client) + '" placeholder="e.g. Crowne Plaza" oninput="setMeta(' + idx + ',\'client\',this.value)"></label>' +
             '<div class="item-folder" data-idx="' + idx + '"></div>' +
             '<label class="wide"><span>Details (shown when visitors open this item)</span>' +
             '<textarea placeholder="Size, material, finish, quantity, turnaround..." oninput="setMeta(' + idx + ',\'details\',this.value)">' + escA(v.details) + '</textarea></label></div>';
