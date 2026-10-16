@@ -1,3 +1,17 @@
+// Favicon: injected on every page that loads shared.js
+(function addFavicons() {
+  if (document.querySelector('link[rel~="icon"]')) return;
+  [
+    { rel: "icon", href: "favicon.ico", sizes: "any" },
+    { rel: "icon", href: "favicon.png", type: "image/png", sizes: "512x512" },
+    { rel: "apple-touch-icon", href: "apple-touch-icon.png", sizes: "180x180" },
+  ].forEach(function (a) {
+    var l = document.createElement("link");
+    Object.keys(a).forEach(function (k) { l.setAttribute(k, a[k]); });
+    document.head.appendChild(l);
+  });
+})();
+
 // Shared header, footer, and mobile menu logic
 
 function esc(str) {
