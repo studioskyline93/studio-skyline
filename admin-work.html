@@ -129,6 +129,51 @@
     .cat-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity .4s; }
     .cat-cover .cnt { position: absolute; bottom: 2px; right: 3px; font-size: 10px; background: rgba(0,0,0,.6); color: #fff; border-radius: 6px; padding: 0 4px; }
     .toggle-row { display: flex; align-items: center; gap: 10px; margin-top: 16px; font-size: 13px; color: var(--zinc-700); }
+
+    /* no sideways scrolling */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    .site-main, .panel, .admin-layout > * { min-width: 0; }
+    .admin-layout { grid-template-columns: minmax(0,1fr); }
+    @media(min-width:1024px){ .admin-layout { grid-template-columns: 340px minmax(0,1fr); } }
+    .cat-item-slug, .cat-item-title { word-break: break-word; }
+    .field-row, .meta-row { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+    @media(max-width:520px){ .field-row, .meta-row { grid-template-columns: minmax(0,1fr); } .panel { padding: 14px; } }
+
+    /* big sticky Save + Apply bar */
+    #adminContent { padding-bottom: 120px; }
+    .savebar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; display: flex; align-items: center; gap: 14px;
+      padding: 12px 16px calc(12px + env(safe-area-inset-bottom,0px)); background: #fff; border-top: 1px solid #e4e4e7; box-shadow: 0 -6px 24px rgba(0,0,0,.12); }
+    .savebar #status { flex: 1; min-width: 0; font-size: 13px; color: var(--zinc-700); }
+    .savebar #status:empty { display: none; }
+    .savebar.dirty { background: #fffbeb; border-top: 2px solid #f59e0b; }
+    .save-big { flex-shrink: 0; margin-left: auto; background: #800D1B; color: #fff; border: none; border-radius: 12px; padding: 16px 30px;
+      font-size: 17px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(128,13,27,.35); }
+    .save-big:disabled { opacity: .7; }
+    .savebar.dirty .save-big { animation: pulse 1.4s infinite; }
+    @keyframes pulse { 50% { box-shadow: 0 0 0 7px rgba(128,13,27,.2); } }
+    @media(max-width:560px){ .savebar { flex-direction: column-reverse; align-items: stretch; gap: 6px; } .save-big { width: 100%; margin-left: 0; } }
+
+    /* droppable sections + items */
+    details.sec { margin-top: 20px; border: 1px solid rgba(228,228,231,.8); border-radius: 12px; background: #fff; }
+    details.sec > summary, details.item > summary { cursor: pointer; list-style: none; }
+    details > summary::-webkit-details-marker { display: none; }
+    details.sec > summary { padding: 12px 14px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    details.sec > summary::before { content: "\25B8"; display: inline-block; transition: transform .15s; color: var(--zinc-500); }
+    details.sec[open] > summary::before { transform: rotate(90deg); }
+    .sec-body { padding: 0 14px 14px; }
+    .sec-tools { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 4px; }
+    .sec-tools button, .item-actions button { font-size: 13px; background: none; border: none; cursor: pointer; text-decoration: underline; padding: 2px 0; }
+    details.item { margin-top: 8px; border: 1px solid rgba(228,228,231,.7); border-radius: 12px; background: #fff; }
+    details.item[open] { border-color: var(--zinc-400); }
+    details.item > summary { display: flex; align-items: center; gap: 10px; padding: 8px 10px; }
+    .item-thumb { width: 56px; height: 44px; border-radius: 8px; object-fit: cover; flex-shrink: 0; border: 1px solid rgba(228,228,231,.9); background: #f4f4f5; }
+    .item-sum-info { flex: 1; min-width: 0; }
+    .pin-badge { font-size: 11px; font-weight: 600; color: #800D1B; border: 1px solid #800D1B; border-radius: 8px; padding: 1px 6px; flex-shrink: 0; }
+    .item-body { padding: 0 10px 12px; }
+    .item-actions { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; margin: 2px 0 10px; }
+    .item-actions .danger { color: #dc2626; }
+    .item-actions .pin-btn.on { font-weight: 600; color: #800D1B; }
+    .item-body .meta-row, .item-body .angles-row { margin-left: 0; }
   </style>
 </head>
 <body>
@@ -143,20 +188,19 @@
       </div>
       <div class="spacer"></div>
       <a href="admin.html" style="font-size:14px; text-decoration:underline">&larr; Back</a>
-      <button class="btn-secondary" onclick="saveAll()" id="saveBtn">Save changes</button>
     </div>
 
-    <div class="status-bar" id="status"></div>
 
     <div class="admin-layout">
       <!-- LEFT: Categories list -->
       <div class="panel">
-        <div class="toolbar">
-          <span style="font-size:14px; font-weight:500">Categories</span>
-          <div class="spacer"></div>
-          <button class="btn-secondary" onclick="createCategory()">+ New</button>
-        </div>
-        <div id="catList"><div style="font-size:14px; color:var(--zinc-500)">Loading...</div></div>
+        <details class="sec" id="catSec" open style="margin-top:0">
+          <summary>Categories</summary>
+          <div class="sec-body">
+            <button class="btn-secondary" onclick="createCategory()">+ New category</button>
+            <div id="catList"><div style="font-size:14px; color:var(--zinc-500)">Loading...</div></div>
+          </div>
+        </details>
       </div>
 
       <!-- RIGHT: Category editor -->
@@ -166,6 +210,7 @@
     </div>
   </div>
 
+  <div class="savebar" id="savebar"><div id="status"></div><button class="save-big" id="saveBtn" onclick="saveAll()">Save &amp; Apply changes</button></div>
   </div><!-- end adminContent -->
   <div id="site-footer"></div>
 
@@ -193,14 +238,20 @@
 
     // --- Save ---
     async function saveAll() {
-      document.getElementById("saveBtn").textContent = "Saving...";
+      var btn = document.getElementById("saveBtn");
+      if (document.getElementById("editSlug") && !applyEdits(true)) return;
+      btn.textContent = "Saving..."; btn.disabled = true;
       var ok = await saveWorkContent(work);
-      document.getElementById("saveBtn").textContent = "Save changes";
-      setStatus(ok ? "Saved." : "Save failed.");
+      btn.textContent = "Save & Apply changes"; btn.disabled = false;
+      setStatus(ok ? "Saved \u2713" : "Save failed - try again.");
+      if (!ok) document.getElementById("savebar").classList.add("dirty");
     }
 
     function setStatus(msg) {
       document.getElementById("status").textContent = msg;
+      var bar = document.getElementById("savebar");
+      if (/Click Save/i.test(msg)) bar.classList.add("dirty");
+      else if (/^Saved/.test(msg)) bar.classList.remove("dirty");
     }
 
 
@@ -360,7 +411,10 @@
       activeSlug = slug;
       renderCats();
       renderEditor();
-      loadFiles();
+      if (window.innerWidth < 1024) {
+        var cs = document.getElementById("catSec"); if (cs) cs.open = false;
+        document.getElementById("editorPanel").scrollIntoView();
+      }
     }
 
     function moveCat(idx, dir) {
@@ -401,29 +455,49 @@
     }
 
     // --- Render editor ---
+    var openItems = {}, scrollToSrc = "";
+    var secState = { details: false, folders: false, items: true, files: false };
+    function onSec(k, el) { secState[k] = el.open; }
+    function onItem(el) { openItems[el.getAttribute("data-src")] = el.open; }
+    function setAllItems(open) {
+      var c = getActive(); if (!c) return;
+      (c.videos || []).forEach(function(v) { openItems[v.src] = open; });
+      renderEditor();
+    }
+    function jumpNewest() {
+      var c = getActive(); if (!c || !c.videos.length) return;
+      var v = c.videos[c.videos.length - 1];
+      openItems[v.src] = true; secState.items = true; scrollToSrc = v.src;
+      renderEditor();
+    }
+    function sec(key, id, title, body) {
+      return '<details class="sec" id="' + id + '"' + (secState[key] ? ' open' : '') + ' ontoggle="onSec(\'' + key + '\',this)"><summary>' + title + '</summary><div class="sec-body">' + body + '</div></details>';
+    }
+
     function renderEditor() {
       var panel = document.getElementById("editorPanel");
       var c = getActive();
+      var sy = window.scrollY;
       if (!c) {
         panel.innerHTML = '<div style="font-size:14px; color:var(--zinc-500)">Select a category.</div>';
         return;
       }
+      var vids = c.videos || [];
+      var nPinned = vids.filter(function(v) { return v.pinned === true; }).length;
 
-      var html = '';
-
-      // Category fields
-      html += '<div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px">' +
-        '<div><div style="font-size:14px; font-weight:500">Category details</div></div>' +
-        '<div style="display:flex; gap:12px">' +
-        '<button onclick="deleteCategory()" style="font-size:13px; color:#dc2626; background:none; border:none; cursor:pointer; text-decoration:underline">Delete category</button>' +
-        '<button class="btn-secondary" onclick="applyEdits()">Apply</button>' +
-        '</div></div>';
+      var html = '<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px">' +
+        '<div style="font-size:16px; font-weight:600">' + c.title + '</div>' +
+        '<div><input type="file" accept="video/mp4,image/*" multiple id="uploadInput" style="display:none" onchange="uploadFiles(this.files)">' +
+        '<button class="btn-secondary" onclick="document.getElementById(\'uploadInput\').click()">+ Upload photos / videos</button></div></div>';
 
       html += '<div class="toggle-row"><label class="switch"><input type="checkbox"' + (isOn(c) ? ' checked' : '') +
         ' onchange="toggleCat(\'' + c.slug + '\', this.checked)"><span class="slider"></span></label>' +
         '<span>' + (isOn(c) ? 'Visible on the website' : 'Hidden from the website') + '</span></div>';
 
-      html += '<div class="field-group">' +
+      // Category details (dropdown)
+      html += sec('details', 'secDetails', 'Category details',
+        '<div style="text-align:right"><button onclick="deleteCategory()" style="font-size:13px; color:#dc2626; background:none; border:none; cursor:pointer; text-decoration:underline">Delete category</button></div>' +
+        '<div class="field-group" style="margin-top:4px">' +
         '<div class="field-row">' +
         '<label><span>Index</span><input id="editIndex" value="' + (c.index || '') + '" placeholder="01"></label>' +
         '<label><span>Slug</span><input id="editSlug" value="' + c.slug + '" placeholder="paper-bags" style="font-family:monospace"></label>' +
@@ -431,100 +505,88 @@
         '<label><span>Title</span><input id="editTitle" value="' + c.title + '" placeholder="Paper Bags"></label>' +
         '<label><span>Subtitle</span><input id="editSubtitle" value="' + (c.subtitle || '') + '" placeholder="Luxury paper bags"></label>' +
         '<label><span>Description</span><textarea id="editDesc" placeholder="Short description...">' + (c.description || '') + '</textarea></label>' +
-        '</div>';
+        '</div>');
 
-      // Upload
-      html += '<div style="margin-top:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px">' +
-        '<div><div style="font-size:14px; font-weight:500">' + c.title + '</div></div>' +
-        '<div><input type="file" accept="video/mp4,image/*" multiple id="uploadInput" style="display:none" onchange="uploadFiles(this.files)">' +
-        '<button class="btn-secondary" onclick="document.getElementById(\'uploadInput\').click()">Upload photos / videos</button></div>' +
-        '</div>';
+      // Client folders (dropdown)
+      html += sec('folders', 'secFolders', 'Client folders',
+        '<div style="font-size:12px; color:var(--zinc-500)">Cover photos change every 3 seconds when a folder has more than 2 pictures. Turn a folder off to show its items individually instead.</div><div id="clientFolders"></div>');
 
-      // Client folders (same client name = one folder on the website)
-      html += '<div style="margin-top:24px"><div style="font-size:14px; font-weight:500">Client folders</div>' +
-        '<div style="margin-top:2px; font-size:12px; color:var(--zinc-500)">Cover photos change every 3 seconds when a folder has more than 2 pictures. Turn a folder off to show its items individually instead.</div>' +
-        '<div id="clientFolders"></div></div>';
-
-      // Current videos
-      var vids = c.videos || [];
-      var nPinned = vids.filter(function(v) { return v.pinned === true; }).length;
-      html += '<div style="margin-top:24px"><div style="font-size:14px; font-weight:500">Current items<span class="pin-count" id="pinCount">' + (nPinned ? nPinned + ' pinned to top' : '') + '</span></div>';
+      // Items: each one is its own dropdown
+      var items = '';
       if (vids.length === 0) {
-        html += '<div style="margin-top:8px; font-size:14px; color:var(--zinc-500)">No videos in this category yet.</div>';
+        items = '<div style="font-size:14px; color:var(--zinc-500)">No videos in this category yet.</div>';
       } else {
+        items = '<div class="sec-tools"><button onclick="jumpNewest()">&darr; Jump to newest</button><button onclick="setAllItems(true)">Expand all</button><button onclick="setAllItems(false)">Collapse all</button></div>';
         vids.forEach(function(v, idx) {
-          var name = v.title || v.src.split("/").pop();
-          html += '<div class="vid-item">' +
-            '<div class="vid-item-arrows">' +
-            '<button onclick="moveVid(' + idx + ',-1)" title="Move up">&uarr;</button>' +
-            '<button onclick="moveVid(' + idx + ',1)" title="Move down">&darr;</button>' +
-            '</div>' +
-            '<div class="vid-item-info"><div class="vid-item-name">' + name + '</div>' +
-            '<div class="vid-item-src">' + v.src + '</div></div>' +
-            (/\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(v.src)
-              ? '<video src="' + v.src + '" muted playsinline style="width:80px; height:48px; border-radius:8px; border:1px solid rgba(228,228,231,0.6); object-fit:cover"></video>'
-              : '<img src="' + v.src + '" alt="" style="width:80px; height:48px; border-radius:8px; border:1px solid rgba(228,228,231,0.6); object-fit:cover">') +
-            '<div class="vid-item-actions">' +
-            '<button class="pin-btn' + (v.pinned === true ? ' on' : '') + '" onclick="togglePin(' + idx + ', this)" title="Pinned items show first on the website; new uploads still appear below them">' + (v.pinned === true ? 'Pinned \u2713' : 'Pin to top') + '</button>' +
+          var fname = v.src.split("/").pop();
+          var name = v.title || fname;
+          var thumb = VIDEO_RE.test(v.src)
+            ? '<video class="item-thumb" src="' + escA(v.src) + '" muted playsinline preload="metadata"></video>'
+            : '<img class="item-thumb" src="' + escA(v.src) + '" alt="" loading="lazy">';
+          items += '<details class="item" data-src="' + escA(v.src) + '"' + (openItems[v.src] ? ' open' : '') + ' ontoggle="onItem(this)"><summary>' + thumb +
+            '<div class="item-sum-info"><div class="vid-item-name" id="nm' + idx + '">' + escA(name) + '</div><div class="vid-item-src">#' + (idx + 1) + ' &middot; ' + escA(fname) + '</div></div>' +
+            '<span class="pin-badge" id="pb' + idx + '"' + (v.pinned === true ? '' : ' style="display:none"') + '>Pinned</span></summary><div class="item-body">' +
+            '<div class="item-actions">' +
+            '<button onclick="moveVid(' + idx + ',-1)">&uarr; Up</button><button onclick="moveVid(' + idx + ',1)">&darr; Down</button>' +
+            '<button class="pin-btn' + (v.pinned === true ? ' on' : '') + '" onclick="togglePin(' + idx + ', this)" title="Pinned items show first on the website">' + (v.pinned === true ? 'Pinned \u2713' : 'Pin to top') + '</button>' +
             '<button onclick="removeVid(' + idx + ')">Remove</button>' +
-            '<button class="danger" onclick="deleteVidForever(' + idx + ')">Delete forever</button>' +
-            '</div></div>';
+            '<button class="danger" onclick="deleteVidForever(' + idx + ')">Delete forever</button></div>';
 
-          // Product details for this item
-          html += '<div class="meta-row">' +
+          items += '<div class="meta-row">' +
             '<label><span>Product name</span><input value="' + escA(v.title) + '" placeholder="e.g. Magnetic gift box" oninput="setMeta(' + idx + ',\'title\',this.value)"></label>' +
             '<label><span>Client</span><input list="clientList" value="' + escA(v.client) + '" placeholder="e.g. Crowne Plaza" oninput="setMeta(' + idx + ',\'client\',this.value)"></label>' +
             '<div class="item-folder" data-idx="' + idx + '"></div>' +
             '<label class="wide"><span>Details (shown when visitors open this item)</span>' +
-            '<textarea placeholder="Size, material, finish, quantity, turnaround..." oninput="setMeta(' + idx + ',\'details\',this.value)">' + escA(v.details) + '</textarea></label>' +
-            '</div>';
+            '<textarea placeholder="Size, material, finish, quantity, turnaround..." oninput="setMeta(' + idx + ',\'details\',this.value)">' + escA(v.details) + '</textarea></label></div>';
 
-          // Extra angles for this item
-          var angs = v.angles || [];
-          html += '<div class="angles-row"><span class="angles-label">Angles</span>';
-          angs.forEach(function(a, j) {
+          items += '<div class="angles-row"><span class="angles-label">Angles</span>';
+          (v.angles || []).forEach(function(a, j) {
             var src = (typeof a === "string") ? a : a.src;
-            var media = /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(src)
-              ? '<video src="' + src + '" muted playsinline></video>'
-              : '<img src="' + src + '" alt="">';
-            html += '<div class="angle-thumb">' + media +
-              '<button class="angle-x" onclick="removeAngle(' + idx + ',' + j + ')" title="Remove angle">&times;</button></div>';
+            var media = VIDEO_RE.test(src) ? '<video src="' + src + '" muted playsinline></video>' : '<img src="' + src + '" alt="">';
+            items += '<div class="angle-thumb">' + media + '<button class="angle-x" onclick="removeAngle(' + idx + ',' + j + ')" title="Remove angle">&times;</button></div>';
           });
-          html += '<input type="file" accept="image/*,video/mp4" multiple id="angleInput' + idx + '" style="display:none" onchange="uploadAngles(' + idx + ', this.files)">' +
-            '<button class="angle-add" onclick="document.getElementById(\'angleInput' + idx + '\').click()">+ Add angles</button>' +
-            '</div>';
+          items += '<input type="file" accept="image/*,video/mp4" multiple id="angleInput' + idx + '" style="display:none" onchange="uploadAngles(' + idx + ', this.files)">' +
+            '<button class="angle-add" onclick="document.getElementById(\'angleInput' + idx + '\').click()">+ Add angles</button></div></div></details>';
         });
       }
-      html += '</div>';
+      html += sec('items', 'secItems', 'Current items (' + vids.length + ')<span class="pin-count" id="pinCount">' + (nPinned ? nPinned + ' pinned to top' : '') + '</span>', items);
 
-      // Available files from storage
-      html += '<div style="margin-top:40px"><div style="font-size:14px; font-weight:500">Uploaded files (Storage)</div>' +
-        '<div style="margin-top:4px; font-size:12px; color:var(--zinc-500)">Files in ' + c.slug + '/videos/</div>' +
-        '<div id="fileList"><div style="margin-top:8px; font-size:14px; color:var(--zinc-500)">Loading...</div></div></div>';
+      // Storage files (dropdown)
+      html += sec('files', 'secFiles', 'Uploaded files (Storage)',
+        '<div style="font-size:12px; color:var(--zinc-500)">Files in ' + c.slug + '/videos/</div>' +
+        '<div id="fileList"><div style="margin-top:8px; font-size:14px; color:var(--zinc-500)">Loading...</div></div>');
 
-      // Suggest existing client names so the same client is always spelled the same way
       var seenClients = {}, opts = '';
-      (c.videos || []).forEach(function(v) {
+      vids.forEach(function(v) {
         var n = (v.client || "").trim();
         if (n && !seenClients[n.toLowerCase()]) { seenClients[n.toLowerCase()] = true; opts += '<option value="' + escA(n) + '">'; }
       });
       html += '<datalist id="clientList">' + opts + '</datalist>';
 
       panel.innerHTML = html;
+      window.scrollTo(0, sy);
       renderClientFolders();
       loadFiles();
+      if (scrollToSrc) {
+        var all = document.querySelectorAll("details.item");
+        for (var i = 0; i < all.length; i++) {
+          if (all[i].getAttribute("data-src") === scrollToSrc) { all[i].scrollIntoView({ block: "center" }); break; }
+        }
+        scrollToSrc = "";
+      }
     }
 
-    function applyEdits() {
+    function applyEdits(silent) {
       var c = getActive();
       if (!c) return;
       var newSlug = document.getElementById("editSlug").value.trim().toLowerCase();
-      if (!newSlug || !/^[a-z0-9-]+$/.test(newSlug)) { setStatus("Invalid slug."); return; }
+      var ds = document.getElementById("secDetails");
+      if (!newSlug || !/^[a-z0-9-]+$/.test(newSlug)) { if (ds) ds.open = true; setStatus("Invalid slug."); return false; }
       var newTitle = document.getElementById("editTitle").value.trim();
-      if (!newTitle) { setStatus("Title cannot be empty."); return; }
+      if (!newTitle) { if (ds) ds.open = true; setStatus("Title cannot be empty."); return false; }
 
       if (newSlug !== c.slug && work.collections.some(function(x) { return x.slug === newSlug; })) {
-        setStatus("Slug already exists."); return;
+        if (ds) ds.open = true; setStatus("Slug already exists."); return false;
       }
 
       c.index = document.getElementById("editIndex").value.trim();
@@ -536,7 +598,8 @@
 
       renderCats();
       renderEditor();
-      setStatus("Updated. Click Save to persist.");
+      if (!silent) setStatus("Updated. Click Save to persist.");
+      return true;
     }
 
     // --- Item details (product name / client / details) ---
@@ -549,6 +612,7 @@
       if (val.trim() === "") delete c.videos[idx][field];
       else c.videos[idx][field] = val;
       if (field === "client") renderClientFolders();
+      if (field === "title") { var nm = document.getElementById("nm" + idx); if (nm) nm.textContent = c.videos[idx].title || c.videos[idx].src.split("/").pop(); }
       setStatus("Details edited. Click Save changes to persist.");
     }
 
@@ -571,6 +635,7 @@
       var v = c.videos[idx];
       if (v.pinned === true) delete v.pinned; else v.pinned = true;
       var on = v.pinned === true;
+      var pb = document.getElementById("pb" + idx); if (pb) pb.style.display = on ? "" : "none";
       if (btn) { btn.classList.toggle("on", on); btn.textContent = on ? "Pinned \u2713" : "Pin to top"; }
       var n = c.videos.filter(function(x) { return x.pinned === true; }).length;
       var pc = document.getElementById("pinCount");
@@ -649,6 +714,7 @@
         var result = await uploadToStorage(c.slug, files[i]);
         if (result) {
           c.videos.push({ src: result.src });
+          openItems[result.src] = true; scrollToSrc = result.src; secState.items = true;
         } else {
           setStatus("Upload failed for " + files[i].name);
           return;
@@ -702,6 +768,7 @@
       if (!src) { setStatus("Could not build URL."); return; }
       if (c.videos.some(function(v) { return v.src === src; })) return;
       c.videos.push({ src: src });
+      openItems[src] = true; scrollToSrc = src; secState.items = true;
       renderEditor();
     }
 
