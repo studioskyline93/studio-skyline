@@ -54,6 +54,8 @@
     .vid-item-actions { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
     .vid-item-actions button { font-size: 13px; background: none; border: none; cursor: pointer; text-decoration: underline; padding: 2px 0; }
     .vid-item-actions .danger { color: #dc2626; }
+    .vid-item-actions .pin-btn.on { font-weight: 600; color: #800D1B; }
+    .pin-count { font-size: 12px; font-weight: 400; color: var(--zinc-500); margin-left: 6px; }
     .vid-item-arrows { display: flex; flex-direction: column; gap: 4px; }
     .vid-item-arrows button { font-size: 12px; color: var(--zinc-500); background: none; border: none; cursor: pointer; }
     .vid-item-arrows button:hover { color: var(--zinc-800); }
@@ -444,8 +446,9 @@
         '<div id="clientFolders"></div></div>';
 
       // Current videos
-      html += '<div style="margin-top:24px"><div style="font-size:14px; font-weight:500">Current items</div>';
       var vids = c.videos || [];
+      var nPinned = vids.filter(function(v) { return v.pinned === true; }).length;
+      html += '<div style="margin-top:24px"><div style="font-size:14px; font-weight:500">Current items<span class="pin-count" id="pinCount">' + (nPinned ? nPinned + ' pinned to top' : '') + '</span></div>';
       if (vids.length === 0) {
         html += '<div style="margin-top:8px; font-size:14px; color:var(--zinc-500)">No videos in this category yet.</div>';
       } else {
@@ -462,6 +465,7 @@
               ? '<video src="' + v.src + '" muted playsinline style="width:80px; height:48px; border-radius:8px; border:1px solid rgba(228,228,231,0.6); object-fit:cover"></video>'
               : '<img src="' + v.src + '" alt="" style="width:80px; height:48px; border-radius:8px; border:1px solid rgba(228,228,231,0.6); object-fit:cover">') +
             '<div class="vid-item-actions">' +
+            '<button class="pin-btn' + (v.pinned === true ? ' on' : '') + '" onclick="togglePin(' + idx + ', this)" title="Pinned items show first on the website; new uploads still appear below them">' + (v.pinned === true ? 'Pinned \u2713' : 'Pin to top') + '</button>' +
             '<button onclick="removeVid(' + idx + ')">Remove</button>' +
             '<button class="danger" onclick="deleteVidForever(' + idx + ')">Delete forever</button>' +
             '</div></div>';
@@ -558,6 +562,20 @@
       c.videos[idx] = c.videos[target];
       c.videos[target] = tmp;
       renderEditor();
+    }
+
+    // Pin to top: pinned items show first on the website (nothing marks them as pinned); everything else stays newest-first below
+    function togglePin(idx, btn) {
+      var c = getActive();
+      if (!c || !c.videos[idx]) return;
+      var v = c.videos[idx];
+      if (v.pinned === true) delete v.pinned; else v.pinned = true;
+      var on = v.pinned === true;
+      if (btn) { btn.classList.toggle("on", on); btn.textContent = on ? "Pinned \u2713" : "Pin to top"; }
+      var n = c.videos.filter(function(x) { return x.pinned === true; }).length;
+      var pc = document.getElementById("pinCount");
+      if (pc) pc.textContent = n ? n + " pinned to top" : "";
+      setStatus(on ? "Pinned. Click Save changes to persist." : "Unpinned. Click Save changes to persist.");
     }
 
     function removeVid(idx) {
