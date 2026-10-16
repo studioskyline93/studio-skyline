@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clients — Studio Skyline</title>
+  <title>Brands — Studio Skyline</title>
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -123,8 +123,8 @@
   <div class="site-main">
     <div class="section">
       <div class="section-kicker">Trust</div>
-      <div class="section-title">Clients</div>
-      <div class="section-desc">Selected clients and collaborators</div>
+      <div class="section-title">Brands</div>
+      <div class="section-desc">Brands we have worked for</div>
     </div>
 
     <div class="clients-grid" id="clientsGrid"></div>
@@ -149,7 +149,7 @@
     function renderClients(clients) {
       var el = document.getElementById("clientsGrid");
       if (!clients || clients.length === 0) {
-        el.innerHTML = '<div style="font-size:14px; color:var(--zinc-500); padding:20px">No clients yet.</div>';
+        el.innerHTML = '<div style="font-size:14px; color:var(--zinc-500); padding:20px">No brands yet.</div>';
         return;
       }
       var html = "";
@@ -158,7 +158,9 @@
           ? '<img src="' + esc(c.logo) + '" alt="' + esc(c.name || '') + '">'
           : '<span class="name">' + esc(c.name || '') + '</span>';
 
-        if (c.url) {
+        if (c.name) {
+          html += '<a href="client.html?c=' + encodeURIComponent(String(c.name).trim()) + '" class="client-cell">' + inner + '</a>';
+        } else if (c.url) {
           html += '<a href="' + esc(c.url) + '" target="_blank" rel="noopener noreferrer" class="client-cell">' + inner + '</a>';
         } else {
           html += '<div class="client-cell">' + inner + '</div>';
