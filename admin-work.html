@@ -456,7 +456,7 @@
 
     // --- Render editor ---
     var openItems = {}, scrollToSrc = "";
-    var secState = { details: false, folders: false, items: true, files: false };
+    var secState = { details: false, folders: false, items: true,  };
     function onSec(k, el) { secState[k] = el.open; }
     function onItem(el) { openItems[el.getAttribute("data-src")] = el.open; }
     function setAllItems(open) {
@@ -551,11 +551,6 @@
       }
       html += sec('items', 'secItems', 'Current items (' + vids.length + ')<span class="pin-count" id="pinCount">' + (nPinned ? nPinned + ' pinned to top' : '') + '</span>', items);
 
-      // Storage files (dropdown)
-      html += sec('files', 'secFiles', 'Uploaded files (Storage)',
-        '<div style="font-size:12px; color:var(--zinc-500)">Files in ' + c.slug + '/videos/</div>' +
-        '<div id="fileList"><div style="margin-top:8px; font-size:14px; color:var(--zinc-500)">Loading...</div></div>');
-
       var seenClients = {}, opts = '';
       vids.forEach(function(v) {
         var n = (v.client || "").trim();
@@ -566,7 +561,6 @@
       panel.innerHTML = html;
       window.scrollTo(0, sy);
       renderClientFolders();
-      loadFiles();
       if (scrollToSrc) {
         var all = document.querySelectorAll("details.item");
         for (var i = 0; i < all.length; i++) {
