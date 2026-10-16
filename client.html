@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brand — Studio Skyline</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--burgundy:#800D1B;--burgundy-deep:#6a0a16;--ivory:#FAF7F3;--white:#fff;--ink:#262222;--muted:#77716F;--line:#E9E0DC;
+      --serif:"Cormorant Garamond","Cormorant",Georgia,serif;--sans:"Inter","Manrope",system-ui,sans-serif;--pad:clamp(20px,4.6vw,72px);
+      --zinc-50:#FAF7F3;--zinc-100:#F3EDE8;--zinc-200:#E9E0DC;--zinc-300:#D9CFCA;--zinc-400:#A39B98;--zinc-500:#77716F;--zinc-600:#5F5958;--zinc-700:#4A4443;--zinc-800:#343030;--zinc-900:#262222}
+    body.fb-page{margin:0;background:var(--ivory);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;animation:fbPageIn .6s ease backwards}
+    body.fb-page *{box-sizing:border-box}
+    body.fb-page #site-header{background:var(--ivory);color:var(--ink);border-bottom:1px solid var(--line);font-family:var(--sans)}
+    body.fb-page #site-header a,body.fb-page #site-footer a{color:inherit}
+    body.fb-page #site-footer{background:var(--ivory);color:var(--ink);border-top:1px solid var(--line);font-family:var(--sans)}
+    body.fb-page .site-main{max-width:none;margin:0;padding:clamp(32px,4vw,56px) var(--pad) clamp(48px,6vw,88px)}
+    html{scroll-behavior:smooth;scrollbar-gutter:stable}
+    html.fb-leave body.fb-page{opacity:0;transition:opacity .25s ease}
+    @keyframes fbPageIn{from{opacity:0}to{opacity:1}}
+    a:focus-visible,button:focus-visible{outline:2px solid var(--burgundy);outline-offset:3px}
+
+    .back{display:inline-block;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:28px;transition:color .25s}
+    .back:hover{color:var(--burgundy)}
+    .kicker{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--burgundy);font-weight:500}
+    .title{font-family:var(--serif);font-weight:500;color:var(--burgundy);font-size:clamp(30px,3.1vw,44px);line-height:1.05;margin:10px 0 16px}
+    .title::after{content:"";display:block;width:62px;height:1px;background:var(--burgundy);margin-top:16px}
+    .desc{font-family:var(--serif);font-size:clamp(16px,1.2vw,19px);line-height:1.5;color:#4a4443;margin:0}
+    .head{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+    .head .logo{width:120px;height:90px;background:#fff;border:1px solid var(--line);border-radius:2px}
+    .head .logo img{width:100%;height:100%;object-fit:contain;padding:8%}
+    .visit{display:inline-block;margin-top:14px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:var(--burgundy);text-decoration:none;border-bottom:1px solid var(--burgundy);padding-bottom:3px}
+
+    .cat{margin-top:56px}
+    .cat h2{font-family:var(--serif);font-weight:600;font-size:clamp(22px,2vw,30px);color:var(--ink);margin:0 0 4px}
+    .cat h2 small{font-family:var(--sans);font-size:12px;font-weight:400;color:var(--muted);margin-left:10px}
+    .cat .sub{font-size:13px;color:var(--muted);margin-bottom:16px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+    .tile{position:relative;padding:0;text-align:left;cursor:pointer;font:inherit;color:inherit;background:#fff;border:1px solid var(--line);border-radius:2px;overflow:hidden;transition:border-color .3s,box-shadow .4s}
+    .tile:hover{border-color:rgba(128,13,27,.35);box-shadow:0 18px 40px -26px rgba(128,13,27,.35)}
+    .tile .m{aspect-ratio:4/3;background:#ece4df;overflow:hidden}
+    .tile .m img,.tile .m video{width:100%;height:100%;object-fit:cover;display:block;transition:transform .9s cubic-bezier(.2,.7,.2,1)}
+    .tile:hover .m img,.tile:hover .m video{transform:scale(1.04)}
+    .tile .cap{padding:12px 14px;font-family:var(--serif);font-size:18px;font-weight:600;line-height:1.2}
+    .tile .play{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;background:rgba(250,247,243,.92);color:var(--burgundy);font-size:11px;display:flex;align-items:center;justify-content:center}
+    .empty{margin-top:40px;font-size:14px;color:var(--muted)}
+
+    .lb{position:fixed;inset:0;z-index:100;background:rgba(38,34,34,.88);display:none;align-items:center;justify-content:center;padding:20px}
+    .lb.open{display:flex;animation:fbPageIn .35s ease backwards}
+    .lb-box{background:var(--ivory);max-width:960px;width:100%;max-height:92vh;overflow:auto;border-radius:2px;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+    @media(max-width:760px){.lb-box{grid-template-columns:1fr}}
+    .lb-media{background:#111;display:flex;align-items:center;justify-content:center;min-height:260px}
+    .lb-media img,.lb-media video{max-width:100%;max-height:70vh;display:block}
+    .lb-thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+    .lb-thumbs button{width:52px;height:52px;padding:0;border:1px solid var(--line);background:#ece4df;cursor:pointer;opacity:.6;overflow:hidden}
+    .lb-thumbs button.on{opacity:1;border-color:var(--burgundy)}
+    .lb-thumbs img,.lb-thumbs video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+    .lb-info{padding:28px}
+    .lb-info h3{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--burgundy);margin:8px 0 12px;line-height:1.1}
+    .lb-info p{font-family:var(--serif);font-size:18px;line-height:1.5;color:#4a4443;white-space:pre-line;margin:0}
+    .lb-nav{display:flex;gap:8px;margin-top:22px}
+    .lb-nav button{font-family:var(--sans);font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;padding:11px 18px;border:1px solid var(--burgundy);background:transparent;color:var(--burgundy);cursor:pointer;transition:background .25s,color .25s}
+    .lb-nav button:hover,.lb-nav .close{background:var(--burgundy);color:#fff}
+    .lb-nav .close{margin-left:auto}
+  </style>
+</head>
+<body class="fb-page">
+  <div id="site-header"></div>
+  <div class="site-main">
+    <a class="back" href="clients.html">&larr; All brands</a>
+    <div class="head" id="head"></div>
+    <div id="work"><div class="empty">Loading…</div></div>
+  </div>
+  <div id="site-footer"></div>
+
+  <div class="lb" id="lb" onclick="if(event.target===this)closeLb()">
+    <div class="lb-box">
+      <div class="lb-media" id="lbMedia"></div>
+      <div class="lb-info" id="lbInfo"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="shared.js"></script>
+  <script src="data.js"></script>
+  <script>
+    var VIDEO_RE = /\.(mp4|webm|mov|m4v)(\?|#|$)/i;
+    var ALL = [], cur = 0, curAngle = 0;
+    function norm(s) { return String(s || "").trim().toLowerCase(); }
+    function isVid(src) { return VIDEO_RE.test(src || ""); }
+    function thumb(src) {
+      return isVid(src) ? '<video src="' + esc(src) + '" muted playsinline preload="metadata"></video>'
+                        : '<img src="' + esc(src) + '" alt="" loading="lazy">';
+    }
+    function srcOf(a) { return (typeof a === "string") ? a : a.src; }
+
+    function openLb(i) { cur = i; curAngle = 0; drawLb(); document.getElementById("lb").classList.add("open"); }
+    function closeLb() {
+      document.getElementById("lb").classList.remove("open");
+      document.getElementById("lbMedia").innerHTML = "";
+    }
+    function stepLb(d) { cur = (cur + d + ALL.length) % ALL.length; curAngle = 0; drawLb(); }
+    function pickAngle(j) { curAngle = j; drawLb(); }
+    function drawLb() {
+      var e = ALL[cur], v = e.v;
+      var srcs = [v.src].concat((v.angles || []).map(srcOf));
+      var s = srcs[curAngle] || v.src;
+      document.getElementById("lbMedia").innerHTML = isVid(s)
+        ? '<video src="' + esc(s) + '" controls autoplay playsinline></video>'
+        : '<img src="' + esc(s) + '" alt="' + esc(v.title || '') + '">';
+      var th = "";
+      if (srcs.length > 1) {
+        th = '<div class="lb-thumbs">';
+        srcs.forEach(function(x, j) { th += '<button class="' + (j === curAngle ? 'on' : '') + '" onclick="pickAngle(' + j + ')">' + thumb(x) + '</button>'; });
+        th += '</div>';
+      }
+      document.getElementById("lbInfo").innerHTML =
+        '<div class="kicker">' + esc(e.cat) + '</div>' +
+        '<h3>' + esc(v.title || 'Untitled') + '</h3>' +
+        (v.details ? '<p>' + esc(v.details) + '</p>' : '') + th +
+        '<div class="lb-nav">' + (ALL.length > 1 ? '<button onclick="stepLb(-1)">&larr; Prev</button><button onclick="stepLb(1)">Next &rarr;</button>' : '') +
+        '<button class="close" onclick="closeLb()">Close</button></div>';
+    }
+    document.addEventListener("keydown", function(e) {
+      if (!document.getElementById("lb").classList.contains("open")) return;
+      if (e.key === "Escape") closeLb();
+      else if (e.key === "ArrowLeft" && ALL.length > 1) stepLb(-1);
+      else if (e.key === "ArrowRight" && ALL.length > 1) stepLb(1);
+    });
+
+    (async function() {
+      var rawName = new URLSearchParams(location.search).get("c") || "";
+      var key = norm(rawName);
+
+      var site = await loadSiteContent();
+      var clients = (site && Array.isArray(site.clients)) ? site.clients : (typeof CLIENTS !== "undefined" ? CLIENTS : []);
+      var client = clients.filter(function(c) { return norm(c.name) === key; })[0] || { name: rawName.trim() };
+      document.title = (client.name || "Brand") + " — Studio Skyline";
+
+      var work = await loadWorkContent();
+      var cols = (work && work.collections) || (typeof WORK_COLLECTIONS !== "undefined" ? WORK_COLLECTIONS : []);
+
+      var groups = [];
+      cols.forEach(function(col) {
+        if (col.enabled === false) return;
+        var items = (col.videos || []).filter(function(v) { return norm(v.client) === key; });
+        if (!items.length) return;
+        // pinned first, otherwise keep the order set in admin
+        items = items.filter(function(v) { return v.pinned === true; }).concat(items.filter(function(v) { return v.pinned !== true; }));
+        groups.push({ col: col, items: items });
+      });
+
+      var total = groups.reduce(function(n, g) { return n + g.items.length; }, 0);
+      var head = "";
+      if (client.logo) head += '<div class="logo"><img src="' + esc(client.logo) + '" alt="' + esc(client.name) + '"></div>';
+      head += '<div><div class="kicker">Brand</div><div class="title">' + esc(client.name || "Brand") + '</div>' +
+        '<p class="desc">' + (total ? total + (total === 1 ? ' piece' : ' pieces') + ' across ' + groups.length + (groups.length === 1 ? ' category' : ' categories') : 'Our work for this brand') + '</p>' +
+        (client.url ? '<a class="visit" href="' + esc(client.url) + '" target="_blank" rel="noopener noreferrer">Visit website &nearr;</a>' : '') + '</div>';
+      document.getElementById("head").innerHTML = head;
+
+      var el = document.getElementById("work");
+      if (!total) { el.innerHTML = '<div class="empty">No work has been added for this brand yet.</div>'; return; }
+
+      var html = "";
+      groups.forEach(function(g) {
+        html += '<section class="cat"><h2>' + esc(g.col.title) + '<small>' + g.items.length + '</small></h2>' +
+          (g.col.subtitle ? '<div class="sub">' + esc(g.col.subtitle) + '</div>' : '<div class="sub"></div>') + '<div class="grid">';
+        g.items.forEach(function(v) {
+          var i = ALL.push({ cat: g.col.title, v: v }) - 1;
+          html += '<button class="tile" onclick="openLb(' + i + ')"><div class="m">' + thumb(v.src) + '</div>' +
+            (isVid(v.src) ? '<span class="play">&#9654;</span>' : '') +
+            '<div class="cap">' + esc(v.title || 'Untitled') + '</div></button>';
+        });
+        html += '</div></section>';
+      });
+      el.innerHTML = html;
+    })();
+
+    /* soft fade between pages */
+    document.addEventListener("click", function(e) {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var a = e.target.closest ? e.target.closest("a[href]") : null;
+      if (!a || (a.target && a.target !== "_self")) return;
+      var u; try { u = new URL(a.href, location.href); } catch (x) { return; }
+      if (u.origin !== location.origin || (u.pathname === location.pathname && u.search === location.search)) return;
+      e.preventDefault();
+      document.documentElement.classList.add("fb-leave");
+      setTimeout(function() { location.href = u.href; }, 260);
+    });
+    window.addEventListener("pageshow", function(e) { if (e.persisted) document.documentElement.classList.remove("fb-leave"); });
+  </script>
+</body>
+</html>
