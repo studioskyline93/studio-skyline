@@ -435,7 +435,10 @@
         });
         return rows.map(function(r) { return r.v; });
       }
-      var videos = newestFirst(collection.videos || []);
+      var sortedVideos = newestFirst(collection.videos || []);
+      /* Items pinned in the admin panel come first; everyone else keeps the newest-first order below them. */
+      var videos = sortedVideos.filter(function(v) { return v.pinned === true; })
+        .concat(sortedVideos.filter(function(v) { return v.pinned !== true; }));
       var modalIndex = -1, angleIdx = 0;
       var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
