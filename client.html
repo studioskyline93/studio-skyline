@@ -120,7 +120,6 @@
         th += '</div>';
       }
       document.getElementById("lbInfo").innerHTML =
-        '<div class="kicker">' + esc(e.cat) + '</div>' +
         (String(v.title || '').trim() ? '<h3>' + esc(v.title) + '</h3>' : '') +
         (v.details ? '<p>' + esc(v.details) + '</p>' : '') + th +
         '<div class="lb-nav">' + (ALL.length > 1 ? '<button onclick="stepLb(-1)">&larr; Prev</button><button onclick="stepLb(1)">Next &rarr;</button>' : '') +
@@ -159,25 +158,25 @@
       var head = "";
       if (client.logo) head += '<div class="logo"><img src="' + esc(client.logo) + '" alt="' + esc(client.name) + '"></div>';
       head += '<div><div class="kicker">Brand</div><div class="title">' + esc(client.name || "Brand") + '</div>' +
-        '<p class="desc">' + (total ? total + (total === 1 ? ' piece' : ' pieces') + ' across ' + groups.length + (groups.length === 1 ? ' category' : ' categories') : 'Our work for this brand') + '</p>' +
         (client.url ? '<a class="visit" href="' + esc(client.url) + '" target="_blank" rel="noopener noreferrer">Visit website &nearr;</a>' : '') + '</div>';
       document.getElementById("head").innerHTML = head;
 
       var el = document.getElementById("work");
       if (!total) { el.innerHTML = '<div class="empty">No work has been added for this brand yet.</div>'; return; }
 
-      var html = "";
-      groups.forEach(function(g) {
-        html += '<section class="cat"><h2>' + esc(g.col.title) + '<small>' + g.items.length + '</small></h2>' +
-          (g.col.subtitle ? '<div class="sub">' + esc(g.col.subtitle) + '</div>' : '<div class="sub"></div>') + '<div class="grid">';
-        g.items.forEach(function(v) {
-          var i = ALL.push({ cat: g.col.title, v: v }) - 1;
-          html += '<button class="tile" onclick="openLb(' + i + ')"><div class="m">' + thumb(v.src) + '</div>' +
-            (isVid(v.src) ? '<span class="play">&#9654;</span>' : '') +
-            (String(v.title || '').trim() ? '<div class="cap">' + esc(v.title) + '</div>' : '') + '</button>';
-        });
-        html += '</div></section>';
+      var all = [];
+      groups.forEach(function(g) { g.items.forEach(function(v) { all.push({ cat: g.col.title, v: v }); }); });
+      // pinned first across everything, otherwise keep the admin order
+      all = all.filter(function(x) { return x.v.pinned === true; }).concat(all.filter(function(x) { return x.v.pinned !== true; }));
+
+      var html = '<section class="cat"><div class="grid">';
+      all.forEach(function(x) {
+        var v = x.v, i = ALL.push(x) - 1;
+        html += '<button class="tile" onclick="openLb(' + i + ')"><div class="m">' + thumb(v.src) + '</div>' +
+          (isVid(v.src) ? '<span class="play">&#9654;</span>' : '') +
+          (String(v.title || '').trim() ? '<div class="cap">' + esc(v.title) + '</div>' : '') + '</button>';
       });
+      html += '</div></section>';
       el.innerHTML = html;
     })();
 
