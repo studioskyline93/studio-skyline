@@ -46,8 +46,7 @@
     try {
       var sb = (typeof getSupabase === 'function') ? getSupabase() : null;
       if (!sb) throw new Error('Supabase is not configured.');
-      var pw = (typeof ADMIN_PASSWORD !== 'undefined') ? ADMIN_PASSWORD : '';
-      var res = await sb.rpc('get_visit_stats', { p_password: pw });
+      var res = await sb.rpc('get_visit_stats');
       if (res.error) throw res.error;
       var d = res.data || {};
       var daily = d.daily || [];
@@ -81,7 +80,7 @@
     } catch (e) {
       var m = (e && e.message) ? e.message : String(e);
       el.innerHTML = shell('<div class="vs-msg">Could not load visitor stats (' + esc(m) +
-        '). Make sure visitor-tracking.sql has been run in Supabase, with your admin password filled in.</div>');
+        '). Make sure visitor-tracking.sql has been run in Supabase, with your admin email filled in, and that you are logged in.</div>');
     }
   };
 })();
