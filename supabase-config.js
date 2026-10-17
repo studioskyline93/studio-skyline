@@ -8,10 +8,7 @@ var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 // Your Supabase storage bucket name for work videos
 var SUPABASE_BUCKET = "work";
 
-// ============================================================
-// ADMIN PASSWORD — change this to something only you know
-// ============================================================
-var ADMIN_PASSWORD = "pass";
+// Admin login now uses a Supabase user (email + password) - no password is stored in this file.
 
 // ============================================================
 // CONTACT FORM — Formspree (optional, free at formspree.io)
