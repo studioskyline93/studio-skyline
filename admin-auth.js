@@ -95,7 +95,11 @@ async function tryLogin() {
     if (r.error) throw r.error;
     _showAdmin();
   } catch (e) {
-    err.textContent = "Incorrect email or password.";
+    console.error("Admin login failed:", e);
+    var m = (e && e.message) ? e.message : "";
+    if (/not confirmed/i.test(m)) err.textContent = "This email is not confirmed yet. In Supabase, delete the user and recreate it with 'Auto Confirm User' ticked.";
+    else if (/invalid login/i.test(m)) err.textContent = "Incorrect email or password.";
+    else err.textContent = "Login failed: " + (m || "unknown error");
     err.style.display = "block";
     document.getElementById("adminPwInput").value = "";
     document.getElementById("adminPwInput").focus();
