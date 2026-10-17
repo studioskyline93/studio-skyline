@@ -5,6 +5,9 @@
   var css = '' +
     '.vs-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}' +
     '.vs-title{font-size:16px;font-weight:600}' +
+    '.vs-toggle{display:flex;align-items:flex-start;gap:8px;cursor:pointer;user-select:none;flex:1;min-width:0}' +
+    '.vs-caret{display:inline-block;font-size:12px;margin-top:5px;color:var(--zinc-500,#71717a);transition:transform .15s}' +
+    '.vs-collapsed .vs-caret{transform:rotate(-90deg)}' +
     '.vs-sub{font-size:12px;color:var(--zinc-500,#71717a)}' +
     '.vs-refresh{margin-left:auto;font-size:13px;background:none;border:none;text-decoration:underline;cursor:pointer;color:inherit}' +
     '.vs-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:16px}' +
@@ -31,10 +34,31 @@
     return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   }
 
+  var COLLAPSE_KEY = 'ss_vs_collapsed';
+  function isCollapsed() { try { return localStorage.getItem(COLLAPSE_KEY) === '1'; } catch (e) { return false; } }
+
+  window.toggleVisitorStats = function () {
+    var el = document.getElementById('visitorStats');
+    if (!el) return;
+    var now = !el.classList.contains('vs-collapsed');
+    el.classList.toggle('vs-collapsed', now);
+    var body = el.querySelector('.vs-body');
+    if (body) body.style.display = now ? 'none' : '';
+    try { localStorage.setItem(COLLAPSE_KEY, now ? '1' : '0'); } catch (e) {}
+  };
+
   function shell(inner) {
-    return '<div class="vs-head"><div><div class="vs-title">Website visitors</div>' +
-      '<div class="vs-sub">One visit = one browser session. Your own visits from this browser are not counted.</div></div>' +
-      '<button class="vs-refresh" onclick="loadVisitorStats()">Refresh</button></div>' + inner;
+    var el = document.getElementById('visitorStats');
+    if (el) el.classList.toggle('vs-collapsed', isCollapsed());
+    return '<div class="vs-head">' +
+      '<div class="vs-toggle" onclick="toggleVisitorStats()" title="Click to show / hide">' +
+        '<span class="vs-caret">&#9660;</span>' +
+        '<div><div class="vs-title">Website visitors</div></div>' +
+      '</div>' +
+      '<button class="vs-refresh" onclick="loadVisitorStats()">Refresh</button></div>' +
+      '<div class="vs-body"' + (isCollapsed() ? ' style="display:none"' : '') + '>' +
+      '<div class="vs-sub" style="margin-top:2px">One visit = one browser session. Your own visits from this browser are not counted.</div>' +
+      inner + '</div>';
   }
 
   window.loadVisitorStats = async function () {
