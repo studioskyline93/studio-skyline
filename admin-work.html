@@ -191,6 +191,9 @@
     </div>
 
 
+    <!-- Visitor stats (visitor-stats.js) -->
+    <div class="panel" id="visitorStats" style="margin-top:32px"></div>
+
     <div class="admin-layout">
       <!-- LEFT: Categories list -->
       <div class="panel">
@@ -218,6 +221,7 @@
   <script src="supabase-config.js"></script>
   <script src="supabase-client.js"></script>
   <script src="shared.js"></script>
+  <script src="visitor-stats.js"></script>
   <script>
     var work = { collections: [] };
     var activeSlug = "";
@@ -767,7 +771,7 @@
     }
 
     // --- Init ---
-    function onAdminReady() { loadAll(); }
+    function onAdminReady() { loadAll(); if (typeof loadVisitorStats === "function") loadVisitorStats(); }
   </script>
   <script src="admin-auth.js"></script>
   <script>initAdminAuth();</script>
