@@ -1,5 +1,9 @@
 // Supabase helper functions (uses the browser JS client loaded via CDN)
 // Requires supabase-config.js to be loaded first
+//
+// CHANGE (R2 migration): content (login, site data, work data) still lives in
+// Supabase. Files (videos/images) now live in Cloudflare R2 and are reached
+// through the Worker defined in supabase-config.js (MEDIA_API_URL / MEDIA_BASE_URL).
 
 var _supabase = null;
 
@@ -79,25 +83,59 @@ async function saveWorkContent(data) {
   }
 }
 
-// Upload a file to Supabase Storage
-async function uploadToStorage(slug, file) {
-  var sb = getSupabase();
-  if (!sb) { alert("Supabase not configured"); return null; }
+// ------------------------------------------------------------
+// Storage (Cloudflare R2 via the Worker)
+// ------------------------------------------------------------
 
+// Get the admin's current Supabase login token (the Worker checks it)
+async function getAuthToken() {
+  var sb = getSupabase();
+  if (!sb) return null;
+  var result = await sb.auth.getSession();
+  var session = result && result.data ? result.data.session : null;
+  return session ? session.access_token : null;
+}
+
+// Call the Worker with the admin's login token
+async function mediaApi(pathname, options) {
+  var token = await getAuthToken();
+  if (!token) throw new Error("Not logged in");
+  options = options || {};
+  options.headers = Object.assign({ Authorization: "Bearer " + token }, options.headers || {});
+  var res = await fetch(MEDIA_API_URL + pathname, options);
+  var body = await res.json().catch(function() { return {}; });
+  if (!res.ok) throw new Error(body.error || ("Request failed: " + res.status));
+  return body;
+}
+
+// Public URL for any stored path
+function mediaUrl(objectPath) {
+  return MEDIA_BASE_URL.replace(/\/+$/, "") + "/" + objectPath;
+}
+
+// Upload a file to R2 (browser -> one-time link -> R2 directly)
+async function uploadToStorage(slug, file) {
   var safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
   var objectPath = slug + "/videos/" + Date.now() + "-" + safeName;
+  var contentType = file.type || "video/mp4";
 
   try {
-    var result = await sb.storage.from(SUPABASE_BUCKET).upload(objectPath, file, {
-      contentType: file.type || "video/mp4",
-      upsert: false
+    var signed = await mediaApi("/presign", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: objectPath, contentType: contentType })
     });
-    if (result.error) throw result.error;
 
-    var pubResult = sb.storage.from(SUPABASE_BUCKET).getPublicUrl(objectPath);
+    var put = await fetch(signed.uploadUrl, {
+      method: "PUT",
+      headers: { "Content-Type": contentType },
+      body: file
+    });
+    if (!put.ok) throw new Error("R2 upload failed: " + put.status);
+
     return {
       path: objectPath,
-      src: pubResult.data.publicUrl
+      src: mediaUrl(objectPath)
     };
   } catch (e) {
     console.error("Upload failed:", e);
@@ -105,13 +143,14 @@ async function uploadToStorage(slug, file) {
   }
 }
 
-// Delete a file from Supabase Storage
+// Delete a file from R2
 async function deleteFromStorage(storagePath) {
-  var sb = getSupabase();
-  if (!sb) { alert("Supabase not configured"); return false; }
   try {
-    var result = await sb.storage.from(SUPABASE_BUCKET).remove([storagePath]);
-    if (result.error) throw result.error;
+    await mediaApi("/delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: storagePath })
+    });
     return true;
   } catch (e) {
     console.error("Delete failed:", e);
@@ -119,17 +158,11 @@ async function deleteFromStorage(storagePath) {
   }
 }
 
-// List files in a storage folder
+// List files in a storage folder (prefix like "my-slug/videos")
 async function listStorageFiles(prefix) {
-  var sb = getSupabase();
-  if (!sb) return [];
   try {
-    var result = await sb.storage.from(SUPABASE_BUCKET).list(prefix, {
-      limit: 200,
-      sortBy: { column: "name", order: "desc" }
-    });
-    if (result.error) throw result.error;
-    return (result.data || []).map(function(f) { return f.name; }).filter(function(n) {
+    var body = await mediaApi("/list?prefix=" + encodeURIComponent(prefix || ""));
+    return (body.names || []).filter(function(n) {
       return /\.(mp4|webm|mov|m4v|jpe?g|png|webp|gif|avif)$/i.test(n);
     });
   } catch (e) {
@@ -140,8 +173,5 @@ async function listStorageFiles(prefix) {
 
 // Get public URL for a file in storage
 function storagePublicUrl(slug, filename) {
-  var sb = getSupabase();
-  if (!sb) return "";
-  var result = sb.storage.from(SUPABASE_BUCKET).getPublicUrl(slug + "/videos/" + filename);
-  return result.data.publicUrl;
+  return mediaUrl(slug + "/videos/" + filename);
 }
