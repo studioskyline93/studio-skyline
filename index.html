@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="coming-soon"><!-- COMING SOON MODE: to publish the site again, delete  class="coming-soon"  from this <html> tag. -->
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -351,8 +351,42 @@
       body.ix-themed .reel-card:hover .reel-card-media img,body.ix-themed .reel-card:hover .reel-card-media video{transform:none}
     }
   </style>
+  <!-- COMING-SOON-START (safe to leave in; only active while <html class="coming-soon">) -->
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    html.coming-soon body > *:not(#cs-overlay){display:none !important}
+    html.coming-soon body{overflow:hidden;background:#FAF7F3}
+    html:not(.coming-soon) #cs-overlay{display:none !important}
+    #cs-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;
+      background:radial-gradient(1200px 700px at 50% -10%,#fff 0%,#FAF7F3 55%,#f1e8e2 100%);color:#262222;font-family:"Inter",system-ui,sans-serif;overflow:hidden}
+    #cs-overlay::before,#cs-overlay::after{content:"";position:absolute;border-radius:50%;filter:blur(70px);opacity:.35;animation:csf 14s ease-in-out infinite alternate}
+    #cs-overlay::before{width:420px;height:420px;background:#800D1B;top:-140px;left:-120px;opacity:.18}
+    #cs-overlay::after{width:520px;height:520px;background:#c9a36a;bottom:-200px;right:-160px;opacity:.22;animation-delay:-6s}
+    @keyframes csf{to{transform:translate(40px,30px) scale(1.12)}}
+    .cs-card{position:relative;max-width:640px;animation:csin 1.2s cubic-bezier(.2,.7,.2,1) both}
+    @keyframes csin{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+    .cs-brand{font-size:12px;letter-spacing:.38em;text-transform:uppercase;color:#800D1B;font-weight:600}
+    .cs-line{width:56px;height:1px;background:#800D1B;margin:26px auto}
+    .cs-title{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:clamp(46px,9vw,92px);line-height:1;margin:0;letter-spacing:.01em}
+    .cs-title em{font-style:italic;color:#800D1B;font-weight:500}
+    .cs-sub{margin:22px auto 0;max-width:460px;color:#77716F;font-size:16px;line-height:1.7}
+    .cs-foot{margin-top:38px;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#77716F}
+  </style>
+  <!-- COMING-SOON-END -->
 </head>
 <body class="ix-themed">
+<!-- COMING-SOON-OVERLAY-START -->
+<div id="cs-overlay" role="main">
+  <div class="cs-card">
+    <div class="cs-brand">Studio Skyline</div>
+    <div class="cs-line"></div>
+    <h1 class="cs-title">Coming <em>Soon</em></h1>
+    <p class="cs-sub">Something beautifully crafted is on its way. Premium packaging &amp; print production, reimagined.</p>
+    <div class="cs-foot">Stay tuned</div>
+  </div>
+</div>
+<!-- COMING-SOON-OVERLAY-END -->
+
 
   <!-- Shared nav injected by shared.js -->
   <div id="site-header"></div>
