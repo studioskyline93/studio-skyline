@@ -191,9 +191,6 @@
     </div>
 
 
-    <!-- Visitor stats (visitor-stats.js) -->
-    <div class="panel" id="visitorStats" style="margin-top:32px"></div>
-
     <div class="admin-layout">
       <!-- LEFT: Categories list -->
       <div class="panel">
@@ -217,11 +214,8 @@
   </div><!-- end adminContent -->
   <div id="site-footer"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-config.js"></script>
   <script src="supabase-client.js"></script>
   <script src="shared.js"></script>
-  <script src="visitor-stats.js"></script>
   <script>
     var work = { collections: [] };
     var activeSlug = "";
@@ -657,8 +651,8 @@
 
       // Extract storage path from public URL
       var path = "";
-      if (SUPABASE_URL && v.src.indexOf(SUPABASE_URL) === 0) {
-        path = v.src.replace(SUPABASE_URL + "/storage/v1/object/public/" + SUPABASE_BUCKET + "/", "");
+      if (v.src.indexOf(R2_PUBLIC_URL + "/") === 0) {
+        path = v.src.slice(R2_PUBLIC_URL.length + 1);
       }
 
       if (path) {
