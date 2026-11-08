@@ -1,5 +1,5 @@
 // Content + admin helpers. No Supabase any more.
-//
+// 
 //  • Pictures and videos live in Cloudflare R2.
 //  • Site text (work.json / site.json) is read from the admin Worker, and falls back
 //    to the work.json / site.json files next to the pages if the Worker has nothing yet.
