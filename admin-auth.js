@@ -1,6 +1,4 @@
-// Admin login (Supabase Auth) - included on all admin pages.
-// Log in with the email + password of the admin user created in Supabase.
-// Works on any admin page even if it does not load the Supabase scripts itself.
+// Admin login (password, checked by the Cloudflare Worker) - included on all admin pages.
 
 function _loadScript(src) {
   return new Promise(function (resolve, reject) {
@@ -12,11 +10,8 @@ function _loadScript(src) {
   });
 }
 
-async function _ensureSupabase() {
-  if (typeof supabase === "undefined") await _loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2");
-  if (typeof SUPABASE_URL === "undefined") await _loadScript("supabase-config.js");
-  if (typeof getSupabase !== "function") await _loadScript("supabase-client.js");
-  return getSupabase();
+async function _ensureClient() {
+  if (typeof ADMIN_API === "undefined") await _loadScript("supabase-client.js");
 }
 
 var _adminReadyFired = false;
@@ -62,8 +57,6 @@ function showLoginScreen(message) {
       '<div style="font-size:24px;font-weight:600;letter-spacing:-0.02em">Admin Login</div>',
       '<div style="margin-top:4px;font-size:14px;color:#71717a">Studio Skyline</div>',
       '<div style="margin-top:24px;display:grid;gap:12px">',
-        '<input id="adminEmailInput" type="email" autocomplete="username" placeholder="Email" style="' + field + '"',
-          ' onkeydown="if(event.key===\'Enter\')document.getElementById(\'adminPwInput\').focus()">',
         '<input id="adminPwInput" type="password" autocomplete="current-password" placeholder="Password" style="' + field + '"',
           ' onkeydown="if(event.key===\'Enter\')tryLogin()">',
         '<button id="adminLoginBtn" onclick="tryLogin()" class="btn-primary" style="width:100%;padding:12px;font-size:14px">Enter</button>',
@@ -78,27 +71,31 @@ function showLoginScreen(message) {
     err.textContent = message;
     err.style.display = "block";
   }
-  document.getElementById("adminEmailInput").focus();
+  document.getElementById("adminPwInput").focus();
 }
 
 async function tryLogin() {
-  var email = document.getElementById("adminEmailInput").value.trim();
   var pw = document.getElementById("adminPwInput").value;
   var err = document.getElementById("loginError");
   var btn = document.getElementById("adminLoginBtn");
   err.style.display = "none";
-  if (!email || !pw) { err.textContent = "Enter your email and password."; err.style.display = "block"; return; }
+  if (!pw) { err.textContent = "Enter your password."; err.style.display = "block"; return; }
 
   btn.disabled = true; btn.textContent = "Checking...";
   try {
-    var r = await getSupabase().auth.signInWithPassword({ email: email, password: pw });
-    if (r.error) throw r.error;
+    var res = await fetch(ADMIN_API + "/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: pw })
+    });
+    var out = await res.json().catch(function () { return {}; });
+    if (!res.ok || !out.token) throw new Error(out.error || ("HTTP " + res.status));
+    ssSetToken(out.token);
     _showAdmin();
   } catch (e) {
     console.error("Admin login failed:", e);
     var m = (e && e.message) ? e.message : "";
-    if (/not confirmed/i.test(m)) err.textContent = "This email is not confirmed yet. In Supabase, delete the user and recreate it with 'Auto Confirm User' ticked.";
-    else if (/invalid login/i.test(m)) err.textContent = "Incorrect email or password.";
+    if (/incorrect/i.test(m)) err.textContent = "Incorrect password.";
     else err.textContent = "Login failed: " + (m || "unknown error");
     err.style.display = "block";
     document.getElementById("adminPwInput").value = "";
@@ -108,22 +105,26 @@ async function tryLogin() {
 }
 
 async function adminLogout() {
-  try { await getSupabase().auth.signOut(); } catch (e) {}
+  ssClearToken();
   location.reload();
 }
 
 async function initAdminAuth() {
   var content = document.getElementById("adminContent");
   if (content) content.style.display = "none";
-  var sb;
-  try { sb = await _ensureSupabase(); }
+  try { await _ensureClient(); }
   catch (e) { showLoginScreen("Could not start login: " + e.message); return; }
-  if (!sb) { showLoginScreen("Supabase is not configured."); return; }
+  if (!ADMIN_API) { showLoginScreen("Admin is not set up yet: add the Worker address to supabase-client.js (ADMIN_API)."); return; }
 
-  var s = await sb.auth.getSession();
-  if (s && s.data && s.data.session) _showAdmin(); else showLoginScreen();
-
-  sb.auth.onAuthStateChange(function (event) {
-    if (event === "SIGNED_OUT") location.reload();
-  });
+  if (ssGetToken()) {
+    try {
+      var r = await fetch(ADMIN_API + "/api/check", { headers: { Authorization: "Bearer " + ssGetToken() } });
+      if (r.ok) { _showAdmin(); return; }
+      ssClearToken();
+    } catch (e) {
+      showLoginScreen("Could not reach the admin server. Check your connection and reload.");
+      return;
+    }
+  }
+  showLoginScreen();
 }
