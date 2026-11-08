@@ -57,6 +57,8 @@ function showLoginScreen(message) {
       '<div style="font-size:24px;font-weight:600;letter-spacing:-0.02em">Admin Login</div>',
       '<div style="margin-top:4px;font-size:14px;color:#71717a">Studio Skyline</div>',
       '<div style="margin-top:24px;display:grid;gap:12px">',
+        '<input id="adminEmailInput" type="email" autocomplete="username" placeholder="Email" style="' + field + '"',
+          ' onkeydown="if(event.key===\'Enter\')document.getElementById(\'adminPwInput\').focus()">',
         '<input id="adminPwInput" type="password" autocomplete="current-password" placeholder="Password" style="' + field + '"',
           ' onkeydown="if(event.key===\'Enter\')tryLogin()">',
         '<button id="adminLoginBtn" onclick="tryLogin()" class="btn-primary" style="width:100%;padding:12px;font-size:14px">Enter</button>',
@@ -71,22 +73,23 @@ function showLoginScreen(message) {
     err.textContent = message;
     err.style.display = "block";
   }
-  document.getElementById("adminPwInput").focus();
+  document.getElementById("adminEmailInput").focus();
 }
 
 async function tryLogin() {
+  var email = document.getElementById("adminEmailInput").value.trim();
   var pw = document.getElementById("adminPwInput").value;
   var err = document.getElementById("loginError");
   var btn = document.getElementById("adminLoginBtn");
   err.style.display = "none";
-  if (!pw) { err.textContent = "Enter your password."; err.style.display = "block"; return; }
+  if (!email || !pw) { err.textContent = "Enter your email and password."; err.style.display = "block"; return; }
 
   btn.disabled = true; btn.textContent = "Checking...";
   try {
     var res = await fetch(ADMIN_API + "/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password: pw })
+      body: JSON.stringify({ email: email, password: pw })
     });
     var out = await res.json().catch(function () { return {}; });
     if (!res.ok || !out.token) throw new Error(out.error || ("HTTP " + res.status));
@@ -95,7 +98,7 @@ async function tryLogin() {
   } catch (e) {
     console.error("Admin login failed:", e);
     var m = (e && e.message) ? e.message : "";
-    if (/incorrect/i.test(m)) err.textContent = "Incorrect password.";
+    if (/incorrect/i.test(m)) err.textContent = "Incorrect email or password.";
     else err.textContent = "Login failed: " + (m || "unknown error");
     err.style.display = "block";
     document.getElementById("adminPwInput").value = "";
