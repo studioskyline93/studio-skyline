@@ -1,0 +1,101 @@
+{
+  "about": {
+    "body": "",
+    "intro": ""
+  },
+  "videos": [
+    {
+      "note": "Manufacturing + finishing highlights",
+      "title": "Studio Film",
+      "youtubeId": "sGJJgBfHy5E"
+    }
+  ],
+  "clients": [
+    {
+      "url": "https://www.needledust.com/",
+      "logo": "public/clients/logos/needledust.png",
+      "name": "Needledust"
+    },
+    {
+      "url": "https://www.ihg.com/crowneplaza/hotels/us/en/new-delhi/ndeol/hoteldetail",
+      "logo": "public/clients/logos/crowneplaza.png",
+      "name": "Crowne Plaza"
+    },
+    {
+      "url": "https://sandbyshirin.com/",
+      "logo": "public/clients/logos/SAND.png",
+      "name": "SAND"
+    },
+    {
+      "url": "https://www.ihg.com/",
+      "logo": "public/clients/logos/IHG.png",
+      "name": "IHG Group"
+    },
+    {
+      "url": "https://www.radissonhotels.com/",
+      "logo": "public/clients/logos/radisson.png",
+      "name": "Radisson"
+    },
+    {
+      "url": "https://www.radissonhotels.com/en-us/brand/park-inn",
+      "logo": "public/clients/logos/Parkinn.png",
+      "name": "Park Inn"
+    },
+    {
+      "url": "https://www.ihgplc.com/en/our-brands/holiday-inn",
+      "logo": "public/clients/logos/holidayinn.png",
+      "name": "Holiday Inn"
+    },
+    {
+      "url": "https://www.thesuryaa.com/",
+      "logo": "public/clients/logos/suryaa.png",
+      "name": "Suryaa"
+    },
+    {
+      "url": "https://www.marriott.com/brands/four-points-by-sheraton.mi",
+      "logo": "public/clients/logos/four.png",
+      "name": "Four Points By Sheraton"
+    }
+  ],
+  "contact": {
+    "email": "studioskyline93@gmail.com",
+    "phone": "011-40527042, 011-40527043 & 011-40527043",
+    "mapUrl": "",
+    "address": "",
+    "whatsapp": "+919810264240"
+  },
+  "testimonials": [
+    {
+      "quote": "Studio Skyline consistently delivers premium quality. The finishing and attention to detail are exceptional.",
+      "author": "Brand Director",
+      "company": "Luxury Fashion Brand"
+    },
+    {
+      "quote": "From concept to manufacturing, the process is smooth and reliable. Highly recommended.",
+      "author": "Founder",
+      "company": "Packaging Studio"
+    },
+    {
+      "quote": "Clean production, precise color, and excellent communication throughout.",
+      "author": "Marketing Lead",
+      "company": "Consumer Goods Brand"
+    }
+  ],
+  "productionHouseMedia": [
+    {
+      "alt": "Machine running",
+      "src": "public/production-house/hero/videos/machine-01.mp4",
+      "type": "video"
+    },
+    {
+      "alt": "Packaging detail",
+      "src": "public/production-house/hero/videos/packaging-01.jpg",
+      "type": "photo"
+    },
+    {
+      "alt": "Packaging line",
+      "src": "public/production-house/hero/videos/packaging-01.mp4",
+      "type": "video"
+    }
+  ]
+}

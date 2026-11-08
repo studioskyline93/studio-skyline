@@ -1,0 +1,424 @@
+{
+  "collections": [
+    {
+      "slug": "premium-fancy-boxes",
+      "index": "01",
+      "title": "Premium Fancy Boxes",
+      "videos": [
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791569686261-Luxurious-Golden-Hotel-Gift-Box.png",
+          "title": "Diwali Gift Box",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791570011313-Golden-Embroidered-Gift-Box-Display.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791570021746-Luxurious-Crowne-Plaza-Gift-Box-Still-Life.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791570818229-Product_showcase_of_gift_box_20261005194805.mp4"
+          ],
+          "client": "Crowne Plaza"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791988462284-Luxury-Pink-NEEDLEDUST-Gift-Box.png",
+          "title": "Needledust x Abhinav Mishra",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791988476846-Needledust-Abhinav-Mishra-Gift-Box.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791988477830-Peach_gift_box_on_surface_20261005203704.mp4"
+          ],
+          "client": "Needledust"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791993370958-Floral-Diwali-Gift-Box-Still-Life.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791993436496-Floral-Diwali-Gift-Box-Glow.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791993508226-Elegant-Diwali-Gift-Box-Still-Life.png"
+          ]
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791988520628-Elegant-Teal-Festive-Gift-Box.png",
+          "title": "Diwali Gift Hamper",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791988532095-Elegant-Teal-Whisky-Gift-Hamper.png"
+          ],
+          "client": "Crowne Plaza"
+        },
+        {
+          "src": "public/work/premium-fancy-boxes/videos/box-02.mp4",
+          "title": "Foil and emboss detail"
+        },
+        {
+          "src": "public/work/premium-fancy-boxes/videos/box-03.mp4",
+          "title": "Magnetic box reveal"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791988563713-Vero-Essere-Colosseum-Gift-Box.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791988610768-Luxury-Orange-Vero-Essere-Unboxing.png"
+          ],
+          "client": "Verbo Essere Colosseum"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791995193894-Luxury-Open-Holiday-Inn-Amenity-Box.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791995200453-Luxury-Holiday-Inn-Gift-Box-Still-Life--1-.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791995208150-Open-Golden-Fold-Out-Gift-Box.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791995216751-Luxurious-Holiday-Inn-Amenity-Box.png"
+          ],
+          "client": "IHG"
+        },
+        {
+          "src": "public/work/premium-fancy-boxes/videos/box-01.mp4",
+          "title": "Magnetic box reveal"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791988658950-Elegant-Purple-Colosseum-Gift-Box.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791988664908-Open-Purple-Luxury-Box-with-Foam-Insert.png"
+          ],
+          "client": "Verbo Essere Colosseum"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791993761979-Holiday-Inn-Aerocity-Gift-Box.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791993885864-Holiday-Inn-Gift-Box-in-a-Warm-Hotel-Setting.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791993943660-Open-Coral-Keepsake-Box-on-Marble.png"
+          ],
+          "client": "IHG "
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791994106579-Elegant-Holiday-Inn-Gift-Box-Display.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791994527709-Holiday-Inn-Luxury-Gift-Box-Display.png"
+          ],
+          "client": "IHG "
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791995418900-Luxury-Evolve-Wellness-Gift-Box.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791995594018-Luxury-Evolve-Gift-Box-Still-Life.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791995598234-Luxurious-Evolve-Wellness-Club-Box.png"
+          ],
+          "client": "Evolve"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791995968112-NOGRAV_-Walk-Beyond-Gravity.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791996024987-Premium-Black-and-Red-Luxury-Shoebox.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791996029223-NOGRAV-Beyond-Gravity-Box.png"
+          ],
+          "client": "Nograv"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791996002977-Turquoise-Bulluka-Gift-Box-Still-Life--1-.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791996008552-Turquoise-Bulluka-Gift-Box-Still-Life.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791996089114-Turquoise-Bulluka-Gift-Box-on-Marble.png"
+          ],
+          "client": "Dulluka"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791996212417-Elegant-Olive-Monogram-Gift-Box.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791996217225-Olive-Gift-Box-with-Elegant-Embossing.png"
+          ],
+          "client": "Rimple & Harpreet"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791996341804-Botanical-Shirin-Sand-Gift-Box-Display.png",
+          "client": "SAND"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791996525701-Luxury-IRA-Udaipur-Box-on-Wood.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791996566894-Vintage-Udaipur-Gold-Embossed-Box-Lid.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791996651678-Heritage-Ivory-Ornament-Gift-Box.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791996708845-Luxury-Black-Boxes-in-Warm-Interiors.png"
+          ],
+          "client": "IRA"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791996687495-Luxury-Floral-Hotel-Keepsake-Box.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791996694704-Elegant-Floral-Gift-Boxes-on-Marble.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791996751201-Luxury-Floral-Hotel-Gift-Box-Display.png"
+          ],
+          "client": "Four Points by Sheraton"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997118992-Kaunteya-Luxury-Box-in-Golden-Sunlight.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997128006-Kaunteya-Landscape-Gift-Box.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997130746-Kaunteya-Box-in-Golden-Light.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997225993-Kaunteya-Gift-Boxes-in-Warm-Luxury.png"
+          ],
+          "client": "Kaunteya"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997278105-Utsav-Luxury-Gift-Box-Still-Life.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997289503-Lavender-Utsav-Luxury-Gift-Box.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997290200-Pastel-Green-Handcrafted-Luxury-Box.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997290669-Utsav-Luxury-Gift-Boxes--1-.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997346432-Stacked-Utsav-Luxury-Gift-Boxes.png"
+          ],
+          "client": "Utsav"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997434613-Warm-Editorial-Gift-Box.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997499374-Aplito-Baby-Box-in-Warm-Sunlight.png"
+          ],
+          "client": "Aplito"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997662772-Kalamkani-Luxury-Green-Gift-Box.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997697990-Kalamkani-Green-Boxes-in-Golden-Light.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997699655-Kalamkani-Green-Luxury-Gift-Box.png"
+          ],
+          "client": "Kalamkani"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997785122-Luxury-Vero-Essere-Perfume-Box-Display.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997808470-Vero-Essere-Luxury-Perfume-Box.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997811757-Vero-Essere-Perfume-on-Marble.png"
+          ],
+          "client": "Verbo Essere Colosseum"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997927047-Khushiyaan-Luxury-Gift-Box-Display.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997986431-Luxury-Khushiyaan-Gift-Box-Reveal.png"
+          ],
+          "client": "Crowne Plaza"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997937424-Luxury-Teal-and-Gold-Hotel-Gift-Box.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791997989500-Luxury-Teal-Holiday-Inn-Gift-Box.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791998030273-Luxurious-Teal-and-Gold-Gift-Box.png"
+          ],
+          "client": "Holiday Inn"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791998091456-Surya-a-Luxury-Boxes-Styled-Still-Life.png",
+          "client": "Suryaa"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791998224812-Ornate-Floral-Park-Inn-Keepsake-Box.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791998460141-Elegant-Floral-Gift-Box-Display.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791998467042-Luxurious-Park-Inn-Keepsake-Box-Display.png"
+          ],
+          "client": "Park Inn"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791998246180-Luxurious-Fuchsia-Gift-Box-with-Gold-Compartments.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791998266899-Luxurious-Radisson-Pink-Gift-Box--1-.png"
+          ],
+          "client": "Radisson"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791998479163-Radisson-Pink-Lotus-Gift-Box.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791998492291-Luxury-Pink-Gift-Box-on-Marble-Tabletop.png"
+          ],
+          "client": "Radisson"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791998623299-Luxurious-Red-Festive-Gift-Box-Display.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/premium-fancy-boxes/videos/1791998676232-Luxurious-Khushiyaan-Gift-Box-Display.png"
+          ],
+          "client": "Crowne Plaza"
+        }
+      ],
+      "subtitle": "Rigid boxes • Luxury finishing",
+      "description": "Rigid boxes with premium wraps, foil stamping, embossing, and custom inserts.",
+      "hiddenFolders": [
+        "crowne plaza",
+        "verbo essere colosseum",
+        "ihg"
+      ]
+    },
+    {
+      "slug": "paper-bags",
+      "index": "02",
+      "title": "Paper Bags",
+      "videos": [
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791992068362-Luxurious-Burgundy-Season-Greetings-Gift-Bag.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791992504173-Luxury-Season-Greetings-Gift-Bag.png"
+          ]
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791992732665-Elegant-RIGSS-Crest-Gift-Bag.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791992748848-Elegant-RIGSS-Gift-Bag-on-Study-Desk.png"
+          ]
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791992812302-Art---Blend-Designer-Shopping-Bag.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791992882368-fe3ab3d9-95d1-4258-94eb-8758373eace1.png"
+          ]
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791992932970-Cobalt-Blue-Gift-Bag-Still-Life.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791993256459-Royal-Blue-Luxury-Gift-Bag-Vignette.png",
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791999412374-Three-Colourful-Bags-in-Sunlit-Stone-Setting.png"
+          ],
+          "client": "os.me"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791999535629-Crimson-Lotus-Gift-Bag.png",
+          "client": "os.me"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791999536965-Elegant-Cream-Shopping-Bag-on-Marble.png",
+          "client": "SAND"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791999537884-Elegant-NEEDLEDUST-Pink-Shopping-Bags.png",
+          "client": "Needledust",
+          "pinned": true
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791999539090-Elegant-Peach-Luxury-Shopping-Bag.png",
+          "client": "Needledust"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791999540649-Elegant-Sand-Gift-Bag-Display.png",
+          "client": "SAND"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791999541331-Galari-Kraft-Gift-Bag-Arrangement.png",
+          "client": "Galari"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791999542494-Luxury-Sand-Gift-Bag-in-Sunlight.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791999604359-Sunlit-Sand-by-Shirin-Shopping-Bags.png"
+          ],
+          "client": "SAND",
+          "pinned": true
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791999543565-Peach-NEEDLEDUST-Tropical-Gift-Bag.png",
+          "client": "Needledust"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1791999545001-Sunlit-Yellow-Lotus-Gift-Bag.png",
+          "client": "os.me"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1792155770279-Luxury-Charcoal-Atelier-Shopping-Bag--1-.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1792155780857-Luxury-Charcoal-Atelier-Shopping-Bag.png"
+          ],
+          "client": "KGL"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1792155852148-Luxury-Blue-Shopping-Bag-Display.png",
+          "angles": [
+            "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/paper-bags/videos/1792155857673-Pastel-Blue-Luxury-Atelier-Bag.png"
+          ],
+          "client": "KGL"
+        }
+      ],
+      "subtitle": "Luxury paper bags",
+      "description": "Premium paper bags with reinforced handles and clean finishing."
+    },
+    {
+      "slug": "books",
+      "index": "03",
+      "title": "Books",
+      "videos": [
+        {
+          "src": "public/work/books-catalogues/videos/book-01.mp4",
+          "title": "Handle and structure"
+        },
+        {
+          "src": "public/work/books-catalogues/videos/book-02.mp4",
+          "title": "Handle and structure"
+        },
+        {
+          "src": "public/work/books-catalogues/videos/book-03.mp4",
+          "title": "Handle and structure"
+        },
+        {
+          "src": "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev/books/videos/1791991657324-Bollywood-Melodies-Sheet-Music-Cover.png",
+          "title": "Romantic Bollywood Melodies",
+          "client": "Ria Om Shandilya"
+        }
+      ],
+      "enabled": false,
+      "subtitle": "Print • Bind • Finish",
+      "description": "High-quality book printing, catalogues, and premium binding."
+    },
+    {
+      "slug": "packaging-acc",
+      "index": "04",
+      "title": "Catalogue & Sample Kits",
+      "videos": [
+        {
+          "src": "public/work/packaging-acc/videos/pack-01.mp4",
+          "title": "Handle and structure"
+        },
+        {
+          "src": "public/work/packaging-acc/videos/pack-02.mp4",
+          "title": "Handle and structure"
+        },
+        {
+          "src": "public/work/packaging-acc/videos/pack-03.mp4",
+          "title": "Handle and structure"
+        }
+      ],
+      "enabled": false,
+      "subtitle": "Rigid boxes, sleeves, labels",
+      "description": "Short intro for this collection."
+    },
+    {
+      "slug": "stationery",
+      "index": "05",
+      "title": "Stationeries",
+      "videos": [
+        {
+          "src": "public/work/stationery/videos/stationery-01.mp4",
+          "title": "Handle and structure"
+        },
+        {
+          "src": "public/work/stationery/videos/stationery-02.mp4",
+          "title": "Handle and structure"
+        },
+        {
+          "src": "public/work/stationery/videos/stationery-03.mp4",
+          "title": "Handle and structure"
+        }
+      ],
+      "enabled": false,
+      "subtitle": "Cards • Letterheads • Envelopes",
+      "description": "Premium stationery production with attention to material and detail."
+    },
+    {
+      "slug": "accessories",
+      "index": "",
+      "title": "Accessories",
+      "videos": [
+        {
+          "src": "public/work/accessories/videos/Demo-video.mp4"
+        },
+        {
+          "src": "public/work/accessories/videos/330656_medium.mp4"
+        },
+        {
+          "src": "public/work/accessories/videos/aehairate.mp4"
+        }
+      ],
+      "enabled": false,
+      "subtitle": "",
+      "description": ""
+    }
+  ]
+}
