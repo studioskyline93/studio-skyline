@@ -1,5 +1,5 @@
 // Content + admin helpers. No Supabase any more.
-// 
+//
 //  • Pictures and videos live in Cloudflare R2.
 //  • Site text (work.json / site.json) is read from the admin Worker, and falls back
 //    to the work.json / site.json files next to the pages if the Worker has nothing yet.
@@ -9,7 +9,7 @@ var R2_PUBLIC_URL = "https://pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev";
 
 // >>> After you create the Worker, paste its address between the quotes, e.g.
 // >>> "https://studio-admin.your-name.workers.dev"   (no slash at the end)
-var ADMIN_API = "";
+var ADMIN_API = "https://studio-admin.riaomshandilya.workers.dev";
 
 var SS_TOKEN_KEY = "ss-admin-token";
 
