@@ -325,7 +325,7 @@
       });
     }
     function groupPics(g) {
-      return g.items.map(function(v) { return v.src; }).filter(function(src) { return src && !VIDEO_RE.test(src); });
+      return g.items.filter(function(v) { return !v.youtube; }).map(function(v) { return v.src; }).filter(function(src) { return src && !VIDEO_RE.test(src); });
     }
 
     function renderClientFolders() {
@@ -486,7 +486,8 @@
       var html = '<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px">' +
         '<div style="font-size:16px; font-weight:600">' + c.title + '</div>' +
         '<div><input type="file" accept="video/mp4,image/*" multiple id="uploadInput" style="display:none" onchange="uploadFiles(this.files)">' +
-        '<button class="btn-secondary" onclick="document.getElementById(\'uploadInput\').click()">+ Upload photos / videos</button></div></div>';
+        '<button class="btn-secondary" onclick="document.getElementById(\'uploadInput\').click()">+ Upload photos / videos</button> ' +
+        '<button class="btn-secondary" onclick="addYouTube()">+ Add YouTube video</button></div></div>';
 
       html += '<div class="toggle-row"><label class="switch"><input type="checkbox"' + (isOn(c) ? ' checked' : '') +
         ' onchange="toggleCat(\'' + c.slug + '\', this.checked)"><span class="slider"></span></label>' +
@@ -518,7 +519,9 @@
         vids.forEach(function(v, idx) {
           var fname = v.src.split("/").pop();
           var name = v.title || fname;
-          var thumb = VIDEO_RE.test(v.src)
+          var thumb = v.youtube
+            ? '<img class="item-thumb" src="https://img.youtube.com/vi/' + escA(v.youtube) + '/hqdefault.jpg" alt="" loading="lazy">'
+            : VIDEO_RE.test(v.src)
             ? '<video class="item-thumb" src="' + escA(v.src) + '" muted playsinline preload="metadata"></video>'
             : '<img class="item-thumb" src="' + escA(v.src) + '" alt="" loading="lazy">';
           items += '<details class="item" data-src="' + escA(v.src) + '"' + (openItems[v.src] ? ' open' : '') + ' ontoggle="onItem(this)"><summary>' + thumb +
@@ -694,6 +697,27 @@
       c.videos[idx].angles.splice(j, 1);
       renderEditor();
       setStatus("Angle removed. Click Save changes to persist.");
+    }
+
+    // --- YouTube video (added pinned) ---
+    function youTubeId(url) {
+      var m = String(url).trim().match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/))([A-Za-z0-9_-]{11})/);
+      if (m) return m[1];
+      return /^[A-Za-z0-9_-]{11}$/.test(String(url).trim()) ? String(url).trim() : "";
+    }
+    function addYouTube() {
+      var c = getActive();
+      if (!c) return;
+      var url = prompt("Paste the YouTube link:");
+      if (!url) return;
+      var id = youTubeId(url);
+      if (!id) { setStatus("That doesn't look like a valid YouTube link."); return; }
+      var src = "https://www.youtube.com/watch?v=" + id;
+      if (c.videos.some(function(v) { return v.youtube === id; })) { setStatus("That YouTube video is already in this category."); return; }
+      c.videos.push({ src: src, youtube: id, pinned: true });
+      openItems[src] = true; scrollToSrc = src; secState.items = true;
+      renderEditor();
+      setStatus("YouTube video added and pinned. Click Save changes to persist.");
     }
 
     async function uploadFiles(files) {
