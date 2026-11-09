@@ -160,6 +160,14 @@
     .fb-hidden{display:none!important}
     .modal-overlay.hidden{display:none}
 
+    /* ---------- YouTube items ---------- */
+    .fb-media,.fb-slide-open,.angle-sq{position:relative}
+    .fb-yt-play{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(128,13,27,.9);pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.35);z-index:2}
+    .fb-yt-play::after{content:"";position:absolute;left:22px;top:17px;border-style:solid;border-width:11px 0 11px 18px;border-color:transparent transparent transparent #fff}
+    .angle-sq .fb-yt-play{width:26px;height:26px;margin:-13px 0 0 -13px}
+    .angle-sq .fb-yt-play::after{left:10px;top:7px;border-width:6px 0 6px 9px}
+    #modalYT{display:none;width:min(100%,calc(62vh * 1.7778));aspect-ratio:16/9;margin:0 auto;border:0;background:#000}
+
     /* ---------- Modal tweaks (existing markup/behaviour kept) ---------- */
     .media-img{width:100%;height:100%;object-fit:cover;display:block}
     #modalImg{max-width:100%;max-height:62vh;margin:0 auto;display:none;object-fit:contain}
@@ -348,6 +356,7 @@
       </div>
       <video id="modalVideo" controls playsinline preload="auto" class="modal-video"></video>
       <img id="modalImg" alt="">
+      <iframe id="modalYT" title="YouTube video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
       <div id="modalAngles"></div>
       <div class="modal-caption" id="modalCaption"></div>
     </div>
@@ -379,6 +388,19 @@
     var CHEV_R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
     var LEAF = '<svg class="fb-leaf" viewBox="0 0 120 160" fill="#800D1B" fill-opacity=".1" stroke="#800D1B" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M60 156C58 118 62 70 71 10" fill="none"/><g transform="translate(59 138) scale(0.95) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(61 104) scale(0.9) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(65 70) scale(0.8) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(68 42) scale(0.65) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(59 122) scale(-0.95 0.95) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(62 88) scale(-0.85 0.85) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(66 56) scale(-0.72 0.72) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(69 30) scale(-0.55 0.55) rotate(-40)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g><g transform="translate(71 12) rotate(-80) scale(.55)"><path d="M0 0C6 -9 20 -11 32 -6C20 4 7 5 0 0Z"/><path d="M2 -1L27 -5" fill="none"/></g></svg>';
 
+    function ytId(src) {
+      var m = /(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{11})/.exec(src || "");
+      return m ? m[1] : "";
+    }
+    function ytThumb(id) { return "https://i.ytimg.com/vi/" + id + "/maxresdefault.jpg"; }
+    function imgSrc(src) { var id = ytId(src); return id ? "https://i.ytimg.com/vi/" + id + "/hqdefault.jpg" : src; }
+    /* maxres thumbnails don't exist for every video (YouTube then sends a tiny placeholder): fall back to hqdefault */
+    function ytFix(img) {
+      if (img.getAttribute("data-fb")) return;
+      if (img.naturalWidth > 120) return;
+      img.setAttribute("data-fb", "1");
+      img.src = "https://i.ytimg.com/vi/" + img.getAttribute("data-yt") + "/hqdefault.jpg";
+    }
     function isVideoSrc(src) { return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(src || ""); }
     function modalSources(item) {
       var list = [item.src];
@@ -386,6 +408,8 @@
       return list;
     }
     function mediaTag(src, preload, alt, eager) {
+      var yid = ytId(src);
+      if (yid) return '<img src="' + ytThumb(yid) + '" data-yt="' + yid + '" onload="ytFix(this)" onerror="ytFix(this)" alt="' + esc(alt || "") + '"' + (eager ? '' : ' loading="lazy"') + ' decoding="async"><span class="fb-yt-play" aria-hidden="true"></span>';
       if (isVideoSrc(src)) return '<video src="' + src + '" muted playsinline loop preload="' + preload + '"></video>';
       return '<img src="' + src + '" alt="' + esc(alt || "") + '"' + (eager ? '' : ' loading="lazy"') + ' decoding="async">';
     }
@@ -634,7 +658,7 @@
                 if (e.kind === "folder") {
           var cover = videos[e.idxs[0]];
           /* Client folder with 2+ pictures: the cover changes by itself every 3 seconds */
-          var pics = e.idxs.map(function(i) { return videos[i].src; }).filter(function(src) { return !isVideoSrc(src); });
+          var pics = e.idxs.map(function(i) { return videos[i].src; }).filter(function(src) { return !isVideoSrc(src); }).map(imgSrc);
           var cycle = pics.length >= 2;
           if (cycle) cyclePics[e.key] = pics;
           var coverSrc = cycle ? pics[(cycleIdx[e.key] || 0) % pics.length] : cover.src;
@@ -842,14 +866,21 @@
         var sources = modalSources(videos[modalIndex]);
         if (angleIdx >= sources.length) angleIdx = 0;
         var msrc = sources[angleIdx];
-        if (isVideoSrc(msrc)) {
+        var yt = document.getElementById("modalYT"), yid = ytId(msrc);
+        if (yid) {
+          vid.pause(); vid.removeAttribute("src"); vid.style.display = "none";
+          img.style.display = "none"; img.removeAttribute("src");
+          yt.style.display = "block"; yt.src = "https://www.youtube.com/embed/" + yid + "?autoplay=1&rel=0&playsinline=1";
+        } else if (isVideoSrc(msrc)) {
+          yt.style.display = "none"; yt.removeAttribute("src");
           img.style.display = "none"; img.removeAttribute("src");
           vid.style.display = ""; vid.src = msrc;
         } else {
+          yt.style.display = "none"; yt.removeAttribute("src");
           vid.pause(); vid.removeAttribute("src"); vid.style.display = "none";
           img.src = msrc; img.alt = videos[modalIndex].title || ""; img.style.display = "block";
         }
-        var swapEl = isVideoSrc(msrc) ? vid : img;
+        var swapEl = yid ? yt : (isVideoSrc(msrc) ? vid : img);
         swapEl.classList.remove("fb-swap"); void swapEl.offsetWidth; swapEl.classList.add("fb-swap");
         document.getElementById("modalCounter").textContent = "";
         var cur = videos[modalIndex], ch = '';
@@ -863,7 +894,7 @@
           var h = '';
           sources.forEach(function(sr, k) {
             h += '<button class="angle-sq' + (k === angleIdx ? ' on' : '') + '" onclick="setAngle(' + k + ')" aria-label="' + (k === 0 ? 'Main view' : 'Angle ' + k) + '">' +
-              (isVideoSrc(sr) ? '<video src="' + sr + '" muted playsinline preload="metadata"></video>' : '<img src="' + sr + '" alt="" loading="lazy">') + '</button>';
+              (isVideoSrc(sr) ? '<video src="' + sr + '" muted playsinline preload="metadata"></video>' : '<img src="' + imgSrc(sr) + '" alt="" loading="lazy">' + (ytId(sr) ? '<span class="fb-yt-play" aria-hidden="true"></span>' : '')) + '</button>';
           });
           th.innerHTML = h; th.style.display = 'flex';
         } else { th.innerHTML = ''; th.style.display = 'none'; }
@@ -874,6 +905,7 @@
         document.getElementById("videoModal").classList.add("hidden");
         document.documentElement.classList.remove("fb-lock");
         vid.pause(); vid.removeAttribute("src");
+        var ytEl = document.getElementById("modalYT"); ytEl.style.display = "none"; ytEl.removeAttribute("src");
         document.getElementById("modalImg").removeAttribute("src");
         modalIndex = -1; angleIdx = 0;
       };
@@ -894,7 +926,7 @@
       function pickImage(re, skip) {
         var fallback = -1;
         for (var i = 0; i < videos.length; i++) {
-          if (isVideoSrc(videos[i].src) || i === skip) continue;
+          if (isVideoSrc(videos[i].src) || ytId(videos[i].src) || i === skip) continue;
           if (fallback < 0) fallback = i;
           if (re && re.test((videos[i].title || "") + " " + (videos[i].details || ""))) return i;
         }
