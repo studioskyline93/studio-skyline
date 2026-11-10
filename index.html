@@ -801,6 +801,7 @@
         (src.indexOf('?') < 0 ? '?' : '&') + 'width=320&height=320&resize=cover&quality=60';
     }
 
+    var IX_FALLBACK_IMG = 'images/hero-backdrop.jpg';   /* shown when a tile's photo is broken */
     function ixTileMedia(it) {
       var el;
       if (it.vid) {
@@ -819,7 +820,11 @@
         }
         el.src = th;
       }
-      el.addEventListener('error', function() { if (el.tagName === 'VIDEO' || el._fb || ixThumb(it.src) === it.src) el.classList.add('ld'); });
+      el.addEventListener('error', function() {
+        if (el.tagName === 'VIDEO') { el.classList.add('ld'); return; }
+        if (el._fb2) { el.classList.add('ld'); return; }
+        if (el._fb || ixThumb(it.src) === it.src) { el._fb2 = true; el.src = IX_FALLBACK_IMG; }   /* original also broken: use fallback */
+      });
       return el;
     }
 
@@ -924,7 +929,7 @@
             busy = false;
           }, 1000);
         };
-        img.onerror = function() { if (!img._fb && ixThumb(next.src) !== next.src) { img._fb = true; img.src = next.src; } else busy = false; };
+        img.onerror = function() { if (!img._fb && ixThumb(next.src) !== next.src) { img._fb = true; img.src = next.src; } else busy = false; };   /* broken swap photos are simply skipped */
         img.src = ixThumb(next.src);
       }, IX_MOS_SWAP_MS);
     }
