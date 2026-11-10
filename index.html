@@ -460,7 +460,16 @@
 
   <div id="site-footer"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+/* Never show a broken image: swap any failed <img> for the fallback photo */
+document.addEventListener('error', function(e) {
+  var t = e.target;
+  if (!t || t.tagName !== 'IMG' || t._ixFb || t.classList.contains('ix-seal')) return;
+  if (t.closest && t.closest('.ix-tile')) return;   /* mosaic tiles have their own handler */
+  t._ixFb = true; t.src = 'images/hero-backdrop.jpg'; t.classList.add('ld');
+}, true);
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="supabase-client.js"></script>
   <script src="shared.js"></script>
@@ -815,15 +824,13 @@
         el.alt = ''; el.decoding = 'async'; el.loading = 'lazy';
         el.addEventListener('load', function() { el.classList.add('ld'); });
         var th = ixThumb(it.src);
-        if (th !== it.src) {
-          el.addEventListener('error', function() { if (!el._fb) { el._fb = true; el.src = it.src; } });   /* thumbnail failed: use the original */
-        }
         el.src = th;
       }
       el.addEventListener('error', function() {
         if (el.tagName === 'VIDEO') { el.classList.add('ld'); return; }
-        if (el._fb2) { el.classList.add('ld'); return; }
-        if (el._fb || ixThumb(it.src) === it.src) { el._fb2 = true; el.src = IX_FALLBACK_IMG; }   /* original also broken: use fallback */
+        if (!el._fb && ixThumb(it.src) !== it.src) { el._fb = true; el.src = it.src; return; }   /* thumbnail failed: try the original */
+        if (!el._fb2) { el._fb2 = true; el.src = IX_FALLBACK_IMG; return; }                       /* original missing: use fallback */
+        el.classList.add('ld');
       });
       return el;
     }
