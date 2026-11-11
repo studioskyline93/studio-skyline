@@ -174,10 +174,18 @@
     var MAX_SLIDES = 8;       // pictures cycled per category
     var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion:reduce)").matches;
 
+    /* YouTube links: use the video's thumbnail (same approach as work-detail.html) */
+    function ytId(src) {
+      var m = /(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{11})/.exec(src || "");
+      return m ? m[1] : "";
+    }
+    function imgSrc(src) { var id = ytId(src); return id ? "https://i.ytimg.com/vi/" + id + "/hqdefault.jpg" : src; }
+
     function isVideoSrc(src) { return /\.(mp4|webm|mov|m4v|ogv)(\?|#|$)/i.test(src || ""); }
     /* An item counts as a video if its own data says so, not only if the URL ends in .mp4 */
     function isVideoItem(v) {
       if (!v) return false;
+      if (ytId(v.src)) return false;
       var t = String(v.type || v.kind || v.mime || v.mediaType || "").toLowerCase();
       if (t.indexOf("video") !== -1) return true;
       if (t.indexOf("image") !== -1) return false;
@@ -191,7 +199,7 @@
       items.forEach(function(v) {
         if (!v || !v.src) return;
         if (isVideoItem(v)) vids.push({ src: v.src, video: true, poster: posterOf(v) });
-        else pics.push({ src: v.src, video: false });
+        else pics.push({ src: imgSrc(v.src), video: false });
       });
       /* Prefer real pictures; otherwise use poster images; otherwise the videos themselves */
       var posters = vids.filter(function(x) { return x.poster; }).map(function(x) { return { src: x.poster, video: false }; });
