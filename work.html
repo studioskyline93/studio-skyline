@@ -199,6 +199,44 @@
       return list.slice(0, MAX_SLIDES);
     }
 
+    /* If a picture fails: try it as a video (odd/missing extension), else drop it and show the next one that works */
+    function wireFallbacks(box) {
+      function dropLayer(el) {
+        var wasOn = el.classList.contains("on");
+        console.warn("[work] could not load media:", el.getAttribute("src"));
+        var layers = box.querySelectorAll("img, video");
+        var idx = Array.prototype.indexOf.call(layers, el);
+        el.remove();
+        var dots = box.querySelectorAll(".fb-cat-dots i");
+        if (dots.length) dots[dots.length - 1].remove();
+        var left = box.querySelectorAll("img, video");
+        var card = box.parentNode;
+        if (card) card.setAttribute("data-slides", left.length);
+        if (wasOn && left.length) {
+          var nx = left[Math.min(idx, left.length - 1)];
+          nx.classList.add("on");
+          if (nx.tagName === "VIDEO") { try { nx.play(); } catch (e) {} }
+        }
+        if (left.length < 2) { var d = box.querySelector(".fb-cat-dots"); if (d) d.remove(); }
+      }
+      function wire(el) {
+        el.addEventListener("error", function() {
+          if (el.tagName === "IMG" && !el.__triedVideo) {
+            var v = document.createElement("video");
+            v.__triedVideo = true;
+            v.muted = true; v.loop = true; v.playsInline = true; v.preload = "auto";
+            v.setAttribute("muted", ""); v.setAttribute("playsinline", "");
+            v.src = el.getAttribute("src");
+            if (el.classList.contains("on")) v.classList.add("on");
+            el.replaceWith(v);
+            v.addEventListener("loadeddata", function() { if (v.classList.contains("on")) { try { v.play(); } catch (e) {} } });
+            wire(v);
+          } else { dropLayer(el); }
+        });
+      }
+      box.querySelectorAll("img, video").forEach(wire);
+    }
+
     function renderWorkGrid(collections) {
       var grid = document.getElementById("workGrid");
       var shown = collections.filter(function(c) { return c.enabled !== false; });
@@ -221,9 +259,7 @@
           '</span></a>';
       });
       grid.innerHTML = html;
-      grid.querySelectorAll(".fb-cat-media img").forEach(function(im) {
-        im.addEventListener("error", function() { im.style.visibility = "hidden"; });
-      });
+      grid.querySelectorAll(".fb-cat-media").forEach(wireFallbacks);
       startSlideshows();
     }
 
@@ -239,14 +275,17 @@
       cards.forEach(function(card, n) {
         var n_s = Number(card.getAttribute("data-slides"));
         if (n_s < 2) return;
-        var layers = card.querySelectorAll(".fb-cat-media img, .fb-cat-media video");
-        var dots = card.querySelectorAll(".fb-cat-dots i");
+        var layers, dots;
         var cur = 0, hover = false;
         if (io) io.observe(card); else visible.set(card, true);
         card.addEventListener("mouseenter", function() { hover = true; });
         card.addEventListener("mouseleave", function() { hover = false; });
         function step() {
           if (document.hidden || hover || visible.get(card) === false) return;
+          layers = card.querySelectorAll(".fb-cat-media img, .fb-cat-media video");
+          dots = card.querySelectorAll(".fb-cat-dots i");
+          if (layers.length < 2) return;
+          for (var k = 0; k < layers.length; k++) if (layers[k].classList.contains("on")) { cur = k; break; }
           var nxt = (cur + 1) % layers.length;
           layers[cur].classList.remove("on"); layers[nxt].classList.add("on");
           if (dots[cur]) dots[cur].classList.remove("on");
