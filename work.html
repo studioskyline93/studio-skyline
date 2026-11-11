@@ -174,12 +174,28 @@
     var MAX_SLIDES = 8;       // pictures cycled per category
     var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion:reduce)").matches;
 
-    function isVideoSrc(src) { return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(src || ""); }
+    function isVideoSrc(src) { return /\.(mp4|webm|mov|m4v|ogv)(\?|#|$)/i.test(src || ""); }
+    /* An item counts as a video if its own data says so, not only if the URL ends in .mp4 */
+    function isVideoItem(v) {
+      if (!v) return false;
+      var t = String(v.type || v.kind || v.mime || v.mediaType || "").toLowerCase();
+      if (t.indexOf("video") !== -1) return true;
+      if (t.indexOf("image") !== -1) return false;
+      return isVideoSrc(v.src);
+    }
+    function posterOf(v) { return v.poster || v.thumb || v.thumbnail || v.cover || v.image || ""; }
 
+    /* Returns [{src, video, poster}] */
     function slidesFor(c) {
       var items = c.videos || [], pics = [], vids = [];
-      items.forEach(function(v) { if (!v || !v.src) return; (isVideoSrc(v.src) ? vids : pics).push(v.src); });
-      var list = pics.length ? pics : vids;
+      items.forEach(function(v) {
+        if (!v || !v.src) return;
+        if (isVideoItem(v)) vids.push({ src: v.src, video: true, poster: posterOf(v) });
+        else pics.push({ src: v.src, video: false });
+      });
+      /* Prefer real pictures; otherwise use poster images; otherwise the videos themselves */
+      var posters = vids.filter(function(x) { return x.poster; }).map(function(x) { return { src: x.poster, video: false }; });
+      var list = pics.length ? pics : (posters.length ? posters : vids);
       return list.slice(0, MAX_SLIDES);
     }
 
@@ -190,10 +206,10 @@
       var html = "";
       shown.forEach(function(c) {
         var vids = c.videos || [], slides = slidesFor(c);
-        var media = slides.map(function(src, i) {
-          return isVideoSrc(src)
-            ? '<video src="' + esc(src) + '" muted playsinline loop preload="metadata"' + (i === 0 ? ' class="on"' : '') + '></video>'
-            : '<img src="' + esc(src) + '" alt="' + esc(c.title) + '"' + (i === 0 ? ' class="on"' : ' loading="lazy"') + ' decoding="async">';
+        var media = slides.map(function(sl, i) {
+          return sl.video
+            ? '<video src="' + esc(sl.src) + '"' + (sl.poster ? ' poster="' + esc(sl.poster) + '"' : '') + ' muted playsinline loop preload="metadata"' + (i === 0 ? ' class="on"' : '') + '></video>'
+            : '<img src="' + esc(sl.src) + '" alt="' + esc(c.title) + '"' + (i === 0 ? ' class="on"' : ' loading="lazy"') + ' decoding="async">';
         }).join("");
         var dots = slides.length > 1 ? '<span class="fb-cat-dots" aria-hidden="true">' + slides.map(function(_, i) { return '<i' + (i === 0 ? ' class="on"' : '') + '></i>'; }).join("") + '</span>' : "";
         html += '<a href="work-detail.html?slug=' + encodeURIComponent(c.slug) + '" class="fb-cat" data-slides="' + slides.length + '">' +
@@ -205,6 +221,9 @@
           '</span></a>';
       });
       grid.innerHTML = html;
+      grid.querySelectorAll(".fb-cat-media img").forEach(function(im) {
+        im.addEventListener("error", function() { im.style.visibility = "hidden"; });
+      });
       startSlideshows();
     }
 
