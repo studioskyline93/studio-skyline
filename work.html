@@ -193,18 +193,15 @@
     }
     function posterOf(v) { return v.poster || v.thumb || v.thumbnail || v.cover || v.image || ""; }
 
-    /* Returns [{src, video, poster}] */
+    /* Returns [{src, video, poster}]: pictures AND videos, in the order they are stored */
     function slidesFor(c) {
-      var items = c.videos || [], pics = [], vids = [];
-      items.forEach(function(v) {
+      var out = [];
+      (c.videos || []).forEach(function(v) {
         if (!v || !v.src) return;
-        if (isVideoItem(v)) vids.push({ src: v.src, video: true, poster: posterOf(v) });
-        else pics.push({ src: imgSrc(v.src), video: false });
+        if (isVideoItem(v)) out.push({ src: v.src, video: true, poster: posterOf(v) });
+        else out.push({ src: imgSrc(v.src), video: false });
       });
-      /* Prefer real pictures; otherwise use poster images; otherwise the videos themselves */
-      var posters = vids.filter(function(x) { return x.poster; }).map(function(x) { return { src: x.poster, video: false }; });
-      var list = pics.length ? pics : (posters.length ? posters : vids);
-      return list.slice(0, MAX_SLIDES);
+      return out.slice(0, MAX_SLIDES);
     }
 
     /* If a picture fails: try it as a video (odd/missing extension), else drop it and show the next one that works */
@@ -254,7 +251,7 @@
         var vids = c.videos || [], slides = slidesFor(c);
         var media = slides.map(function(sl, i) {
           return sl.video
-            ? '<video src="' + esc(sl.src) + '"' + (sl.poster ? ' poster="' + esc(sl.poster) + '"' : '') + ' muted playsinline loop preload="metadata"' + (i === 0 ? ' class="on"' : '') + '></video>'
+            ? '<video src="' + esc(sl.src) + (sl.poster ? '' : '#t=0.1') + '"' + (sl.poster ? ' poster="' + esc(sl.poster) + '"' : '') + ' muted playsinline loop preload="metadata"' + (i === 0 ? ' class="on"' : '') + '></video>'
             : '<img src="' + esc(sl.src) + '" alt="' + esc(c.title) + '"' + (i === 0 ? ' class="on"' : ' loading="lazy"') + ' decoding="async">';
         }).join("");
         var dots = slides.length > 1 ? '<span class="fb-cat-dots" aria-hidden="true">' + slides.map(function(_, i) { return '<i' + (i === 0 ? ' class="on"' : '') + '></i>'; }).join("") + '</span>' : "";
@@ -268,6 +265,8 @@
       });
       grid.innerHTML = html;
       grid.querySelectorAll(".fb-cat-media").forEach(wireFallbacks);
+      /* a card that opens on a video should start playing it */
+      grid.querySelectorAll(".fb-cat-media video.on").forEach(function(v) { v.muted = true; try { var pr = v.play(); if (pr && pr.catch) pr.catch(function() {}); } catch (e) {} });
       startSlideshows();
     }
 
