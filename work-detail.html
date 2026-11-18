@@ -393,7 +393,25 @@
       return m ? m[1] : "";
     }
     function ytThumb(id) { return "https://i.ytimg.com/vi/" + id + "/maxresdefault.jpg"; }
-    function imgSrc(src) { var id = ytId(src); return id ? "https://i.ytimg.com/vi/" + id + "/hqdefault.jpg" : src; }
+    /* Photos are stored with the free r2.dev address. Serve them through the custom domain,
+       which is cached by Cloudflare and can hand out small resized copies. Any failure falls back to the original. */
+    var MEDIA_RESIZE = true, MEDIA_HOST = "media.studioskylinegraphics.com", R2_HOST = "pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev";
+    function mImg(src, w, q) {
+      if (!MEDIA_RESIZE || !src || isVideoSrc(src)) return src;
+      try {
+        var u = new URL(src, location.href);
+        if (u.hostname === R2_HOST) u.hostname = MEDIA_HOST;
+        if (u.hostname !== MEDIA_HOST || u.pathname.indexOf("/cdn-cgi/image/") === 0) return src;
+        return u.origin + "/cdn-cgi/image/width=" + w + ",quality=" + (q || 75) + ",format=auto,fit=cover" + u.pathname + u.search;
+      } catch (e) { return src; }
+    }
+    document.addEventListener("error", function(e) {   /* resized copy failed: use the original file */
+      var t = e.target;
+      if (!t || t.tagName !== "IMG") return;
+      var o = t.getAttribute("data-orig");
+      if (o && t.getAttribute("src") !== o) t.setAttribute("src", o);
+    }, true);
+    function imgSrc(src) { var id = ytId(src); return id ? "https://i.ytimg.com/vi/" + id + "/hqdefault.jpg" : mImg(src, 200, 60); }
     /* maxres thumbnails don't exist for every video (YouTube then sends a tiny placeholder): fall back to hqdefault */
     function ytFix(img) {
       if (img.getAttribute("data-fb")) return;
@@ -411,7 +429,7 @@
       var yid = ytId(src);
       if (yid) return '<img src="' + ytThumb(yid) + '" data-yt="' + yid + '" onload="ytFix(this)" onerror="ytFix(this)" alt="' + esc(alt || "") + '"' + (eager ? '' : ' loading="lazy"') + ' decoding="async"><span class="fb-yt-play" aria-hidden="true"></span>';
       if (isVideoSrc(src)) return '<video src="' + src + '" muted playsinline loop preload="' + preload + '"></video>';
-      return '<img src="' + src + '" alt="' + esc(alt || "") + '"' + (eager ? '' : ' loading="lazy"') + ' decoding="async">';
+      return '<img src="' + mImg(src, 700, 72) + '" data-orig="' + src + '" alt="' + esc(alt || "") + '"' + (eager ? ' fetchpriority="high"' : ' loading="lazy"') + ' decoding="async">';
     }
     function pad(n) { return String(n).padStart(2, "0"); }
 
@@ -816,9 +834,9 @@
             pre.onload = function() {
               img.style.transition = reduceMotion ? "opacity .45s" : "opacity .45s, transform .9s cubic-bezier(.2,.7,.2,1)";
               img.style.opacity = 0;
-              setTimeout(function() { img.src = next; img.style.opacity = 1; }, 450);
+              setTimeout(function() { img.setAttribute("data-orig", next); img.src = mImg(next, 700, 72); img.style.opacity = 1; }, 450);
             };
-            pre.src = next;
+            pre.src = mImg(next, 700, 72);
           })(boxes[b]);
         }
       }, 3000);
@@ -878,7 +896,7 @@
         } else {
           yt.style.display = "none"; yt.removeAttribute("src");
           vid.pause(); vid.removeAttribute("src"); vid.style.display = "none";
-          img.src = msrc; img.alt = videos[modalIndex].title || ""; img.style.display = "block";
+          img.setAttribute("data-orig", msrc); img.src = mImg(msrc, 1600, 80); img.alt = videos[modalIndex].title || ""; img.style.display = "block";
         }
         var swapEl = yid ? yt : (isVideoSrc(msrc) ? vid : img);
         swapEl.classList.remove("fb-swap"); void swapEl.offsetWidth; swapEl.classList.add("fb-swap");
@@ -894,7 +912,7 @@
           var h = '';
           sources.forEach(function(sr, k) {
             h += '<button class="angle-sq' + (k === angleIdx ? ' on' : '') + '" onclick="setAngle(' + k + ')" aria-label="' + (k === 0 ? 'Main view' : 'Angle ' + k) + '">' +
-              (isVideoSrc(sr) ? '<video src="' + sr + '" muted playsinline preload="metadata"></video>' : '<img src="' + imgSrc(sr) + '" alt="" loading="lazy">' + (ytId(sr) ? '<span class="fb-yt-play" aria-hidden="true"></span>' : '')) + '</button>';
+              (isVideoSrc(sr) ? '<video src="' + sr + '" muted playsinline preload="metadata"></video>' : '<img src="' + imgSrc(sr) + '"' + (ytId(sr) ? '' : ' data-orig="' + sr + '"') + ' alt="" loading="lazy">' + (ytId(sr) ? '<span class="fb-yt-play" aria-hidden="true"></span>' : '')) + '</button>';
           });
           th.innerHTML = h; th.style.display = 'flex';
         } else { th.innerHTML = ''; th.style.display = 'none'; }
@@ -935,8 +953,8 @@
       var bi = pickImage(/foil|emboss|stamp/i, -1);
       var ci2 = pickImage(null, bi);
       if (ci2 < 0) ci2 = bi;
-      if (bi >= 0) document.getElementById("fbBannerImg").innerHTML = '<img src="' + videos[bi].src + '" alt="" loading="lazy">';
-      if (ci2 >= 0) document.getElementById("fbCtaImg").innerHTML = '<img src="' + videos[ci2].src + '" alt="" loading="lazy">';
+      if (bi >= 0) document.getElementById("fbBannerImg").innerHTML = '<img src="' + mImg(videos[bi].src, 1400, 75) + '" data-orig="' + videos[bi].src + '" alt="" loading="lazy">';
+      if (ci2 >= 0) document.getElementById("fbCtaImg").innerHTML = '<img src="' + mImg(videos[ci2].src, 1400, 75) + '" data-orig="' + videos[ci2].src + '" alt="" loading="lazy">';
       ["fbBannerImg", "fbCtaImg"].forEach(function(id) { var el = document.getElementById(id); markLoaded(el); setTimeout(function() { forceLd(el); }, 4000); });
 
       renderGrid();
