@@ -466,6 +466,7 @@ document.addEventListener('error', function(e) {
   var t = e.target;
   if (!t || t.tagName !== 'IMG' || t._ixFb || t.classList.contains('ix-seal')) return;
   if (t.closest && t.closest('.ix-tile')) return;   /* mosaic tiles have their own handler */
+  if (t.dataset && t.dataset.orig && t.src !== t.dataset.orig) { t.src = t.dataset.orig; return; }   /* resized copy failed: use the original */
   t._ixFb = true; t.src = 'images/hero-backdrop.jpg'; t.classList.add('ld');
 }, true);
 </script>
@@ -583,14 +584,14 @@ document.addEventListener('error', function(e) {
           return;
       }
       var html = '';
-      collections.forEach(function(c) {
+      collections.forEach(function(c, ci) {
         var vids = c.videos || [];
         var preview = vids.length > 0 ? vids[0].src : '';
         var isVid = /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(preview);
         var mediaHtml = preview
           ? (isVid
               ? '<video class="fade" src="' + preview + '" autoplay' + (vids.length < 2 ? ' loop' : '') + ' muted playsinline preload="metadata"></video>'
-              : '<img class="fade" src="' + preview + '" alt="' + esc(c.title) + '" loading="lazy" decoding="async">')
+              : '<img class="fade" src="' + ixImg(preview, 800, 75) + '" data-orig="' + preview + '" alt="' + esc(c.title) + '" ' + (ci < 2 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"') + ' decoding="async">')
           : '<div class="no-vid">No video yet</div>';
         html += '<a href="work-detail.html?slug=' + encodeURIComponent(c.slug) + '" class="reel-card">' +
           '<div class="reel-card-media">' + mediaHtml + '</div>' +
@@ -643,12 +644,14 @@ document.addEventListener('error', function(e) {
         el = document.createElement('video');
         el.muted = true; el.defaultMuted = true;
         el.setAttribute('muted', ''); el.setAttribute('playsinline', '');
-        el.playsInline = true; el.preload = 'auto'; el.loop = false;
+        el.playsInline = true; el.preload = 'metadata'; el.loop = false;
+        el.src = src;
       } else {
         el = document.createElement('img');
         el.alt = alt || ''; el.decoding = 'async';
+        el.dataset.orig = src;
+        el.src = ixImg(src, 800, 75);
       }
-      el.src = src;
       return el;
     }
 
@@ -800,15 +803,21 @@ document.addEventListener('error', function(e) {
 
     /* Tiles are ~100px, so ask Supabase for a small version instead of the full-size photo.
        A one-image probe checks the project supports it; otherwise full-size files are used. */
-    var IX_SB = '/storage/v1/object/public/';
-    var IX_THUMB = { ok: null };
-    function ixThumb(src) {
-      if (IX_THUMB.ok === false || !src || isVidSrc(src)) return src;
-      var m = src.indexOf(IX_SB);
-      if (m < 0) return src;
-      return src.slice(0, m) + '/storage/v1/render/image/public/' + src.slice(m + IX_SB.length) +
-        (src.indexOf('?') < 0 ? '?' : '&') + 'width=320&height=320&resize=cover&quality=60';
+    /* Images live on Cloudflare R2. Resizing works only when they are served from a custom domain
+       proxied by Cloudflare with Image Transformations enabled (r2.dev URLs can't resize).
+       Set IX_RESIZE = false to turn it off; any failed resize falls back to the original file. */
+    var IX_RESIZE = true;
+    var IX_THUMB = { ok: IX_RESIZE };
+    function ixImg(src, w, q) {
+      if (!IX_RESIZE || !src || isVidSrc(src)) return src;
+      try {
+        var u = new URL(src, location.href);
+        if (/\.r2\.dev$|\.r2\.cloudflarestorage\.com$/i.test(u.hostname)) return src;   /* no resizing on these hosts */
+        if (u.pathname.indexOf('/cdn-cgi/image/') === 0) return src;
+        return u.origin + '/cdn-cgi/image/width=' + w + ',quality=' + (q || 75) + ',format=auto,fit=cover' + u.pathname + u.search;
+      } catch (e) { return src; }
     }
+    function ixThumb(src) { return ixImg(src, 320, 60); }
 
     var IX_FALLBACK_IMG = 'images/hero-backdrop.jpg';   /* shown when a tile's photo is broken */
     function ixTileMedia(it) {
