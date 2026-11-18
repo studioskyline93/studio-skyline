@@ -175,6 +175,24 @@
     var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion:reduce)").matches;
 
     /* YouTube links: use the video's thumbnail (same approach as work-detail.html) */
+    /* Photos are stored with the free r2.dev address. Serve them through the custom domain,
+       which is cached by Cloudflare and can hand out small resized copies. Any failure falls back to the original. */
+    var MEDIA_RESIZE = true, MEDIA_HOST = "media.studioskylinegraphics.com", R2_HOST = "pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev";
+    function mImg(src, w, q) {
+      if (!MEDIA_RESIZE || !src || /\.(mp4|webm|mov|m4v|ogv)(\?|#|$)/i.test(src)) return src;
+      try {
+        var u = new URL(src, location.href);
+        if (u.hostname === R2_HOST) u.hostname = MEDIA_HOST;
+        if (u.hostname !== MEDIA_HOST || u.pathname.indexOf("/cdn-cgi/image/") === 0) return src;
+        return u.origin + "/cdn-cgi/image/width=" + w + ",quality=" + (q || 75) + ",format=auto,fit=cover" + u.pathname + u.search;
+      } catch (e) { return src; }
+    }
+    document.addEventListener("error", function(e) {   /* resized copy failed: use the original file */
+      var t = e.target;
+      if (!t || t.tagName !== "IMG") return;
+      var o = t.getAttribute("data-orig");
+      if (o && t.getAttribute("src") !== o) { t.__swap = 1; t.setAttribute("src", o); }
+    }, true);
     function ytId(src) {
       var m = /(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{11})/.exec(src || "");
       return m ? m[1] : "";
@@ -226,6 +244,7 @@
       }
       function wire(el) {
         el.addEventListener("error", function() {
+          if (el.__swap === 1) { el.__swap = 2; return; }   /* resized copy failed: the original is being tried first */
           if (el.tagName === "IMG" && !el.__triedVideo) {
             var v = document.createElement("video");
             v.__triedVideo = true;
@@ -251,8 +270,8 @@
         var vids = c.videos || [], slides = slidesFor(c);
         var media = slides.map(function(sl, i) {
           return sl.video
-            ? '<video src="' + esc(sl.src) + (sl.poster ? '' : '#t=0.1') + '"' + (sl.poster ? ' poster="' + esc(sl.poster) + '"' : '') + ' muted playsinline loop preload="metadata"' + (i === 0 ? ' class="on"' : '') + '></video>'
-            : '<img src="' + esc(sl.src) + '" alt="' + esc(c.title) + '"' + (i === 0 ? ' class="on"' : ' loading="lazy"') + ' decoding="async">';
+            ? '<video src="' + esc(sl.src) + (sl.poster ? '' : '#t=0.1') + '"' + (sl.poster ? ' poster="' + esc(mImg(sl.poster, 800, 72)) + '"' : '') + ' muted playsinline loop preload="metadata"' + (i === 0 ? ' class="on"' : '') + '></video>'
+            : '<img src="' + esc(mImg(sl.src, 800, 72)) + '" data-orig="' + esc(sl.src) + '" alt="' + esc(c.title) + '"' + (i === 0 ? ' class="on" fetchpriority="high"' : ' loading="lazy"') + ' decoding="async">';
         }).join("");
         var dots = slides.length > 1 ? '<span class="fb-cat-dots" aria-hidden="true">' + slides.map(function(_, i) { return '<i' + (i === 0 ? ' class="on"' : '') + '></i>'; }).join("") + '</span>' : "";
         html += '<a href="work-detail.html?slug=' + encodeURIComponent(c.slug) + '" class="fb-cat" data-slides="' + slides.length + '">' +
