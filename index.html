@@ -808,11 +808,14 @@ document.addEventListener('error', function(e) {
        proxied by Cloudflare with Image Transformations enabled (r2.dev URLs can't resize).
        Set IX_RESIZE = false to turn it off; any failed resize falls back to the original file. */
     var IX_RESIZE = true;
+    var IX_MEDIA_HOST = 'media.studioskylinegraphics.com';
     var IX_THUMB = { ok: IX_RESIZE };
     function ixImg(src, w, q) {
       if (!IX_RESIZE || !src || isVidSrc(src)) return src;
       try {
         var u = new URL(src, location.href);
+        /* photos are stored with the free r2.dev address: serve them through the custom domain (cached + resizable) */
+        if (u.hostname === 'pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev') u.hostname = IX_MEDIA_HOST;
         if (/\.r2\.dev$|\.r2\.cloudflarestorage\.com$/i.test(u.hostname)) return src;   /* no resizing on these hosts */
         if (u.pathname.indexOf('/cdn-cgi/image/') === 0) return src;
         return u.origin + '/cdn-cgi/image/width=' + w + ',quality=' + (q || 75) + ',format=auto,fit=cover' + u.pathname + u.search;
