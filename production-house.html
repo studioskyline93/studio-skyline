@@ -149,6 +149,24 @@
   <script src="data.js"></script>
   <script>
     var media = [];
+    /* Photos are stored with the free r2.dev address. Serve them through the custom domain,
+       which is cached by Cloudflare and can hand out small resized copies. Any failure falls back to the original. */
+    var MEDIA_RESIZE = true, MEDIA_HOST = "media.studioskylinegraphics.com", R2_HOST = "pub-3a2db1cd0a2746e8969d504aadce99e5.r2.dev";
+    function mImg(src, w, q) {
+      if (!MEDIA_RESIZE || !src || /\.(mp4|webm|mov|m4v|ogv)(\?|#|$)/i.test(src)) return src;
+      try {
+        var u = new URL(src, location.href);
+        if (u.hostname === R2_HOST) u.hostname = MEDIA_HOST;
+        if (u.hostname !== MEDIA_HOST || u.pathname.indexOf("/cdn-cgi/image/") === 0) return src;
+        return u.origin + "/cdn-cgi/image/width=" + w + ",quality=" + (q || 75) + ",format=auto,fit=cover" + u.pathname + u.search;
+      } catch (e) { return src; }
+    }
+    document.addEventListener("error", function(e) {   /* resized copy failed: use the original file */
+      var t = e.target;
+      if (!t || t.tagName !== "IMG") return;
+      var o = t.getAttribute("data-orig");
+      if (o && t.getAttribute("src") !== o) { t.__swap = 1; t.setAttribute("src", o); }
+    }, true);
     var phIndex = -1;
 
     function renderPHGrid() {
@@ -181,7 +199,7 @@
       if (item.type === "video") {
         html += '<video src="' + esc(item.src) + '" autoplay loop muted playsinline></video>';
       } else {
-        html += '<img src="' + esc(item.src) + '" alt="' + esc(item.alt || '') + '">';
+        html += '<img src="' + esc(mImg(item.src, 640, 72)) + '" data-orig="' + esc(item.src) + '" alt="' + esc(item.alt || '') + '" decoding="async">';
       }
       html += '</div><div class="play-overlay"><div class="play-circle">&#9654;</div></div>';
       return html;
@@ -204,7 +222,7 @@
       if (item.type === "video") {
         mediaEl.innerHTML = '<video src="' + esc(item.src) + '" controls autoplay style="width:100%;height:100%;object-fit:contain"></video>';
       } else {
-        mediaEl.innerHTML = '<img src="' + esc(item.src) + '" alt="' + esc(item.alt || '') + '" style="width:100%;height:100%;object-fit:contain">';
+        mediaEl.innerHTML = '<img src="' + esc(mImg(item.src, 1600, 80)) + '" data-orig="' + esc(item.src) + '" alt="' + esc(item.alt || '') + '" style="width:100%;height:100%;object-fit:contain">';
       }
       altEl.textContent = item.alt || '';
     }
